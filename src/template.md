@@ -8,7 +8,6 @@
 * {lines_of_code} lines of code  
 * {user_count} users  
 * {orphan_issues} issues that cannot be migrated 
-{auth_method}
 
 
 # DevOps Integrations
@@ -76,7 +75,6 @@
 ## Details
 
 * {sast_configued}  
-* {total_issues} of Total Issues   
 * {safe_hotspots} Hotspots Marked Safe  
 * {fixed_hotspots} Hotspots Fixed
 * {accepted_issues} Issues Accepted  
