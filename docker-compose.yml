@@ -1,0 +1,8 @@
+services:
+  report:
+    build: .
+    command: bash /app/report.sh
+    volumes:
+      - ./files:/app/files
+    env_file:
+      - local.env
