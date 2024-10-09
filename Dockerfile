@@ -14,3 +14,4 @@ RUN chmod +x /app/report.sh
 COPY /src /app/
 
 WORKDIR /app
+ENTRYPOINT ["bash", "/app/report.sh"]
