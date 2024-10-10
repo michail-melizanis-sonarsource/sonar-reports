@@ -20,7 +20,7 @@ jobs:
 
       # Log in to DockerHub
       - name: Log in to DockerHub
-        run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
       # Build the Docker image using the Dockerfile in the repo
       - name: Build Docker image
