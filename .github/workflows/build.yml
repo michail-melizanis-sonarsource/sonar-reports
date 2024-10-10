@@ -25,9 +25,9 @@ jobs:
       # Build the Docker image using the Dockerfile in the repo
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/your-app-name:latest .
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/sonar-reports:latest .
 
       # Push the Docker image to DockerHub
       - name: Push Docker image to DockerHub
         run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/your-app-name:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/sonar-reports:latest
