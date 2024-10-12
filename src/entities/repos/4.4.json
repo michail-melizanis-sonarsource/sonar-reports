@@ -1,0 +1,32 @@
+{
+  "url": "api/rules/repositories",
+  "dependencies": [],
+  "resultKeys": [
+    "repositories"
+  ],
+  "paginationKey": null,
+  "parameters": {},
+  "mappings": [
+    {
+      "destination": "repo",
+      "source": "$",
+      "uniqueKeys": [
+        "repo_key"
+      ],
+      "columns": [
+        {
+          "name": "repo_key",
+          "path": "$.key"
+        },
+        {
+          "name": "name",
+          "path": "$.name"
+        },
+        {
+          "name": "language",
+          "path": "$.language"
+        }
+      ]
+    }
+  ]
+}

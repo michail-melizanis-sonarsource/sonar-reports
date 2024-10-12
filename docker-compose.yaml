@@ -1,0 +1,14 @@
+services:
+  extract:
+    build: .
+    env_file:
+      - local.env
+    volumes:
+      - ./files:/app/files
+  test:
+    build:
+      dockerfile: test.Dockerfile
+    command: ['/app/tests', '--asyncio-mode', "auto", '-rfE', '-p', 'no:warnings']
+    volumes:
+      - ./tests:/app/tests
+      - ./files:/app/files

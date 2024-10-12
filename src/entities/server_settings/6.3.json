@@ -1,0 +1,11 @@
+{
+  "url": "api/settings/values",
+  "dependencies": [],
+  "paginationKey": null,
+  "resultKeys": [
+    "settings"
+  ],
+  "parameters": {
+  },
+  "operations": []
+}

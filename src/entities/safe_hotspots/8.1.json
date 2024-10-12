@@ -1,0 +1,35 @@
+{
+  "url": "api/hotspots/search",
+  "dependencies": [
+    {
+      "entity": "projects"
+    }
+  ],
+  "resultKeys": null,
+  "paginationKey": null,
+  "parameters": {
+    "project": {
+      "source": "projects",
+      "path": "$.key"
+    },
+    "status": {
+      "value": "REVIEWED"
+    },
+    "resolution": {
+      "value": "SAFE"
+    },
+    "ps": {
+      "value": 1
+    }
+  },
+  "operations": [
+    {
+      "operator": "set",
+      "key": "projectKey",
+      "value": {
+        "source": "projects",
+        "path": "$.key"
+      }
+    }
+  ]
+}

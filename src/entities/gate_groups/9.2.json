@@ -1,0 +1,84 @@
+{
+  "url": "api/qualitygates/search_groups",
+  "dependencies": [
+    {
+      "entity": "gates"
+    }
+  ],
+  "paginationKey": "p",
+  "pageSizeKey": "ps",
+  "maxPageSize": 1000,
+  "totalKey": "$.paging.total",
+  "resultKeys": [
+    "groups"
+  ],
+  "preFilters": [
+    {
+      "source": "gates",
+      "path": "$.isBuiltIn",
+      "operator": "neq",
+      "value": true
+    }
+  ],
+  "parameters": {
+    "gateName": {
+      "source": "gates",
+      "path": "$.name"
+    }
+  },
+  "operations": [
+    {
+      "operator": "set",
+      "key": "gateName",
+      "value": {
+        "source": "gates",
+        "path": "$.name"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "destination": "group_mapping",
+      "source": "$",
+      "uniqueKeys": [
+        "group_mapping_uuid"
+      ],
+      "preFilters": [
+        {
+          "path": "$.permissions",
+          "operator": "neq",
+          "value": []
+        }
+      ],
+      "columns": [
+        {
+          "name": "group_mapping_uuid",
+          "path": null,
+          "operations": [
+            {
+              "operator": "generate_uuid",
+              "kwargs": {
+                "paths": [
+                  "$.name",
+                  "$.gateName"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "group_name",
+          "path": "$.name"
+        },
+        {
+          "name": "gate_name",
+          "path": "$.gateName"
+        },
+        {
+          "name": "permissions",
+          "path": "$.permissions"
+        }
+      ]
+    }
+  ]
+}

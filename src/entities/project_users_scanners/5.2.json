@@ -1,0 +1,78 @@
+{
+  "url": "api/permissions/users",
+  "dependencies": [
+    {
+      "entity": "projects"
+    }
+  ],
+  "paginationKey": "p",
+  "pageSizeKey": "ps",
+  "totalKey": "$.paging.total",
+  "resultKeys": [
+    "users"
+  ],
+  "parameters": {
+    "projectKey": {
+      "source": "projects",
+      "path": "$.key"
+    },
+    "permission": {
+      "value": "scan"
+    }
+  },
+  "operations": [
+    {
+      "operator": "set",
+      "key": "project",
+      "value": {
+        "source": "projects",
+        "path": "$.key"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "destination": "user_mapping",
+      "source": "$",
+      "uniqueKeys": [
+        "user_mapping_uuid"
+      ],
+      "preFilters": [
+        {
+          "path": "$.permissions",
+          "operator": "neq",
+          "value": []
+        }
+      ],
+      "columns": [
+        {
+          "name": "user_mapping_uuid",
+          "value": null,
+          "operations": [
+            {
+              "operator": "generate_uuid",
+              "kwargs": {
+                "paths": [
+                  "$.login",
+                  "$.project"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "user_login",
+          "path": "$.login"
+        },
+        {
+          "name": "project_key",
+          "path": "$.projectKey"
+        },
+        {
+          "name": "permissions",
+          "path": "$.permissions"
+        }
+      ]
+    }
+  ]
+}

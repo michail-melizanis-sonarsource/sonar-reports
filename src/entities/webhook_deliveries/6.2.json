@@ -1,0 +1,59 @@
+{
+  "url": "api/webhooks/deliveries",
+  "dependencies": [
+    {
+      "entity": "webhooks"
+    }
+  ],
+  "resultKeys": [
+    "deliveries"
+  ],
+  "totalKey": "$.paging.total",
+  "paginationKey": "p",
+  "pageSizeKey": "ps",
+  "pageLimit": 10,
+  "maxPageSize": 500,
+  "parameters": {
+    "webhooks": {
+      "source": "webhooks",
+      "path": "$.key"
+    }
+  },
+  "operations": [
+    {
+      "operator": "set",
+      "key": "webhookKey",
+      "value": {
+        "source": "webhooks",
+        "path": "$.key"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "destination": "webhook_delivery",
+      "source": "$",
+      "uniqueKeys": [
+        "webhook_delivery_id"
+      ],
+      "columns": [
+        {
+          "name": "webhook_delivery_id",
+          "path": "$.id"
+        },
+        {
+          "name": "webhook_key",
+          "path": "$.webhookKey"
+        },
+        {
+          "name": "response_code",
+          "path": "$.httpStatus"
+        },
+        {
+          "name": "created_ts",
+          "path": "$.at"
+        }
+      ]
+    }
+  ]
+}

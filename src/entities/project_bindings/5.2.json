@@ -1,0 +1,53 @@
+{
+  "url": "api/alm_settings/get_binding",
+  "dependencies": [
+    {
+      "entity": "projects"
+    }
+  ],
+  "paginationKey": null,
+  "resultKeys": null,
+  "parameters": {
+    "project": {
+      "source": "projects",
+      "path": "$.key"
+    }
+  },
+  "operations": [
+    {
+      "operator": "set",
+      "key": "projectKey",
+      "value": {
+        "source": "projects",
+        "path": "$.key"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "destination": "project_platform_mapping",
+      "source": "$",
+      "uniqueKeys": [
+        "project_key"
+      ],
+      "columns": [
+        {
+          "name": "project_key",
+          "path": "$.projectKey"
+        },
+        {
+          "name": "repository",
+          "path": "$.repository"
+        },
+        {
+          "name": "is_monorepo",
+          "path": "$.monorepo"
+        },
+        {
+          "name": "platform_key",
+          "path": "$.key"
+        }
+      ]
+    }
+  ]
+}

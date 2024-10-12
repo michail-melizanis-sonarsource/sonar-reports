@@ -1,0 +1,28 @@
+{
+  "url": "api/project_pull_requests/list",
+  "dependencies": [
+    {
+      "entity": "projects"
+    }
+  ],
+  "paginationKey": null,
+  "resultKeys": [
+    "pullRequests"
+  ],
+  "parameters": {
+    "project": {
+      "source": "projects",
+      "path": "$.key"
+    }
+  },
+  "operations": [
+    {
+      "operator": "set",
+      "key": "projectKey",
+      "value": {
+        "source": "projects",
+        "path": "$.key"
+      }
+    }
+  ]
+}

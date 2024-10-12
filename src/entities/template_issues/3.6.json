@@ -1,0 +1,23 @@
+{
+  "url": "api/issues/search",
+  "dependencies": [
+    {
+      "entity": "template_rules",
+      "type": "chunk",
+      "chunkSize": 10
+    }
+  ],
+  "resultKeys": null,
+  "paginationKey": null,
+  "parameters": {
+    "rules": {
+      "source": "template_rules",
+      "path": "$.key",
+      "joinCharacter": ","
+    },
+    "ps": {
+      "value": "1"
+    }
+  },
+  "operations": []
+}

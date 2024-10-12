@@ -1,0 +1,119 @@
+{
+  "url": "api/qualitygates/show",
+  "dependencies": [
+    {
+      "entity": "gates"
+    }
+  ],
+  "paginationKey": null,
+  "resultKeys": [
+    "conditions"
+  ],
+  "parameters": {
+    "name": {
+      "source": "gates",
+      "path": "$.name"
+    }
+  },
+  "preFilters": [
+    {
+      "source": "gates",
+      "path": "$.isBuiltIn",
+      "operator": "neq",
+      "value": true
+    }
+  ],
+  "operations": [
+    {
+      "operator": "set",
+      "key": "gateName",
+      "value": {
+        "source": "gates",
+        "path": "$.name"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "destination": "condition",
+      "source": "$",
+      "uniqueKeys": [
+        "condition_uuid"
+      ],
+      "columns": [
+        {
+          "name": "metric",
+          "path": "$.metric"
+        },
+        {
+          "name": "operator",
+          "path": "$.op"
+        },
+        {
+          "name": "error_threshold",
+          "path": "$.error"
+        },
+        {
+          "name": "condition_uuid",
+          "path": null,
+          "operations": [
+            {
+              "operator": "generate_uuid",
+              "kwargs": {
+                "paths": [
+                  "$.op",
+                  "$.metric",
+                  "$.error"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "destination": "gate_condition_mapping",
+      "source": "$",
+      "uniqueKeys": [
+        "gate_condition_mapping_uuid"
+      ],
+      "columns": [
+        {
+          "name": "condition_uuid",
+          "path": null,
+          "operations": [
+            {
+              "operator": "generate_uuid",
+              "kwargs": {
+                "paths": [
+                  "$.op",
+                  "$.metric",
+                  "$.error"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "gate_name",
+          "path": "$.gateName"
+        },
+        {
+          "name": "gate_condition_mapping_uuid",
+          "path": null,
+          "operations": [
+            {
+              "operator": "generate_uuid",
+              "kwargs": {
+                "keys": [
+                  "gate_name",
+                  "condition_uuid"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

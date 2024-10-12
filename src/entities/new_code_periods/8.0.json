@@ -1,0 +1,28 @@
+{
+  "url": "api/new_code_periods/list",
+  "dependencies": [
+    {
+      "entity": "projects"
+    }
+  ],
+  "paginationKey": null,
+  "resultKeys": [
+    "newCodePeriods"
+  ],
+  "parameters": {
+    "project": {
+      "source": "projects",
+      "path": "$.key"
+    }
+  },
+  "operations": [
+    {
+      "operator": "set",
+      "key": "project",
+      "value": {
+        "source": "projects",
+        "path": "$.key"
+      }
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "url": "api/permissions/template_groups",
+  "dependencies": [
+    {
+      "entity": "templates"
+    }
+  ],
+  "paginationKey": "p",
+  "pageSizeKey": "ps",
+  "totalKey": "$.paging.total",
+  "resultKeys": [
+    "groups"
+  ],
+  "parameters": {
+    "templateId": {
+      "source": "templates",
+      "path": "$.id"
+    },
+    "permission": {
+      "value": "user"
+    }
+  },
+  "operations": [
+    {
+      "operator": "set",
+      "key": "templateId",
+      "value": {
+        "source": "templates",
+        "path": "$.id"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "destination": "group_mapping",
+      "source": "$",
+      "uniqueKeys": [
+        "group_mapping_uuid"
+      ],
+      "preFilters": [
+        {
+          "path": "$.permissions",
+          "operator": "neq",
+          "value": []
+        }
+      ],
+      "columns": [
+        {
+          "name": "group_mapping_uuid",
+          "path": null,
+          "operations": [
+            {
+              "operator": "generate_uuid",
+              "kwargs": {
+                "paths": [
+                  "$.id",
+                  "$.templateId"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "group_id",
+          "path": "$.id"
+        },
+        {
+          "name": "permission_template_id",
+          "path": "$.templateId"
+        },
+        {
+          "name": "permissions",
+          "path": "$.permissions"
+        }
+      ]
+    }
+  ]
+}
