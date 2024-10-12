@@ -1,0 +1,38 @@
+{
+  "url": "api/webhooks/list",
+  "dependencies": [],
+  "resultKeys": [
+    "webhooks"
+  ],
+  "totalKey": "$.paging.total",
+  "paginationKey": null,
+  "parameters": {},
+  "operations": [],
+  "mappings": [
+    {
+      "destination": "webhook",
+      "source": "$",
+      "uniqueKeys": [
+        "webhook_key"
+      ],
+      "columns": [
+        {
+          "name": "webhook_key",
+          "path": "$.key"
+        },
+        {
+          "name": "name",
+          "path": "$.name"
+        },
+        {
+          "name": "url",
+          "path": "$.url"
+        },
+        {
+          "name": "project_key",
+          "value": null
+        }
+      ]
+    }
+  ]
+}

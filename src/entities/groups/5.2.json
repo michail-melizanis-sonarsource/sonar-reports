@@ -1,0 +1,44 @@
+{
+  "url": "api/permissions/groups",
+  "dependencies": [],
+  "paginationKey": "p",
+  "pageSizeKey": "ps",
+  "maxPageSize": 100,
+  "totalKey": "$.paging.total",
+  "resultKeys": [
+    "groups"
+  ],
+  "parameters": {},
+  "operations": [],
+  "mappings": [
+    {
+      "destination": "group",
+      "source": "$",
+      "uniqueKeys": [
+        "group_id"
+      ],
+      "columns": [
+        {
+          "name": "group_id",
+          "path": "$.id"
+        },
+        {
+          "name": "name",
+          "path": "$.name"
+        },
+        {
+          "name": "description",
+          "path": "$.description"
+        },
+        {
+          "name": "permissions",
+          "path": "$.permissions"
+        },
+        {
+          "name": "is_managed",
+          "path": "$.managed"
+        }
+      ]
+    }
+  ]
+}

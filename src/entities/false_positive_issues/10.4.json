@@ -1,0 +1,32 @@
+{
+  "url": "api/issues/search",
+  "dependencies": [
+    {
+      "entity": "projects"
+    }
+  ],
+  "resultKeys": null,
+  "paginationKey": null,
+  "parameters": {
+    "components": {
+      "source": "projects",
+      "path": "$.key"
+    },
+    "issueStatuses": {
+      "value": "FALSE_POSITIVE"
+    },
+    "ps": {
+      "value": "1"
+    }
+  },
+  "operations": [
+    {
+      "operator": "set",
+      "key": "projectKey",
+      "value": {
+        "source": "projects",
+        "path": "$.key"
+      }
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "url": "api/plugins/installed",
+  "dependencies": [],
+  "paginationKey": null,
+  "resultKeys": [
+    "plugins"
+  ],
+  "parameters": {},
+  "operations": [],
+  "mappings": [
+    {
+      "destination": "plugin",
+      "uniqueKeys": [
+        "plugin_key"
+      ],
+      "source": "$",
+      "columns": [
+        {
+          "name": "plugin_key",
+          "path": "$.key"
+        },
+        {
+          "name": "name",
+          "path": "$.name"
+        },
+        {
+          "name": "version",
+          "path": "$.version"
+        },
+        {
+          "name": "description",
+          "path": "$.description"
+        },
+        {
+          "name": "license",
+          "path": "$.license"
+        },
+        {
+          "name": "organization",
+          "path": "$.organizationName"
+        },
+        {
+          "name": "updated_ts",
+          "path": "$.updatedAt",
+          "operations": [
+            {
+              "operator": "convert_to_timestamp"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

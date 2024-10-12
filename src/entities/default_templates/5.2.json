@@ -1,0 +1,55 @@
+{
+  "url": "api/permissions/search_templates",
+  "dependencies": [],
+  "paginationKey": null,
+  "resultKeys": [
+    "defaultTemplates"
+  ],
+  "parameters": {},
+  "operations": [],
+  "mappings": [
+    {
+      "destination": "permission_template",
+      "source": "$",
+      "uniqueKeys": [
+        "permission_template_id"
+      ],
+      "columns": [
+        {
+          "name": "permission_template_id",
+          "path": "$.id"
+        },
+        {
+          "name": "name",
+          "path": "$.name"
+        },
+        {
+          "name": "description",
+          "path": "$.description"
+        },
+        {
+          "name": "project_key_pattern",
+          "path": "$.projectKeyPattern"
+        },
+        {
+          "name": "created_ts",
+          "path": "$.createdAt",
+          "operations": [
+            {
+              "operator": "convert_to_timestamp"
+            }
+          ]
+        },
+        {
+          "name": "updated_ts",
+          "path": "$.updatedAt",
+          "operations": [
+            {
+              "operator": "convert_to_timestamp"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

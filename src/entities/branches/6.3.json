@@ -1,0 +1,68 @@
+{
+  "url": "api/project_branches/list",
+  "dependencies": [
+    {
+      "entity": "projects"
+    }
+  ],
+  "resultKeys": [
+    "branches"
+  ],
+  "paginationKey": null,
+  "parameters": {
+    "project": {
+      "source": "projects",
+      "path": "$.key"
+    }
+  },
+  "operations": [
+    {
+      "operator": "set",
+      "key": "projectKey",
+      "value": {
+        "source": "projects",
+        "path": "$.key"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "destination": "branch",
+      "source": "$",
+      "uniqueKeys": [
+        "branch_id"
+      ],
+      "columns": [
+        {
+          "name": "project_key",
+          "path": "$.projectKey"
+        },
+        {
+          "name": "branch_id",
+          "path": "$.branchId"
+        },
+        {
+          "name": "name",
+          "path": "$.name"
+        },
+        {
+          "name": "is_main",
+          "path": "$.isMain"
+        },
+        {
+          "name": "is_long_lived",
+          "path": "$.excludedFromPurge"
+        },
+        {
+          "name": "last_analysis_ts",
+          "path": "$.analysisDate",
+          "operations": [
+            {
+              "operator": "convert_to_timestamp"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

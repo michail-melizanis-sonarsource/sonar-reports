@@ -1,0 +1,30 @@
+{
+  "url": "api/rules/search",
+  "dependencies": [
+    {
+      "entity": "rules"
+    }
+  ],
+  "resultKeys": [
+    "rules"
+  ],
+  "totalKey": "$.paging.total",
+  "paginationKey": "p",
+  "pageSizeKey": "ps",
+  "maxPageSize": 500,
+  "preFilters": [
+    {
+      "source": "rules",
+      "path": "$.templateKey",
+      "operator": "neq",
+      "value": null
+    }
+  ],
+  "parameters": {
+    "rule_key": {
+      "source": "rules",
+      "path": "$.key"
+    }
+  },
+  "mappings": []
+}

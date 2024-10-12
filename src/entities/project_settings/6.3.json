@@ -1,0 +1,35 @@
+{
+  "url": "api/settings/values",
+  "dependencies": [
+    {
+      "entity": "projects"
+    }
+  ],
+  "paginationKey": null,
+  "resultKeys": [
+    "settings"
+  ],
+  "parameters": {
+    "component": {
+      "source": "projects",
+      "path": "$.key"
+    }
+  },
+  "postFilters": [
+    {
+      "path": "$.inherited",
+      "operator": "neq",
+      "value": false
+    }
+  ],
+  "operations": [
+    {
+      "operator": "set",
+      "key": "project",
+      "value": {
+        "source": "projects",
+        "path": "$.key"
+      }
+    }
+  ]
+}

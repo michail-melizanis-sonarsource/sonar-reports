@@ -1,0 +1,54 @@
+{
+  "url": "api/rules/search",
+  "dependencies": [],
+  "resultKeys": [
+    "actives"
+  ],
+  "totalKey": "$.paging.total",
+  "paginationKey": "p",
+  "pageSizeKey": "ps",
+  "maxPageSize": 500,
+  "parameters": {
+    "f": {
+      "value": "actives"
+    },
+    "activation": {
+      "value": true
+    }
+  },
+  "operations": [],
+  "mappings": [
+    {
+      "destination": "profile_rule_mapping",
+      "source": "$",
+      "uniqueKeys": [
+        "profile_rule_mapping_uuid"
+      ],
+      "columns": [
+        {
+          "name": "profile_rule_mapping_uuid",
+          "value": null,
+          "operations": [
+            {
+              "operator": "generate_uuid",
+              "kwargs": {
+                "paths": [
+                  "$.key",
+                  "$.profileKey"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "profile_key",
+          "path": "$.profileKey"
+        },
+        {
+          "name": "rule_key",
+          "path": "$.key"
+        }
+      ]
+    }
+  ]
+}

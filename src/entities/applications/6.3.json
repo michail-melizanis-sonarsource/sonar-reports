@@ -1,0 +1,17 @@
+{
+  "url": "api/components/search",
+  "dependencies": [],
+  "paginationKey": "p",
+  "pageSizeKey": "ps",
+  "maxPageSize": 500,
+  "totalKey": "$.paging.total",
+  "resultKeys": [
+    "components"
+  ],
+  "parameters": {
+    "qualifiers": {
+      "value": "APP"
+    }
+  },
+  "operations": []
+}

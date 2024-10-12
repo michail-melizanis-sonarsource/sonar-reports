@@ -1,0 +1,74 @@
+{
+  "url": "api/users/search",
+  "dependencies": [],
+  "resultKeys": [
+    "users"
+  ],
+  "totalKey": "$.paging.total",
+  "paginationKey": "p",
+  "pageSizeKey": "ps",
+  "maxPageSize": 100,
+  "parameters": {},
+  "mappings": [
+    {
+      "destination": "user",
+      "uniqueKeys": [
+        "user_login"
+      ],
+      "source": "$",
+      "columns": [
+        {
+          "name": "user_login",
+          "path": "$.login"
+        },
+        {
+          "name": "name",
+          "path": "$.name"
+        },
+        {
+          "name": "email",
+          "path": "$.email"
+        },
+        {
+          "name": "is_active",
+          "path": "$.active"
+        },
+        {
+          "name": "is_local",
+          "path": "$.local"
+        },
+        {
+          "name": "external_identity",
+          "path": "$.externalIdentity"
+        },
+        {
+          "name": "external_provider",
+          "path": "$.externalProvider"
+        },
+        {
+          "name": "is_managed",
+          "path": "$.managed",
+          "default": false
+        },
+        {
+          "name": "last_connection_ts",
+          "path": "$.lastConnectionDate",
+          "operations": [
+            {
+              "operator": "convert_to_timestamp"
+            }
+          ]
+        },
+        {
+          "name": "sonar_lint_last_connection_ts",
+          "path": "$.sonarLintLastConnectionDate",
+          "operations": [
+            {
+              "operator": "convert_to_timestamp"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "url": "api/permissions/groups",
+  "dependencies": [
+    {
+      "entity": "projects"
+    }
+  ],
+  "paginationKey": "p",
+  "pageSizeKey": "ps",
+  "totalKey": "$.paging.total",
+  "resultKeys": [
+    "groups"
+  ],
+  "parameters": {
+    "projectKey": {
+      "source": "projects",
+      "path": "$.key"
+    },
+    "permission": {
+      "value": "user"
+    }
+  },
+  "operations": [
+    {
+      "operator": "set",
+      "key": "project",
+      "value": {
+        "source": "projects",
+        "path": "$.key"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "destination": "group_mapping",
+      "source": "$",
+      "uniqueKeys": [
+        "group_mapping_uuid"
+      ],
+      "preFilters": [
+        {
+          "path": "$.permissions",
+          "operator": "neq",
+          "value": []
+        }
+      ],
+      "columns": [
+        {
+          "name": "group_mapping_uuid",
+          "path": null,
+          "operations": [
+            {
+              "operator": "generate_uuid",
+              "kwargs": {
+                "paths": [
+                  "$.id",
+                  "$.project"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "group_id",
+          "path": "$.id"
+        },
+        {
+          "name": "project_key",
+          "path": "$.project"
+        },
+        {
+          "name": "permissions",
+          "path": "$.permissions"
+        }
+      ]
+    }
+  ]
+}
