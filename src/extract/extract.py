@@ -226,7 +226,7 @@ def load_dependencies(entity, config, directory):
             load_dependency,
             dependency=dependency,
             directory=directory,
-            required_keys=required_keys[dependency['entity']]
+            required_keys=required_keys[dependency['key']]
         )
         for dependency in config.get('dependencies', [])
     ]
@@ -244,18 +244,18 @@ def load_dependencies(entity, config, directory):
             if len(load_funcs) == 1:
                 dependencies = [dependencies]
             for idx, dependency in enumerate(config.get('dependencies', [])):
-                dependency_map[dependency['entity']] = dependencies[idx]
+                dependency_map[dependency['key']] = dependencies[idx]
             yield dependency_map
 
 
 def load_dependency(dependency, directory, required_keys):
-    dependency_type = dependency.get('type', 'each')
-    if dependency_type == 'each':
-        for entity in entity_reader(extract_directory=directory, entity_type=dependency['entity']):
+    load_strategy = dependency.get('loadStrategy', 'each')
+    if load_strategy == 'each':
+        for entity in entity_reader(extract_directory=directory, entity_type=dependency['key']):
             yield entity
-    elif dependency_type == 'chunk':
+    elif load_strategy == 'chunk':
         entities = list()
-        for entity in entity_reader(extract_directory=directory, entity_type=dependency['entity']):
+        for entity in entity_reader(extract_directory=directory, entity_type=dependency['key']):
             results = clean_entity(entity=entity, required_keys=required_keys)
             entities.append(results)
             if len(entities) >= dependency['chunkSize']:
@@ -263,9 +263,9 @@ def load_dependency(dependency, directory, required_keys):
                 entities = list()
         if entities:
             yield entities
-    elif dependency_type == 'all':
+    elif load_strategy == 'all':
         entities = list()
-        for entity in entity_reader(extract_directory=directory, entity_type=dependency['entity']):
+        for entity in entity_reader(extract_directory=directory, entity_type=dependency['key']):
             results = clean_entity(entity=entity, required_keys=required_keys)
             entities.append(results)
         yield entities

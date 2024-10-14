@@ -2,7 +2,8 @@
   "url": "api/user_tokens/search",
   "dependencies": [
     {
-      "entity": "users"
+      "type": "entity",
+      "key": "users"
     }
   ],
   "resultKeys": [

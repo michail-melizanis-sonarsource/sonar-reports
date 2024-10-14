@@ -2,7 +2,8 @@
   "url": "api/alm_settings/get_binding",
   "dependencies": [
     {
-      "entity": "projects"
+      "type": "entity",
+      "key": "projects"
     }
   ],
   "paginationKey": null,

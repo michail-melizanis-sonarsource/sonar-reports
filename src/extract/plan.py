@@ -36,12 +36,12 @@ def extract_dependencies(entity, entity_configs):
     if entity_config is None:
         return None
     for dependency in entity_config.get('dependencies', []):
-        nested_dependencies = extract_dependencies(entity=dependency['entity'], entity_configs=entity_configs)
+        nested_dependencies = extract_dependencies(entity=dependency['key'], entity_configs=entity_configs)
         if nested_dependencies is None:
             dependencies = None
             break
         dependencies = dependencies.union(nested_dependencies)
-        dependencies.add(dependency['entity'])
+        dependencies.add(dependency['key'])
     return dependencies
 
 
@@ -52,7 +52,7 @@ def plan_extractions(extractions: set, entity_configs: dict):
     while continue_planning:
         phase = list()
         for extraction in extractions - completed:
-            if completed >= set([i['entity'] for i in entity_configs[extraction].get('dependencies', list())]):
+            if completed >= set([i['key'] for i in entity_configs[extraction].get('dependencies', list())]):
                 phase.append(extraction)
         completed = completed.union(set(phase))
         if not phase or len(completed) == len(extractions):

@@ -2,7 +2,8 @@
   "url": "api/permissions/users",
   "dependencies": [
     {
-      "entity": "projects"
+      "type": "entity",
+      "key": "projects"
     }
   ],
   "paginationKey": "p",

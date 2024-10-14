@@ -2,7 +2,8 @@
   "url": "api/settings/values",
   "dependencies": [
     {
-      "entity": "projects"
+      "type": "entity",
+      "key": "projects"
     }
   ],
   "paginationKey": null,

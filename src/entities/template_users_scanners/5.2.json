@@ -2,7 +2,8 @@
   "url": "api/permissions/template_users",
   "dependencies": [
     {
-      "entity": "templates"
+      "type": "entity",
+      "key": "templates"
     }
   ],
   "paginationKey": "p",

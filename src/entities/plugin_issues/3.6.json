@@ -2,7 +2,8 @@
   "url": "api/issues/search",
   "dependencies": [
     {
-      "entity": "plugin_rules"
+      "type": "entity",
+      "key": "plugin_rules"
     }
   ],
   "resultKeys": null,

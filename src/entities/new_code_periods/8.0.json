@@ -2,7 +2,8 @@
   "url": "api/new_code_periods/list",
   "dependencies": [
     {
-      "entity": "projects"
+      "type": "entity",
+      "key": "projects"
     }
   ],
   "paginationKey": null,

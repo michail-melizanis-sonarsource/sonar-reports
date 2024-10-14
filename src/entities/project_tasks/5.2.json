@@ -2,7 +2,8 @@
   "url": "api/ce/activity",
   "dependencies": [
     {
-      "entity": "projects"
+      "type": "entity",
+      "key": "projects"
     }
   ],
   "paginationKey": "p",

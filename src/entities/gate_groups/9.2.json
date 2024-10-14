@@ -2,7 +2,8 @@
   "url": "api/qualitygates/search_groups",
   "dependencies": [
     {
-      "entity": "gates"
+      "type": "entity",
+      "key": "gates"
     }
   ],
   "paginationKey": "p",

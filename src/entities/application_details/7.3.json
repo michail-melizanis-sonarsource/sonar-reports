@@ -2,7 +2,8 @@
   "url": "api/applications/show",
   "dependencies": [
     {
-      "entity": "applications"
+      "type": "entity",
+      "key": "applications"
     }
   ],
   "paginationKey": null,

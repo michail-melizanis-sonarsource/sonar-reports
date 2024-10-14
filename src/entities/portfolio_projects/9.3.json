@@ -2,7 +2,8 @@
   "url": "api/views/projects_status",
   "dependencies": [
     {
-      "entity": "portfolios"
+      "type": "entity",
+      "key": "portfolios"
     }
   ],
   "paginationKey": "p",

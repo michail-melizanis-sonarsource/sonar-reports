@@ -2,7 +2,8 @@
   "url": "api/views/show",
   "dependencies": [
     {
-      "entity": "portfolios"
+      "type": "entity",
+      "key": "portfolios"
     }
   ],
   "paginationKey": null,

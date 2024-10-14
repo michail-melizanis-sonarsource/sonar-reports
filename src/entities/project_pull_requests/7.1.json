@@ -2,7 +2,8 @@
   "url": "api/project_pull_requests/list",
   "dependencies": [
     {
-      "entity": "projects"
+      "type": "entity",
+      "key": "projects"
     }
   ],
   "paginationKey": null,

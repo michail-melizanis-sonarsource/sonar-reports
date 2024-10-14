@@ -2,7 +2,8 @@
   "url": "api/webhooks/deliveries",
   "dependencies": [
     {
-      "entity": "webhooks"
+      "type": "entity",
+      "key": "webhooks"
     }
   ],
   "resultKeys": [

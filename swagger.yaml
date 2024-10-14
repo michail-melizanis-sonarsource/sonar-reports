@@ -1,0 +1,31 @@
+openapi: 3.0.1
+info:
+  title: SonarQube Web API v2
+servers:
+  - url: http://next.sonarqube.com/sonarqube/api/
+paths:
+  /projects/create:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - organization
+                - project
+              properties:
+                name:
+                  type: string
+                organization:
+                  type: string
+                  description: Organization key
+                project:
+                  type: string
+                  description: Project key
+              }
+      responses:
+        200:
+          description: Created Project
+  
