@@ -78,8 +78,8 @@
 
 # Project Metrics
 
-| Project Name | Template Issues | Plugin Issues | Devops Binding |
-|:-------------|:----------------|:--------------|:---------------|
+| Project Name | Template Issues | Plugin Issues | Total Issues |
+|:-------------|:----------------|:--------------|:-------------|
 {project_metrics}
 
 # Other Information
