@@ -1,7 +1,8 @@
+import base64
 import uuid
 from collections import defaultdict
 
-from httpx import AsyncClient, Limits
+from httpx import AsyncClient, Limits, BasicAuth
 from asyncio import gather
 import os
 import json
@@ -12,17 +13,26 @@ from utils import extract_path_value, entity_reader
 from itertools import product
 
 
-async def execute_extraction_plan(token: str, directory: str, base_url: str, extraction_plan: list,
+async def execute_extraction_plan(token: str, server_version: float, directory: str, base_url: str,
+                                  extraction_plan: list,
                                   entity_configs: dict, cert: tuple, max_threads):
     if not base_url.endswith('/'):
         base_url += '/'
     limits = Limits(max_connections=max_threads * 2, max_keepalive_connections=max_threads * 2)
+    auth_kwargs = dict(
+    )
+    if server_version >= 10:
+        auth_kwargs['headers'] = dict(Authorization=f"Bearer {token}")
+    else:
+        encoded_auth = base64.b64encode((token+':').encode('utf-8')).decode('utf-8')
+        auth_kwargs['headers'] = dict(Authorization=f"Basic {encoded_auth}")
     async with AsyncClient(
             base_url=base_url,
-            headers=dict(Authorization=f"Bearer {token}"),
             cert=cert if cert else None,
             limits=limits,
-            timeout=60) as client:
+            timeout=60,
+            **auth_kwargs
+    ) as client:
         for phase in extraction_plan:
             for entity in phase:
                 await extract_entity(client=client, config=entity_configs[entity], max_threads=max_threads,
@@ -91,13 +101,14 @@ async def get_max_pages(client, config, params):
     try:
         first_page = response.json()
     except Exception as e:
-        logger.error(response.content)
-        logger.error(config['url'])
-        logger.error(params)
-        logger.error(e)
+        logger.error(
+            dict(auth=client.auth, status_code=response.status_code, content=response.content, url=config['url'], params=params)
+        )
         raise e
     try:
         total_entities = extract_path_value(path=config['totalKey'], js=first_page)
+        if total_entities is None:
+            total_entities = 0
         results_per_page = config.get('maxPageSize', 1)
         total_pages = ceil(total_entities / results_per_page)
     except Exception as e:
@@ -269,7 +280,6 @@ def load_dependency(dependency, directory, required_keys):
             results = clean_entity(entity=entity, required_keys=required_keys)
             entities.append(results)
         yield entities
-
 
 
 def clean_entity(entity, required_keys):

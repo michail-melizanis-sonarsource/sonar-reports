@@ -35,6 +35,7 @@ def run_extract(token, url, key_file_path, pem_file_path, cert_password, max_thr
     loop.run_until_complete(
         execute_extraction_plan(
             cert=cert,
+            server_version=server_version,
             entity_configs=configs,
             extraction_plan=extraction_plan,
             directory=export_directory,
