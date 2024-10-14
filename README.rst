@@ -5,9 +5,9 @@ Sonarqube Reports
 
 Usage
 -----
-docker run sonar-demos/sonarqube-reports -v ./files:/app/files -e TOKEN="$SONAR_TOKEN" -e URL="$SONAR_URL"
+docker run -v ./files:/app/files -e TOKEN="$SONAR_TOKEN" -e URL="$SONAR_URL" sonar-demos/sonarqube-reports
 
 Build from source
 -----------------
 docker build . -t sonarqube-reports
-docker run sonarqube-reports -v ./files:/app/files -e TOKEN="$SONAR_TOKEN" -e URL="$SONAR_URL"
+docker run -v ./files:/app/files -e TOKEN="$SONAR_TOKEN" -e URL="$SONAR_URL" sonarqube-reports
