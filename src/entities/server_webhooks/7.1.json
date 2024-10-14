@@ -1,0 +1,11 @@
+{
+  "url": "api/webhooks/list",
+  "dependencies": [],
+  "paginationKey": null,
+  "resultKeys": [
+    "webhooks"
+  ],
+  "parameters": {
+  },
+  "operations": []
+}

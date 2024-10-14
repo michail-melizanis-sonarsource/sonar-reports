@@ -1,0 +1,21 @@
+{
+  "url": "api/issues/search",
+  "dependencies": [
+  ],
+  "resultKeys": null,
+  "paginationKey": null,
+  "preFilters": [
+    {
+      "source": "rules",
+      "path": "$.is_template",
+      "operator": "eq",
+      "value": true
+    }
+  ],
+  "parameters": {
+    "issueStatuses": {
+      "value": "CONFIRMED,FALSE_POSITIVE,ACCEPTED"
+    }
+  },
+  "operations": []
+}

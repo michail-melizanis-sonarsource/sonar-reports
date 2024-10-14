@@ -1,0 +1,12 @@
+{
+  "url": "api/projects/search",
+  "dependencies": [],
+  "resultKeys": [
+    "components"
+  ],
+  "totalKey": "$.paging.total",
+  "paginationKey": "p",
+  "pageSizeKey": "ps",
+  "parameters": {
+  }
+}

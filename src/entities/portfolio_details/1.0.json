@@ -1,0 +1,17 @@
+{
+  "url": "api/views/show",
+  "dependencies": [
+    {
+      "entity": "portfolios"
+    }
+  ],
+  "paginationKey": null,
+  "resultKeys": null,
+  "parameters": {
+    "key": {
+      "source": "portfolios",
+      "path": "$.key"
+    }
+  },
+  "operations": []
+}

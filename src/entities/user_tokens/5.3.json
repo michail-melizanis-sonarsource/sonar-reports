@@ -1,0 +1,97 @@
+{
+  "url": "api/user_tokens/search",
+  "dependencies": [
+    {
+      "entity": "users"
+    }
+  ],
+  "resultKeys": [
+    "userTokens"
+  ],
+  "paginationKey": null,
+  "parameters": {
+    "login": {
+      "source": "users",
+      "path": "$.login"
+    }
+  },
+  "operations": [
+    {
+      "operator": "set",
+      "key": "login",
+      "value": {
+        "source": "users",
+        "path": "$.login"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "destination": "token",
+      "source": "$",
+      "uniqueKeys": [
+        "token_uuid"
+      ],
+      "columns": [
+        {
+          "name": "token_uuid",
+          "value": null,
+          "operations": [
+            {
+              "operator": "generate_uuid",
+              "kwargs": {
+                "paths": [
+                  "$.login",
+                  "$.name"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "user_login",
+          "path": "$.login"
+        },
+        {
+          "name": "name",
+          "path": "$.name"
+        },
+        {
+          "name": "type",
+          "path": "$.type"
+        },
+        {
+          "name": "expiration_ts",
+          "path": "$.expirationDate",
+          "operations": [
+            {
+              "operator": "convert_to_timestamp"
+            }
+          ]
+        },
+        {
+          "name": "is_expired",
+          "path": "$.isExpired"
+        },
+        {
+          "name": "created_ts",
+          "path": "$.createdAt",
+          "operations": [
+            {
+              "operator": "convert_to_timestamp"
+            }
+          ]
+        },
+        {
+          "name": "last_connection_ts",
+          "path": "$.lastConnectionDate",
+          "operations": [
+            {
+              "operator": "convert_to_timestamp"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

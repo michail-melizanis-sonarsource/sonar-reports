@@ -1,0 +1,15 @@
+{
+  "url": "api/issues/search",
+  "dependencies": [
+  ],
+  "resultKeys": null,
+  "paginationKey": null,
+  "preFilters": [
+  ],
+  "parameters": {
+    "issueStatuses": {
+      "value": "CONFIRMED,FALSE_POSITIVE,ACCEPTED"
+    }
+  },
+  "operations": []
+}

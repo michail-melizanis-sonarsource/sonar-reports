@@ -1,0 +1,68 @@
+{
+  "url": "api/project_analyses/search",
+  "dependencies": [
+    {
+      "entity": "projects"
+    }
+  ],
+  "paginationKey": null,
+  "resultKeys": [
+    "analyses"
+  ],
+  "parameters": {
+    "project": {
+      "source": "projects",
+      "path": "$.key"
+    }
+  },
+  "operations": [
+    {
+      "operator": "set",
+      "key": "projectKey",
+      "value": {
+        "source": "projects",
+        "path": "$.key"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "destination": "project_analysis",
+      "source": "$",
+      "uniqueKeys": [
+        "project_analysis_key"
+      ],
+      "columns": [
+        {
+          "name": "project_analysis_key",
+          "path": "$.key"
+        },
+        {
+          "name": "project_key",
+          "path": "$.projectKey"
+        },
+        {
+          "name": "created_ts",
+          "path": "$.date",
+          "operations": [
+            {
+              "operator": "convert_to_timestamp"
+            }
+          ]
+        },
+        {
+          "name": "detected_ci",
+          "path": "$.detectedCI"
+        },
+        {
+          "name": "revision",
+          "path": "$.revision"
+        },
+        {
+          "name": "version",
+          "path": "$.projectVersion"
+        }
+      ]
+    }
+  ]
+}

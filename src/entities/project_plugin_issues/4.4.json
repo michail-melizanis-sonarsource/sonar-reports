@@ -1,0 +1,38 @@
+{
+  "url": "api/issues/search",
+  "dependencies": [
+    {
+      "entity": "projects"
+    },
+    {
+      "entity": "plugin_rules",
+      "type": "all"
+    }
+  ],
+  "resultKeys": null,
+  "paginationKey": null,
+  "parameters": {
+    "components": {
+      "source": "projects",
+      "path": "$.key"
+    },
+    "rules": {
+      "source": "plugin_rules",
+      "path": "$.key",
+      "joinCharacter": ","
+    },
+    "ps": {
+      "value": "1"
+    }
+  },
+  "operations": [
+    {
+      "operator": "set",
+      "key": "projectKey",
+      "value": {
+        "source": "projects",
+        "path": "$.key"
+      }
+    }
+  ]
+}

@@ -1,3 +1,11 @@
-sonar_migration==0.2.0
-markdown
+pytest
+orjson
+httpx
+respx
+uvloop
+pytest-asyncio
+greenlet
+gevent
+jsonpath-ng
 click
+markdown

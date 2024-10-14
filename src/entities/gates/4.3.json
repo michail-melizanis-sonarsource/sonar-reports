@@ -1,0 +1,33 @@
+{
+  "url": "api/qualitygates/list",
+  "dependencies": [],
+  "paginationKey": null,
+  "resultKeys": [
+    "qualitygates"
+  ],
+  "parameters": {},
+  "operations": [],
+  "mappings": [
+    {
+      "destination": "gate",
+      "source": "$",
+      "uniqueKeys": [
+        "gate_name"
+      ],
+      "columns": [
+        {
+          "name": "gate_name",
+          "path": "$.name"
+        },
+        {
+          "name": "is_built_in",
+          "path": "$.isBuiltIn"
+        },
+        {
+          "name": "cayc_status",
+          "path": "$.caycStatus"
+        }
+      ]
+    }
+  ]
+}

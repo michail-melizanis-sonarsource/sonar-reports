@@ -1,0 +1,39 @@
+{
+  "url": "api/issues/search",
+  "dependencies": [
+    {
+      "entity": "projects"
+    },
+    {
+      "entity": "template_rules",
+      "type": "chunk",
+      "chunkSize": 10
+    }
+  ],
+  "resultKeys": null,
+  "paginationKey": null,
+  "parameters": {
+    "components": {
+      "source": "projects",
+      "path": "$.key"
+    },
+    "rules": {
+      "source": "template_rules",
+      "path": "$.key",
+      "joinCharacter": ","
+    },
+    "ps": {
+      "value": "1"
+    }
+  },
+  "operations": [
+    {
+      "operator": "set",
+      "key": "projectKey",
+      "value": {
+        "source": "projects",
+        "path": "$.key"
+      }
+    }
+  ]
+}

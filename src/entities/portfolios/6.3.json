@@ -1,0 +1,12 @@
+{
+  "url": "api/views/search",
+  "dependencies": [],
+  "paginationKey": "p",
+  "pageSizeKey": "ps",
+  "totalKey": "$.paging.total",
+  "resultKeys": [
+    "components"
+  ],
+  "parameters": {},
+  "operations": []
+}
