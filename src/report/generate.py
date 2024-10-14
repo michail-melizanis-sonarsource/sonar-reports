@@ -11,13 +11,6 @@ from utils import entity_reader
 MARKDOWN_PATH = __file__.replace('generate.py', 'template.md')
 
 
-def evaluate_sast_config(config):
-    return "SAST Configuration Detected" if any(
-        [v for k, v in config.get('globalSettings', dict()).get('sastConfig', dict()).items()] + [
-            i.get('sastConfig') for i
-            in config['projects'].values()
-        ]) else "No SAST Configuration Detected"
-
 
 def extract_multi_branch_projects(extract_directory):
     projects = dict()
@@ -27,7 +20,7 @@ def extract_multi_branch_projects(extract_directory):
         if branch['projectKey'] not in projects.keys():
             projects[branch['projectKey']] = set()
         projects[branch['projectKey']].add(branch['name'])
-    return {k in projects for k, v in projects.items() if len(v) > 1}
+    return {k for k, v in projects.items() if len(v) > 1}
 
 
 def extract_pull_request_projects(extract_directory):
@@ -41,6 +34,7 @@ def extract_pull_request_projects(extract_directory):
 
 def format_devops_bindings(extract_directory, devops_bindings: dict):
     multi_branch_projects = extract_multi_branch_projects(extract_directory=extract_directory)
+    print(multi_branch_projects)
     pr_projects = extract_pull_request_projects(extract_directory=extract_directory)
     return "\n".join([
         "| {name} | {type} | {project_count} | {multi_branch_projects} | {pr_projects} |".format(
@@ -322,7 +316,7 @@ def format_project_metrics(projects, project_issues):
 def process_sast_config(extract_directory):
     sast = False
     for setting in entity_reader(extract_directory=extract_directory, entity_type='project_settings'):
-        if 'sast' in setting['key'].lower():
+        if 'security.conf' in setting['key'].lower():
             sast = True
             break
     return sast
@@ -334,6 +328,7 @@ def generate_markdown(url, extract_directory):
     server_info = load_server_info(extract_directory=extract_directory)
     projects, profile_mapping, gate_mapping = process_project_details(extract_directory=extract_directory)
     project_issues = process_project_issues(extract_directory=extract_directory)
+    print(project_issues)
     users = process_entity(extract_directory=extract_directory, entity_type='users', key='login')
     template_rules, plugin_rules = process_rules(extract_directory=extract_directory)
     profile_rules = process_profile_rules(extract_directory=extract_directory, plugin_rules=plugin_rules,
@@ -371,8 +366,8 @@ def generate_markdown(url, extract_directory):
         total_issues=sum([v['total_issues'] for v in project_issues.values()]),
         safe_hotspots=hotspot_types['safe'],
         fixed_hotspots=hotspot_types['fixed'],
-        accepted_issues=len(process_entity(extract_directory=extract_directory, entity_type='accepted_issues')),
-        false_positives=len(process_entity(extract_directory=extract_directory, entity_type='false_positive_issues'))
+        accepted_issues=sum(process_entity(extract_directory=extract_directory, entity_type='accepted_issues', key='total')),
+        false_positives=sum(process_entity(extract_directory=extract_directory, entity_type='false_positive_issues', key='total'))
     )
     with open(os.path.join(extract_directory, 'report.md'), 'wt') as f:
         f.write(md)

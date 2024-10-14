@@ -238,6 +238,8 @@ def load_dependencies(entity, config, directory):
         else:
             loader = load_funcs[0]
         for dependencies in loader():
+            if any(len(dependency) == 0 for dependency in dependencies):
+                continue
             dependency_map = dict()
             if len(load_funcs) == 1:
                 dependencies = [dependencies]
@@ -247,10 +249,11 @@ def load_dependencies(entity, config, directory):
 
 
 def load_dependency(dependency, directory, required_keys):
-    if dependency.get('type', 'each') == 'each':
+    dependency_type = dependency.get('type', 'each')
+    if dependency_type == 'each':
         for entity in entity_reader(extract_directory=directory, entity_type=dependency['entity']):
             yield entity
-    elif dependency.get('type', 'each') == 'chunk':
+    elif dependency_type == 'chunk':
         entities = list()
         for entity in entity_reader(extract_directory=directory, entity_type=dependency['entity']):
             results = clean_entity(entity=entity, required_keys=required_keys)
@@ -260,7 +263,7 @@ def load_dependency(dependency, directory, required_keys):
                 entities = list()
         if entities:
             yield entities
-    elif dependency.get('type', 'each') == 'all':
+    elif dependency_type == 'all':
         entities = list()
         for entity in entity_reader(extract_directory=directory, entity_type=dependency['entity']):
             results = clean_entity(entity=entity, required_keys=required_keys)
