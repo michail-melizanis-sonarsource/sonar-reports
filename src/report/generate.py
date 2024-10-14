@@ -34,7 +34,6 @@ def extract_pull_request_projects(extract_directory):
 
 def format_devops_bindings(extract_directory, devops_bindings: dict):
     multi_branch_projects = extract_multi_branch_projects(extract_directory=extract_directory)
-    print(multi_branch_projects)
     pr_projects = extract_pull_request_projects(extract_directory=extract_directory)
     return "\n".join([
         "| {name} | {type} | {project_count} | {multi_branch_projects} | {pr_projects} |".format(
@@ -328,7 +327,6 @@ def generate_markdown(url, extract_directory):
     server_info = load_server_info(extract_directory=extract_directory)
     projects, profile_mapping, gate_mapping = process_project_details(extract_directory=extract_directory)
     project_issues = process_project_issues(extract_directory=extract_directory)
-    print(project_issues)
     users = process_entity(extract_directory=extract_directory, entity_type='users', key='login')
     template_rules, plugin_rules = process_rules(extract_directory=extract_directory)
     profile_rules = process_profile_rules(extract_directory=extract_directory, plugin_rules=plugin_rules,
