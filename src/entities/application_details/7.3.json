@@ -1,5 +1,10 @@
 {
   "url": "api/applications/show",
+  "editions": [
+    "enterprise",
+    "developer",
+    "datacenter"
+  ],
   "dependencies": [
     {
       "type": "entity",

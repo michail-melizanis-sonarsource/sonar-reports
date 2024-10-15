@@ -1,5 +1,9 @@
 {
   "url": "api/views/projects_status",
+  "editions": [
+    "enterprise",
+    "datacenter"
+  ],
   "dependencies": [
     {
       "type": "entity",

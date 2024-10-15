@@ -7,22 +7,24 @@ import os
 import json
 from math import ceil
 from functools import partial
+
+from extract.utils import generate_auth_headers
 from logs import logger
 from utils import extract_path_value, entity_reader
 from itertools import product
 
 
-async def execute_extraction_plan(token: str, directory: str, base_url: str, extraction_plan: list,
-                                  entity_configs: dict, cert: tuple, max_threads):
-    if not base_url.endswith('/'):
-        base_url += '/'
+async def execute_extraction_plan(token: str, server_version: float, directory: str, base_url: str,
+                                  extraction_plan: list, entity_configs: dict, cert: tuple[str, str, str] | None, max_threads: int):
     limits = Limits(max_connections=max_threads * 2, max_keepalive_connections=max_threads * 2)
+
     async with AsyncClient(
             base_url=base_url,
-            headers=dict(Authorization=f"Bearer {token}"),
-            cert=cert if cert else None,
+            cert=cert,
             limits=limits,
-            timeout=60) as client:
+            timeout=60,
+            headers=generate_auth_headers(token=token, server_version=server_version)
+    ) as client:
         for phase in extraction_plan:
             for entity in phase:
                 await extract_entity(client=client, config=entity_configs[entity], max_threads=max_threads,
@@ -91,13 +93,14 @@ async def get_max_pages(client, config, params):
     try:
         first_page = response.json()
     except Exception as e:
-        logger.error(response.content)
-        logger.error(config['url'])
-        logger.error(params)
-        logger.error(e)
+        logger.error(
+            dict(auth=client.auth, status_code=response.status_code, content=response.content, url=config['url'], params=params)
+        )
         raise e
     try:
         total_entities = extract_path_value(path=config['totalKey'], js=first_page)
+        if total_entities is None:
+            total_entities = 0
         results_per_page = config.get('maxPageSize', 1)
         total_pages = ceil(total_entities / results_per_page)
     except Exception as e:

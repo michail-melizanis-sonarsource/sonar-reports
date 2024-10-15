@@ -2,7 +2,7 @@ import os
 import json
 ENTITY_DIR = os.path.join(os.path.dirname(__file__), '../entities/')
 
-def get_available_entity_configs(server_version):
+def get_available_entity_configs(server_version, edition):
     available_entities = dict()
     for root, dirs, files in os.walk(ENTITY_DIR):
         entity = root.split('/')[-1]
@@ -13,9 +13,12 @@ def get_available_entity_configs(server_version):
             file_version = float(file.replace('.json', ''))
             if file_version <= server_version and (latest_version is None or file_version > latest_version):
                 latest_version = file_version
-        if latest_version is not None:
-            with open(f'{ENTITY_DIR}/{entity}/{latest_version}.json', 'r') as f:
-                available_entities[entity] = json.load(f)
+        if latest_version is None:
+            continue
+        with open(f'{ENTITY_DIR}/{entity}/{latest_version}.json', 'r') as f:
+            config = json.load(f)
+            if edition in config.get('editions', ['datacenter', 'developer', 'enterprise', 'community']) :
+                available_entities[entity] = config
     return available_entities
 
 

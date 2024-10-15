@@ -1,6 +1,11 @@
 {
   "url": "api/components/search",
   "dependencies": [],
+  "editions": [
+    "enterprise",
+    "developer",
+    "datacenter"
+  ],
   "paginationKey": "p",
   "pageSizeKey": "ps",
   "maxPageSize": 500,
