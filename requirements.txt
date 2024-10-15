@@ -2,10 +2,9 @@ pytest
 orjson
 httpx
 respx
-uvloop
 pytest-asyncio
 greenlet
 gevent
-jsonpath-ng
 click
 markdown
+pytest-cov

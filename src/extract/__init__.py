@@ -33,7 +33,6 @@ def run_extract(token, url, key_file_path, pem_file_path, cert_password, max_thr
             cert=cert,
             server_version=server_version,
             entity_configs=configs,
-            server_version=server_version,
             extraction_plan=extraction_plan,
             directory=export_directory,
             max_threads=max_threads,
