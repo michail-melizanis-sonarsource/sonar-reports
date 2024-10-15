@@ -28,7 +28,6 @@ def get_server_details(url, cert, token):
     server_version = float('.'.join(server_version_resp.text.split(".")[:2]))
     headers = generate_auth_headers(token=token, server_version=server_version)
     server_details_resp = sync_client.get("/api/system/info", headers=headers)
-    print(server_details_resp.json())
     for k, v in edition_mapper.items():
         if k.lower() in server_details_resp.json()['System']['Edition'].lower():
             edition = v
