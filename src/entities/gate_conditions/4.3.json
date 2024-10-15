@@ -2,7 +2,8 @@
   "url": "api/qualitygates/show",
   "dependencies": [
     {
-      "entity": "gates"
+      "type": "entity",
+      "key": "gates"
     }
   ],
   "paginationKey": null,

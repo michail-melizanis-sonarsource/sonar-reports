@@ -2,7 +2,8 @@
   "url": "api/webhooks/deliveries",
   "dependencies": [
     {
-      "entity": "project_webhooks"
+      "type": "entity",
+      "key": "project_webhooks"
     }
   ],
   "resultKeys": [
@@ -15,7 +16,7 @@
   "maxPageSize": 500,
   "parameters": {
     "webhooks": {
-      "source": "webhooks",
+      "source": "project_webhooks",
       "path": "$.key"
     }
   },
@@ -24,7 +25,7 @@
       "operator": "set",
       "key": "webhookKey",
       "value": {
-        "source": "webhooks",
+        "source": "project_webhooks",
         "path": "$.key"
       }
     }

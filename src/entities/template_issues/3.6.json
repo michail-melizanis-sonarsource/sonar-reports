@@ -2,8 +2,9 @@
   "url": "api/issues/search",
   "dependencies": [
     {
-      "entity": "template_rules",
-      "type": "chunk",
+      "type": "entity",
+      "key": "template_rules",
+      "loadStrategy": "chunk",
       "chunkSize": 10
     }
   ],

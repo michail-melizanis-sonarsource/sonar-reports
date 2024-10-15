@@ -2,7 +2,8 @@
   "url": "api/user_groups/users",
   "dependencies": [
     {
-      "entity": "groups"
+      "type": "entity",
+      "key": "groups"
     }
   ],
   "resultKeys": [

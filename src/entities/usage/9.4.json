@@ -1,6 +1,11 @@
 {
   "url": "api/projects/license_usage",
   "dependencies": [],
+  "editions": [
+    "enterprise",
+    "developer",
+    "datacenter"
+  ],
   "resultKeys": [
     "projects"
   ],

@@ -2,7 +2,8 @@
   "url": "api/rules/search",
   "dependencies": [
     {
-      "entity": "rules"
+      "type": "entity",
+      "key": "rules"
     }
   ],
   "resultKeys": [

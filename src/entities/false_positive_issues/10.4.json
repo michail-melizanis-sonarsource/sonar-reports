@@ -2,7 +2,8 @@
   "url": "api/issues/search",
   "dependencies": [
     {
-      "entity": "projects"
+      "type": "entity",
+      "key": "projects"
     }
   ],
   "resultKeys": null,

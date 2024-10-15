@@ -1,8 +1,13 @@
 {
   "url": "api/views/projects_status",
+  "editions": [
+    "enterprise",
+    "datacenter"
+  ],
   "dependencies": [
     {
-      "entity": "portfolios"
+      "type": "entity",
+      "key": "portfolios"
     }
   ],
   "paginationKey": "p",

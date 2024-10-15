@@ -1,37 +1,29 @@
-import base64
 import uuid
 from collections import defaultdict
 
-from httpx import AsyncClient, Limits, BasicAuth
+from httpx import AsyncClient, Limits
 from asyncio import gather
 import os
 import json
 from math import ceil
 from functools import partial
+
+from extract.utils import generate_auth_headers
 from logs import logger
 from utils import extract_path_value, entity_reader
 from itertools import product
 
 
 async def execute_extraction_plan(token: str, server_version: float, directory: str, base_url: str,
-                                  extraction_plan: list,
-                                  entity_configs: dict, cert: tuple, max_threads):
-    if not base_url.endswith('/'):
-        base_url += '/'
+                                  extraction_plan: list, entity_configs: dict, cert: tuple[str, str, str] | None, max_threads: int):
     limits = Limits(max_connections=max_threads * 2, max_keepalive_connections=max_threads * 2)
-    auth_kwargs = dict(
-    )
-    if server_version >= 10:
-        auth_kwargs['headers'] = dict(Authorization=f"Bearer {token}")
-    else:
-        encoded_auth = base64.b64encode((token+':').encode('utf-8')).decode('utf-8')
-        auth_kwargs['headers'] = dict(Authorization=f"Basic {encoded_auth}")
+
     async with AsyncClient(
             base_url=base_url,
-            cert=cert if cert else None,
+            cert=cert,
             limits=limits,
             timeout=60,
-            **auth_kwargs
+            headers=generate_auth_headers(token=token, server_version=server_version)
     ) as client:
         for phase in extraction_plan:
             for entity in phase:
@@ -237,7 +229,7 @@ def load_dependencies(entity, config, directory):
             load_dependency,
             dependency=dependency,
             directory=directory,
-            required_keys=required_keys[dependency['entity']]
+            required_keys=required_keys[dependency['key']]
         )
         for dependency in config.get('dependencies', [])
     ]
@@ -255,18 +247,18 @@ def load_dependencies(entity, config, directory):
             if len(load_funcs) == 1:
                 dependencies = [dependencies]
             for idx, dependency in enumerate(config.get('dependencies', [])):
-                dependency_map[dependency['entity']] = dependencies[idx]
+                dependency_map[dependency['key']] = dependencies[idx]
             yield dependency_map
 
 
 def load_dependency(dependency, directory, required_keys):
-    dependency_type = dependency.get('type', 'each')
-    if dependency_type == 'each':
-        for entity in entity_reader(extract_directory=directory, entity_type=dependency['entity']):
+    load_strategy = dependency.get('loadStrategy', 'each')
+    if load_strategy == 'each':
+        for entity in entity_reader(extract_directory=directory, entity_type=dependency['key']):
             yield entity
-    elif dependency_type == 'chunk':
+    elif load_strategy == 'chunk':
         entities = list()
-        for entity in entity_reader(extract_directory=directory, entity_type=dependency['entity']):
+        for entity in entity_reader(extract_directory=directory, entity_type=dependency['key']):
             results = clean_entity(entity=entity, required_keys=required_keys)
             entities.append(results)
             if len(entities) >= dependency['chunkSize']:
@@ -274,12 +266,13 @@ def load_dependency(dependency, directory, required_keys):
                 entities = list()
         if entities:
             yield entities
-    elif dependency_type == 'all':
+    elif load_strategy == 'all':
         entities = list()
-        for entity in entity_reader(extract_directory=directory, entity_type=dependency['entity']):
+        for entity in entity_reader(extract_directory=directory, entity_type=dependency['key']):
             results = clean_entity(entity=entity, required_keys=required_keys)
             entities.append(results)
         yield entities
+
 
 
 def clean_entity(entity, required_keys):

@@ -11,4 +11,4 @@ services:
     command: ['/app/tests', '--asyncio-mode', "auto", '-rfE', '-p', 'no:warnings']
     volumes:
       - ./tests:/app/tests
-      - ./files:/app/files
+      - ./files:/app/files/

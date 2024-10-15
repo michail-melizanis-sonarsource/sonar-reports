@@ -1,8 +1,14 @@
 {
   "url": "api/project_pull_requests/list",
+  "editions": [
+    "enterprise",
+    "developer",
+    "datacenter"
+  ],
   "dependencies": [
     {
-      "entity": "projects"
+      "type": "entity",
+      "key": "projects"
     }
   ],
   "paginationKey": null,

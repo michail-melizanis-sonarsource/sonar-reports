@@ -1,8 +1,14 @@
 {
   "url": "api/applications/show",
+  "editions": [
+    "enterprise",
+    "developer",
+    "datacenter"
+  ],
   "dependencies": [
     {
-      "entity": "applications"
+      "type": "entity",
+      "key": "applications"
     }
   ],
   "paginationKey": null,

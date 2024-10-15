@@ -8,8 +8,8 @@ from zope.interface import named
 from utils import extract_path_value
 from constants import BUILTIN_REPOS
 from utils import entity_reader
-MARKDOWN_PATH = __file__.replace('generate.py', 'template.md')
 
+MARKDOWN_PATH = __file__.replace('generate.py', 'template.md')
 
 
 def extract_multi_branch_projects(extract_directory):
@@ -127,9 +127,9 @@ def process_project_details(extract_directory):
             dict(
                 name=project['name'],
                 key=project['key'],
-                main_branch=project['branch'],
-                profiles=[i['key'] for i in project['qualityProfiles'] if not i['deleted']],
-                languages=set([i['language'] for i in project['qualityProfiles'] if not i['deleted']]),
+                main_branch=project.get('branch', ''),
+                profiles=[i['key'] for i in project['qualityProfiles'] if not i.get('deleted', False)],
+                languages=set([i['language'] for i in project['qualityProfiles'] if not i.get('deleted', False)]),
                 quality_gate=project['qualityGate']['key'],
                 binding=project.get('binding', dict()).get('key', '')
             )
@@ -294,11 +294,13 @@ def create_project_issues_dict():
 def process_project_issues(extract_directory):
     projects = defaultdict(create_project_issues_dict)
     for project_issues in entity_reader(extract_directory=extract_directory, entity_type='project_issues'):
-        projects[project_issues['projectKey']]['total_issues'] = project_issues['total']
-    for template_project_issues in entity_reader(extract_directory=extract_directory, entity_type='project_template_issues'):
-        projects[template_project_issues['projectKey']]['template_issues'] = template_project_issues['total']
-    for plugin_project_issues in entity_reader(extract_directory=extract_directory, entity_type='project_plugin_issues'):
-        projects[plugin_project_issues['projectKey']]['plugin_issues'] = plugin_project_issues['total']
+        projects[project_issues['projectKey']]['total_issues'] = project_issues['paging']['total']
+    for template_project_issues in entity_reader(extract_directory=extract_directory,
+                                                 entity_type='project_template_issues'):
+        projects[template_project_issues['projectKey']]['template_issues'] = template_project_issues['paging']['total']
+    for plugin_project_issues in entity_reader(extract_directory=extract_directory,
+                                               entity_type='project_plugin_issues'):
+        projects[plugin_project_issues['projectKey']]['plugin_issues'] = plugin_project_issues['paging']['total']
     return projects
 
 
@@ -309,8 +311,10 @@ def format_project_metrics(projects, project_issues):
             template_issues=project_issues[project['key']]['template_issues'],
             plugin_issues=project_issues[project['key']]['plugin_issues'],
             total_issues=project_issues[project['key']]['total_issues']
-        ) for project in projects if (project_issues[project['key']]['plugin_issues'] + project_issues[project['key']]['template_issues']) > 0
+        ) for project in projects if
+        (project_issues[project['key']]['plugin_issues'] + project_issues[project['key']]['template_issues']) > 0
     ])
+
 
 def process_sast_config(extract_directory):
     sast = False
@@ -332,9 +336,10 @@ def generate_markdown(url, extract_directory):
     profile_rules = process_profile_rules(extract_directory=extract_directory, plugin_rules=plugin_rules,
                                           template_rules=template_rules)
     template_issues = sum(
-        process_entity(extract_directory=extract_directory, entity_type='project_template_issues', key='total'))
+        process_entity(extract_directory=extract_directory, entity_type='project_template_issues',
+                       key='$.paging.total'))
     plugin_issues = sum(
-        process_entity(extract_directory=extract_directory, entity_type='project_plugin_issues', key='total'))
+        process_entity(extract_directory=extract_directory, entity_type='project_plugin_issues', key='$.paging.total'))
     bindings = process_devops_bindings(extract_directory=extract_directory)
 
     hotspot_types = (
@@ -342,11 +347,14 @@ def generate_markdown(url, extract_directory):
     md = template_content.format(
         server_version="{edition} {version}".format(
             edition=server_info['System']['Edition'],
-            version=server_info['Application Nodes'][0]['System']['Version'] if server_info.get('Application Nodes') else server_info['System']['Version']
+            version=server_info['Application Nodes'][0]['System']['Version'] if server_info.get(
+                'Application Nodes') else server_info['System']['Version']
         ),
         server_url=url,
         project_count=len(projects),
-        lines_of_code=server_info['System']['Lines of Code'],
+        lines_of_code=sum(
+            process_entity(extract_directory=extract_directory, entity_type='usage', key='$.linesOfCode')
+        ),
         user_count=len(users),
         auth_method="",
         orphan_issues=template_issues + plugin_issues,
@@ -364,8 +372,10 @@ def generate_markdown(url, extract_directory):
         total_issues=sum([v['total_issues'] for v in project_issues.values()]),
         safe_hotspots=hotspot_types['safe'],
         fixed_hotspots=hotspot_types['fixed'],
-        accepted_issues=sum(process_entity(extract_directory=extract_directory, entity_type='accepted_issues', key='total')),
-        false_positives=sum(process_entity(extract_directory=extract_directory, entity_type='false_positive_issues', key='total'))
+        accepted_issues=sum(
+            process_entity(extract_directory=extract_directory, entity_type='accepted_issues', key='$.paging.total')),
+        false_positives=sum(
+            process_entity(extract_directory=extract_directory, entity_type='false_positive_issues', key='$.paging.total'))
     )
     with open(os.path.join(extract_directory, 'report.md'), 'wt') as f:
         f.write(md)

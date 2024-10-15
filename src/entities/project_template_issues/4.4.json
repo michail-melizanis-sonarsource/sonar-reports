@@ -2,11 +2,13 @@
   "url": "api/issues/search",
   "dependencies": [
     {
-      "entity": "projects"
+      "type": "entity",
+      "key": "projects"
     },
     {
-      "entity": "template_rules",
-      "type": "chunk",
+      "type": "entity",
+      "key": "template_rules",
+      "loadStrategy": "chunk",
       "chunkSize": 10
     }
   ],

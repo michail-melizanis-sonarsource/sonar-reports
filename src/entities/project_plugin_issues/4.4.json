@@ -2,11 +2,13 @@
   "url": "api/issues/search",
   "dependencies": [
     {
-      "entity": "projects"
+      "type": "entity",
+      "key": "projects"
     },
     {
-      "entity": "plugin_rules",
-      "type": "all"
+      "type": "entity",
+      "key": "plugin_rules",
+      "loadStrategy": "all"
     }
   ],
   "resultKeys": null,
