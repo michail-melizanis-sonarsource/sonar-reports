@@ -13,4 +13,4 @@ jobs:
       - name: Checkout Merge Commit
         uses: actions/checkout@v4
       - name: Run Compose Tests
-        run: docker-compose run test
+        run: docker compose run test
