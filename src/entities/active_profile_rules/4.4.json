@@ -1,0 +1,38 @@
+{
+  "url": "api/rules/search",
+  "dependencies": [
+    {
+      "key": "profiles",
+      "type": "entity"
+    }
+  ],
+  "resultKeys": [
+    "rules"
+  ],
+  "totalKey": "$.paging.total",
+  "paginationKey": "p",
+  "pageSizeKey": "ps",
+  "maxPageSize": 500,
+  "parameters": {
+    "inheritance": {
+      "value": "NONE"
+    },
+    "qprofile": {
+      "source": "profiles",
+      "path": "$.key"
+    },
+    "activation": {
+      "value": true
+    }
+  },
+  "operations": [
+    {
+      "operator": "set",
+      "key": "profileKey",
+      "value": {
+        "source": "profiles",
+        "path": "$.key"
+      }
+    }
+  ]
+}

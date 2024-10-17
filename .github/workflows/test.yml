@@ -1,0 +1,16 @@
+# .github/workflows/app.yaml
+name: Test
+on:
+  pull_request:
+    branches:
+      - 'main'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    timeout-minutes: 10
+    steps:
+      - name: Checkout Merge Commit
+        uses: actions/checkout@v4
+      - name: Run Compose Tests
+        run: docker-compose run test
