@@ -2,7 +2,7 @@ services:
   extract:
     build: .
     env_file:
-      - local.env
+      - .env
     volumes:
       - ./files:/app/files
   test:
