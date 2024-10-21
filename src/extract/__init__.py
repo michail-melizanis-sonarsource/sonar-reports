@@ -10,7 +10,7 @@ from .utils import get_server_details, configure_client_cert
 def run_extract(token, url, key_file_path, pem_file_path, cert_password, max_threads, export_directory, timeout,
                 entities=None):
     cert = configure_client_cert(key_file_path, pem_file_path, cert_password)
-    server_version, edition = get_server_details(url=url, cert=cert, token=token)
+    server_version, edition = get_server_details(url=url, cert=cert, token=token, timeout=timeout)
     configs = get_available_entity_configs(server_version=server_version, edition=edition)
 
     extraction_plan = generate_extraction_plan(

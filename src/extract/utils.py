@@ -14,7 +14,7 @@ def generate_auth_headers(token, server_version):
     return headers
 
 
-def get_server_details(url, cert, token):
+def get_server_details(url, cert, token, timeout):
     from httpx import Client
     edition_mapper = {
         "Data": "datacenter",
@@ -23,7 +23,7 @@ def get_server_details(url, cert, token):
         "Community": "community"
     }
     edition = None
-    sync_client = Client(base_url=url, cert=cert)
+    sync_client = Client(base_url=url, cert=cert, timeout=timeout)
     server_version_resp = sync_client.get("/api/server/version")
     server_version = float('.'.join(server_version_resp.text.split(".")[:2]))
     headers = generate_auth_headers(token=token, server_version=server_version)
