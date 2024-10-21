@@ -14,4 +14,4 @@ COPY /deployment/startup/extract.sh /app/extract.sh
 RUN chmod +x /app/extract.sh
 
 WORKDIR /app
-ENTRYPOINT ["bash", "/app/extract.sh"]
+ENTRYPOINT ["python", "/app/main.py"]
