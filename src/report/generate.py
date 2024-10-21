@@ -375,7 +375,8 @@ def generate_markdown(url, extract_directory):
         accepted_issues=sum(
             process_entity(extract_directory=extract_directory, entity_type='accepted_issues', key='$.paging.total')),
         false_positives=sum(
-            process_entity(extract_directory=extract_directory, entity_type='false_positive_issues', key='$.paging.total'))
+            process_entity(extract_directory=extract_directory, entity_type='false_positive_issues',
+                           key='$.paging.total'))
     )
     with open(os.path.join(extract_directory, 'report.md'), 'wt') as f:
         f.write(md)

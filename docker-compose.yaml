@@ -1,8 +1,12 @@
 services:
   extract:
     build: .
-    env_file:
-      - .env
+    command:
+      - "report"
+      - ""
+      - ""
+      - "--timeout=60"
+      - "--concurrency=1"
     volumes:
       - ./files:/app/files
   test:

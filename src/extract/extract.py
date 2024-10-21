@@ -9,20 +9,21 @@ from math import ceil
 from functools import partial
 
 from extract.utils import generate_auth_headers
-from logs import logger
+from logs import log_event
 from utils import extract_path_value, entity_reader
 from itertools import product
 
 
 async def execute_extraction_plan(token: str, server_version: float, directory: str, base_url: str,
-                                  extraction_plan: list, entity_configs: dict, cert: tuple[str, str, str] | None, max_threads: int):
+                                  extraction_plan: list, entity_configs: dict, cert: tuple[str, str, str] | None,
+                                  max_threads: int, timeout=60):
     limits = Limits(max_connections=max_threads * 2, max_keepalive_connections=max_threads * 2)
 
     async with AsyncClient(
             base_url=base_url,
             cert=cert,
             limits=limits,
-            timeout=60,
+            timeout=timeout,
             headers=generate_auth_headers(token=token, server_version=server_version)
     ) as client:
         for phase in extraction_plan:
@@ -36,15 +37,19 @@ async def extract_entity(config, client, max_threads, entity, directory):
     entity_dir = f'{directory}/{entity}'
     os.makedirs(entity_dir, exist_ok=True)
     chunk = list()
+    chunk_number = 0
     for idx, dependencies in enumerate(generate_entity_plan(directory=directory, config=config, entity=entity)):
-        logger.info(f"Extracting {entity} page {idx + 1}")
+
         initial_params = load_params(config=config, dependencies=dependencies)
         chunk.append(dict(params=initial_params, dependencies=dependencies))
         if len(chunk) >= max_threads:
+            log_event(level='WARNING', event=f"Extracting {entity} chunk {chunk_number+1}")
+            chunk_number += 1
             await extract_chunk(client=client, max_threads=max_threads, config=config, chunk=chunk,
                                 entity_dir=entity_dir)
             chunk = list()
     if chunk:
+        log_event(level='WARNING', event=f"Extracting {entity} chunk {chunk_number + 1}")
         await extract_chunk(client=client, config=config, max_threads=max_threads, chunk=chunk, entity_dir=entity_dir)
 
 
@@ -93,9 +98,9 @@ async def get_max_pages(client, config, params):
     try:
         first_page = response.json()
     except Exception as e:
-        logger.error(
-            dict(auth=client.auth, status_code=response.status_code, content=response.content, url=config['url'], params=params)
-        )
+        log_event(level='ERROR',
+                  event=dict(status_code=response.status_code, content=response.content, url=config['url'],
+                             params=params))
         raise e
     try:
         total_entities = extract_path_value(path=config['totalKey'], js=first_page)
@@ -104,8 +109,8 @@ async def get_max_pages(client, config, params):
         results_per_page = config.get('maxPageSize', 1)
         total_pages = ceil(total_entities / results_per_page)
     except Exception as e:
-        logger.debug(config)
-        logger.error(response.json())
+        log_event(level='ERROR',
+                  event=response.json())
         raise e
     return total_pages
 
@@ -165,7 +170,7 @@ async def extract_entity_page(client: AsyncClient, config: dict, params: dict, d
     try:
         results = extract_entity_results(js=response.json(), dependencies=dependencies, config=config)
     except Exception as e:
-        logger.error(e)
+        log_event(level='ERROR', event=e)
         raise e
     return results
 
@@ -272,7 +277,6 @@ def load_dependency(dependency, directory, required_keys):
             results = clean_entity(entity=entity, required_keys=required_keys)
             entities.append(results)
         yield entities
-
 
 
 def clean_entity(entity, required_keys):
