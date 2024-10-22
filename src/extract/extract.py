@@ -43,7 +43,7 @@ async def extract_entity(config, client, max_threads, entity, directory):
         initial_params = load_params(config=config, dependencies=dependencies)
         chunk.append(dict(params=initial_params, dependencies=dependencies))
         if len(chunk) >= max_threads:
-            log_event(level='WARNING', event=f"Extracting {entity} chunk {chunk_number+1}")
+            log_event(level='WARNING', event=f"Extracting {entity} chunk {chunk_number + 1}")
             chunk_number += 1
             await extract_chunk(client=client, max_threads=max_threads, config=config, chunk=chunk,
                                 entity_dir=entity_dir)
@@ -93,8 +93,12 @@ def store_results(config, results, page, directory):
 async def get_max_pages(client, config, params):
     if config.get('paginationKey') is None:
         return 1
-    response = await client.get(config['url'], params=params)
-
+    try:
+        response = await client.get(config['url'], params=params)
+    except Exception as e:
+        log_event(level='ERROR', event=dict(url=config['url'], params=params, error=e, operation='get_max_pages'),
+                  logger_name='extract')
+        return 0
     try:
         first_page = response.json()
     except Exception as e:
@@ -164,7 +168,12 @@ def evaluate_filter(filter_, value):
 
 
 async def extract_entity_page(client: AsyncClient, config: dict, params: dict, dependencies: dict):
-    response = await client.get(config['url'], params=params)
+    try:
+        response = await client.get(config['url'], params=params)
+    except Exception as e:
+        log_event(level='ERROR', event=dict(url=config['url'], params=params, operation='extract_entity_page', error=e),
+                  logger_name='extract')
+        return []
     if response.status_code >= 300:
         return []
     try:

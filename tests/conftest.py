@@ -48,7 +48,7 @@ def endpoints(root_dir, edition, version):
             paths[path]['response'] = response
     return paths
 
-@pytest.fixture()
+@pytest.fixture(scope='session')
 def output_dir(root_dir, edition, version):
     import shutil
     shutil.rmtree(f"/app/files/{edition}/{version}", ignore_errors=True)
@@ -77,3 +77,12 @@ def validate_api_input(request, endpoint):
     if set(params.keys()) > allowed_params:
         raise ValueError(f"Invalid parameters: {set(params.keys()) - allowed_params}")
     return httpx.Response(200, json=endpoint.get('response', dict()))
+
+@pytest.fixture()
+def extracts(request_mocks, token, server_url, version, edition, output_dir):
+    from extract import run_extract
+    extract_id, extract_dir = run_extract(
+        token=token, url=server_url, key_file_path=None, pem_file_path=None, cert_password=None,
+        export_directory=f'/app/files/{edition}/{version}', entities=None, max_threads=25, timeout=60,
+    )
+    return extract_id, extract_dir
