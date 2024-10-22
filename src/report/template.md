@@ -22,7 +22,7 @@
 * {project_count} Projects
 * {lines_of_code} lines of code
 * {user_count} users
-* {orphan_issues} issues that cannot be migrated
+* SAST Configured: {sast_configued}
 
 # DevOps Integrations
 
@@ -78,14 +78,6 @@
 
 # Project Metrics
 
-| Project Name | Template Issues | Plugin Issues | Total Issues |
-|:-------------|:----------------|:--------------|:-------------|
+| Project Name | Template Rules | Plugin Rules |
+|:-------------|:---------------|:-------------|
 {project_metrics}
-
-# Other Information
-
-* SAST Configured: {sast_configued}
-* {safe_hotspots} Hotspots Marked Safe
-* {fixed_hotspots} Hotspots Fixed
-* {accepted_issues} Issues Accepted
-* {false_positives} False Positives   
