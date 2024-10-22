@@ -105,7 +105,10 @@ async def get_max_pages(client, config, params):
         log_event(level='ERROR',
                   event=dict(status_code=response.status_code, content=response.content, url=config['url'],
                              params=params))
-        raise e
+        log_event(level='ERROR', event=dict(url=config['url'], params=params, error=e, operation='get_max_pages',
+                                            content=response.content),
+                  logger_name='extract')
+        return 0
     try:
         total_entities = extract_path_value(path=config['totalKey'], js=first_page)
         if total_entities is None:
@@ -114,8 +117,11 @@ async def get_max_pages(client, config, params):
         total_pages = ceil(total_entities / results_per_page)
     except Exception as e:
         log_event(level='ERROR',
-                  event=response.json())
-        raise e
+                  event=dict(
+                      url=config['url'], params=params, error=e, operation='get_max_pages',
+                      json=response.json()),
+                  logger_name='extract')
+        return 0
     return total_pages
 
 
@@ -179,8 +185,13 @@ async def extract_entity_page(client: AsyncClient, config: dict, params: dict, d
     try:
         results = extract_entity_results(js=response.json(), dependencies=dependencies, config=config)
     except Exception as e:
-        log_event(level='ERROR', event=e)
-        raise e
+        log_event(
+            level='ERROR',
+            event=dict(url=config['url'], params=params, operation='extract_entity_page', content=response.content,
+                       error=e),
+            logger_name='extract'
+        )
+        return []
     return results
 
 
