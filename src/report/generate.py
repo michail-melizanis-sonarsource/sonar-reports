@@ -92,7 +92,7 @@ def format_pipelines(extract_directory):
     return "\n".join([
         "| {name} | {project_count} | {first_scan} | {last_scan} | {total_scans} |".format(
             name=k,
-            project_count=len(v),
+            project_count=len(v['projects']),
             first_scan=v['first_scan'].strftime('%Y-%m-%d'),
             last_scan=v['last_scan'].strftime('%Y-%m-%d'),
             total_scans=v['scans']
