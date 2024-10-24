@@ -1,0 +1,130 @@
+{
+  "editions": [
+    "community",
+    "enterprise",
+    "developer",
+    "datacenter"
+  ],
+  "dependencies": [
+    {
+      "key": "getProjects",
+      "loadStrategy": "each"
+    }
+  ],
+  "operations": [
+    {
+      "operation": "http_request",
+      "kwargs": {
+        "client": {
+          "value": {
+            "source": "inputs",
+            "path": "url"
+          }
+        },
+        "url": {
+          "value": {
+            "raw": "/api/settings/values"
+          },
+          "operations": []
+        },
+        "method": {
+          "value": {
+            "raw": "GET"
+          },
+          "operations": []
+        },
+        "paginationKey": {
+          "value": {
+            "raw": null
+          },
+          "operations": []
+        },
+        "pageSizeKey": {
+          "value": {
+            "raw": null
+          },
+          "operations": []
+        },
+        "pageLimit": {
+          "value": {
+            "raw": null
+          },
+          "operations": []
+        },
+        "resultKeys": {
+          "value": {
+            "raw": [
+              "settings"
+            ]
+          },
+          "operations": []
+        },
+        "maxPageSize": {
+          "value": {
+            "raw": null
+          },
+          "operations": []
+        },
+        "totalKey": {
+          "value": {
+            "raw": null
+          },
+          "operations": []
+        },
+        "params": {
+          "value": {
+            "map": {
+              "component": {
+                "value": {
+                  "source": "getProjects",
+                  "path": "$.key"
+                },
+                "operations": []
+              }
+            }
+          },
+          "operations": []
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "project"
+          },
+          "operations": []
+        },
+        "val": {
+          "value": {
+            "source": "getProjects",
+            "path": "$.key"
+          },
+          "operations": []
+        }
+      }
+    },
+    {
+      "operation": "apply_filter",
+      "kwargs": {
+        "operator": {
+          "value": {
+            "raw": "neq"
+          }
+        },
+        "left": {
+          "value": {
+            "source": "obj",
+            "path": "$.inherited"
+          }
+        },
+        "right": {
+          "value": {
+            "raw": false
+          }
+        }
+      }
+    }
+  ]
+}

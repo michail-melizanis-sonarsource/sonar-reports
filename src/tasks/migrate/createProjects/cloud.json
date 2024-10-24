@@ -1,0 +1,112 @@
+{
+  "dependencies": [
+    {
+      "key": "projectMappings",
+      "strategy": "each"
+    }
+  ],
+  "editions": [
+    "enterprise"
+  ],
+  "operations": [
+    {
+      "operation": "http_request",
+      "kwargs": {
+        "url": {
+          "value": {
+            "raw": "/api/settings/set"
+          }
+        },
+        "client": {
+          "value": {
+            "source": "inputs",
+            "path": "url"
+          }
+        },
+        "method": {
+          "value": {
+            "raw": "POST"
+          }
+        },
+        "encoding": {
+          "value": {
+            "raw": "x-www-form-urlencoded"
+          }
+        },
+        "payload": {
+          "value": {
+            "map": {
+              "project": {
+                "value": {
+                  "raw": null
+                },
+                "operations": [
+                  {
+                    "operation": "join_string",
+                    "kwargs": {
+                      "strings": {
+                        "value": {
+                          "array": [
+                            {
+                              "value": {
+                                "source": "projectMappings",
+                                "path": "sonarCloudOrgKey"
+                              }
+                            },
+                            {
+                              "value": {
+                                "source": "projectMappings",
+                                "path": "projectKey"
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "delimiter": {
+                        "value": {
+                          "raw": "_"
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              "name": {
+                "value": {
+                  "source": "projectMappings",
+                  "path": "name"
+                }
+              },
+              "organization": {
+                "value": {
+                  "source": "organizations",
+                  "path": "sonarCloudOrgKey"
+                }
+              },
+              "visibility": {
+                "value": {
+                  "source": "projectMappings",
+                  "path": "visibility"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "sourceProjectKey"
+          }
+        },
+        "val": {
+          "source": "projectMappings",
+          "path": "projectKey"
+        }
+      }
+    }
+  ]
+}

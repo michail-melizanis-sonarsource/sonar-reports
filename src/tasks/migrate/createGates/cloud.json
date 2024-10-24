@@ -1,0 +1,71 @@
+{
+  "dependencies": [
+    {
+      "key": "getGates",
+      "strategy": "each"
+    }
+  ],
+  "editions": [
+    "enterprise"
+  ],
+  "operations": [
+    {
+      "operation": "http_request",
+      "kwargs": {
+        "url": {
+          "value": {
+            "raw": "/api/qualitygates/create"
+          }
+        },
+        "client": {
+          "value": {
+            "source": "inputs",
+            "path": "url"
+          }
+        },
+        "method": {
+          "value": {
+            "raw": "POST"
+          }
+        },
+        "encoding": {
+          "value": {
+            "raw": "x-www-form-urlencoded"
+          }
+        },
+        "payload": {
+          "value": {
+            "map": {
+              "name": {
+                "value": {
+                  "source": "generateGateMappings",
+                  "path": "$.gate.name"
+                }
+              },
+              "organization": {
+                "value": {
+                  "source": "generateGateMappings",
+                  "path": "sonarCloudOrgKey"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "sonarCloudOrgKey"
+          }
+        },
+        "val": {
+          "source": "generateGateMappings",
+          "path": "sonarCloudOrgKey"
+        }
+      }
+    }
+  ]
+}

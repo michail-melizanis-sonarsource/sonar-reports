@@ -1,0 +1,96 @@
+{
+  "dependencies": [
+    {
+      "key": "groupMapping",
+      "strategy": "each"
+    }
+  ],
+  "editions": [
+    "enterprise"
+  ],
+  "operations": [
+    {
+      "operation": "http_request",
+      "kwargs": {
+        "url": {
+          "value": {
+            "raw": "/api/user_groups/create"
+          }
+        },
+        "client": {
+          "value": {
+            "source": "inputs",
+            "path": "url"
+          }
+        },
+        "method": {
+          "value": {
+            "raw": "POST"
+          }
+        },
+        "encoding": {
+          "value": {
+            "raw": "x-www-form-urlencoded"
+          }
+        },
+        "responseKey": {
+          "value": {
+            "raw": "group"
+          }
+        },
+        "payload": {
+          "value": {
+            "map": {
+              "name": {
+                "value": {
+                  "source": "groupMapping",
+                  "path": "name"
+                }
+              },
+              "description": {
+                "value": {
+                  "source": "groupMapping",
+                  "path": "description"
+                }
+              },
+              "organization": {
+                "value": {
+                  "source": "groupMapping",
+                  "path": "sonarCloudOrgKey"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "sourceGroupId"
+          }
+        },
+        "val": {
+          "source": "groupMapping",
+          "path": "id"
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "sonarCloudOrgKey"
+          }
+        },
+        "val": {
+          "source": "groupMapping",
+          "path": "sonarCloudOrgKey"
+        }
+      }
+    }
+  ]
+}

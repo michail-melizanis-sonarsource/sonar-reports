@@ -1,0 +1,69 @@
+{
+  "dependencies": [
+    {
+      "key": "/api/permissions/create_template",
+      "strategy": "each"
+    }
+  ],
+  "editions": [
+    "enterprise"
+  ],
+  "operations": [
+    {
+      "operation": "http_request",
+      "kwargs": {
+        "url": {
+          "value": {
+            "raw": ""
+          }
+        },
+        "client": {
+          "value": {
+            "source": "inputs",
+            "path": "url"
+          }
+        },
+        "method": {
+          "value": {
+            "raw": "POST"
+          }
+        },
+        "encoding": {
+          "value": {
+            "raw": "x-www-form-urlencoded"
+          }
+        },
+        "payload": {
+          "value": {
+            "map": {
+              "description": {
+                "value": {
+                  "source": "",
+                  "path": ""
+                }
+              },
+              "name": {
+                "value": {
+                  "source": "",
+                  "path": ""
+                }
+              },
+              "projectKeyPattern": {
+                "value": {
+                  "source": "",
+                  "path": ""
+                }
+              },
+              "organization": {
+                "value": {
+                  "source": "",
+                  "path": ""
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

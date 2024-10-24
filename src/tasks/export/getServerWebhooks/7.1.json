@@ -1,0 +1,78 @@
+{
+  "editions": [
+    "community",
+    "enterprise",
+    "developer",
+    "datacenter"
+  ],
+  "dependencies": [],
+  "operations": [
+    {
+      "operation": "http_request",
+      "kwargs": {
+        "client": {
+          "value": {
+            "source": "inputs",
+            "path": "url"
+          }
+        },
+        "url": {
+          "value": {
+            "raw": "/api/webhooks/list"
+          },
+          "operations": []
+        },
+        "method": {
+          "value": {
+            "raw": "GET"
+          },
+          "operations": []
+        },
+        "paginationKey": {
+          "value": {
+            "raw": null
+          },
+          "operations": []
+        },
+        "pageSizeKey": {
+          "value": {
+            "raw": null
+          },
+          "operations": []
+        },
+        "pageLimit": {
+          "value": {
+            "raw": null
+          },
+          "operations": []
+        },
+        "resultKeys": {
+          "value": {
+            "raw": [
+              "webhooks"
+            ]
+          },
+          "operations": []
+        },
+        "maxPageSize": {
+          "value": {
+            "raw": null
+          },
+          "operations": []
+        },
+        "totalKey": {
+          "value": {
+            "raw": null
+          },
+          "operations": []
+        },
+        "params": {
+          "value": {
+            "map": {}
+          },
+          "operations": []
+        }
+      }
+    }
+  ]
+}

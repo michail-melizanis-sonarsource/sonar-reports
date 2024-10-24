@@ -1,0 +1,25 @@
+{
+  "dependencies": [
+  ],
+  "editions": [
+    "enterprise"
+  ],
+  "operations": [
+    {
+      "operation": "expand_list",
+      "kwargs": {
+        "inputKey": {
+          "value": {
+            "source": "inputs",
+            "path": "organizations"
+          }
+        },
+        "outputKey": {
+          "value": {
+            "raw": "org"
+          }
+        }
+      }
+    }
+  ]
+}
