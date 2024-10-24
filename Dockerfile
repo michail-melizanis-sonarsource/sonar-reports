@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.13-slim
 
 RUN apt-get --assume-yes update && apt-get --assume-yes install bash
 
@@ -10,8 +10,6 @@ RUN pip install -r /app/requirements.txt
 
 COPY /src/ /app/
 COPY /deployment/startup/extract.sh /app/extract.sh
-
-RUN chmod +x /app/extract.sh
 
 WORKDIR /app
 ENTRYPOINT ["python", "/app/main.py"]

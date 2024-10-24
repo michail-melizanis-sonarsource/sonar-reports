@@ -47,15 +47,15 @@ def extract(url, token, export_directory:str, pem_file_path=None, key_file_path=
     plan = generate_task_plan(target_tasks=target_tasks, task_configs=configs)
     execute_plan(execution_plan=plan, inputs=dict(url=url), concurrency=concurrency, task_configs=configs,
                  output_directory=extract_directory)
+    print(extract_id)
 
-
-@cli.command()
-@click.argument('url')
-@click.option('--export_directory')
-@click.option('--extract_id', default=None)
+# @cli.command()
+# @click.argument('url')
+# @click.option('--export_directory')
+# @click.option('--extract_id', default=None)
 def report(url, export_directory='/app/files/', extract_id=None):
     from report.generate import generate_markdown
-    generate_markdown(url=url, extract_directory=export_directory)
+    generate_markdown(url=url, extract_directory=os.path.join(export_directory, extract_id.strip() + '/'))
 
 
 @cli.command()

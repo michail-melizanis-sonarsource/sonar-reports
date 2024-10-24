@@ -8,6 +8,10 @@ import httpx
 from urllib.parse import urlparse, parse_qs
 import re
 from respx.patterns import M
+import os
+
+from click.testing import CliRunner
+from main import cli, extract, report
 
 @pytest.fixture(scope='session')
 def token():
@@ -51,9 +55,11 @@ def endpoints(root_dir, edition, version):
 @pytest.fixture(scope='session')
 def output_dir(root_dir, edition, version):
     import shutil
-    shutil.rmtree(f"/app/files/{edition}/{version}", ignore_errors=True)
+    path = f"/app/files/{edition}/{version}/"
+    shutil.rmtree(path, ignore_errors=True)
     os.makedirs(f"/app/files/{edition}", exist_ok=True)
-    os.makedirs(f"/app/files/{edition}/{version}", exist_ok=True)
+    os.makedirs(path, exist_ok=True)
+    return path
 
 @pytest.fixture()
 def request_mocks(respx_mock, server_url, edition, version, endpoints):
@@ -79,10 +85,7 @@ def validate_api_input(request, endpoint):
     return httpx.Response(200, json=endpoint.get('response', dict()))
 
 @pytest.fixture()
-def extracts(request_mocks, token, server_url, version, edition, output_dir):
-    from extract import run_extract
-    extract_id, extract_dir = run_extract(
-        token=token, url=server_url, key_file_path=None, pem_file_path=None, cert_password=None,
-        export_directory=f'/app/files/{edition}/{version}', entities=None, max_threads=25, timeout=60,
-    )
-    return extract_id, extract_dir
+def extracts(request_mocks, server_url, token, output_dir):
+    runner = CliRunner()
+    result = runner.invoke(cli, ['extract', server_url, token, f'--export_directory={output_dir}'])
+    return result.output

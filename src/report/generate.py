@@ -3,16 +3,16 @@ import os
 import json
 from datetime import datetime
 
-from utils import extract_path_value
+from parser import extract_path_value
 from constants import BUILTIN_REPOS
-from utils import entity_reader
+from utils import object_reader
 
 MARKDOWN_PATH = __file__.replace('generate.py', 'template.md')
 
 
 def extract_multi_branch_projects(extract_directory):
     projects = dict()
-    for branch in entity_reader(extract_directory=extract_directory, entity_type='branches'):
+    for branch in object_reader(directory=extract_directory, key='getBranches'):
         if not branch.get('excludedFromPurge'):
             continue
         if branch['projectKey'] not in projects.keys():
@@ -23,8 +23,8 @@ def extract_multi_branch_projects(extract_directory):
 
 def extract_pull_request_projects(extract_directory):
     projects = dict()
-    for pull_request in entity_reader(extract_directory=extract_directory, entity_type='project_pull_requests'):
-        projects[pull_request['projectKey']] = extract_path_value(js=pull_request, path='$.paging.total')
+    for pull_request in object_reader(directory=extract_directory, key='getProjectPullRequests'):
+        projects[pull_request['projectKey']] = extract_path_value(obj=pull_request, path='$.paging.total')
     return set(projects.keys())
 
 
@@ -44,7 +44,7 @@ def format_devops_bindings(extract_directory, devops_bindings: dict):
 def process_rules(extract_directory):
     template_rules = set()
     plugin_rules = set()
-    for rule in entity_reader(extract_directory=extract_directory, entity_type='rules'):
+    for rule in object_reader(directory=extract_directory, key='getRules'):
         if rule.get('templateKey'):
             template_rules.add(rule['key'])
         if rule['repo'] not in BUILTIN_REPOS:
@@ -54,7 +54,7 @@ def process_rules(extract_directory):
 
 def process_profile_rules(extract_directory, template_rules, plugin_rules):
     profiles = dict()
-    for rule in entity_reader(extract_directory=extract_directory, entity_type='profile_rules'):
+    for rule in object_reader(directory=extract_directory, key='getProfileRules'):
         template_rule = False
         plugin_rule = False
         if rule['indexKey'] in template_rules:
@@ -74,7 +74,7 @@ def process_profile_rules(extract_directory, template_rules, plugin_rules):
 
 def format_pipelines(extract_directory):
     ci_mapping = dict()
-    for analysis in entity_reader(extract_directory=extract_directory, entity_type='project_analyses'):
+    for analysis in object_reader(directory=extract_directory, key='getProjectAnalyses'):
         if 'detectedCI' not in analysis.keys():
             continue
         if analysis['detectedCI'] not in ci_mapping.keys():
@@ -113,7 +113,7 @@ def process_project_details(extract_directory):
     projects = list()
     profiles = defaultdict(int)
     gates = dict()
-    for project in entity_reader(extract_directory=extract_directory, entity_type='project_details'):
+    for project in object_reader(directory=extract_directory, key='getProjectDetails'):
         for profile in project['qualityProfiles']:
             profiles[profile['key']] += 1
         if project['qualityGate']['name'] not in gates.keys():
@@ -139,7 +139,7 @@ def format_applications(extract_directory):
             name=application['application']['name'],
             project_count=len(application['application']['projects'])
         ) for application in
-            entity_reader(extract_directory=extract_directory, entity_type='application_details')])
+            object_reader(directory=extract_directory, key='getApplicationDetails')])
 
 
 def format_gates(gate_mapping):
@@ -152,20 +152,20 @@ def format_gates(gate_mapping):
 
 
 def load_server_info(extract_directory):
-    info = [i for i in entity_reader(extract_directory=extract_directory, entity_type='server_info')][0]
+    info = [i for i in object_reader(directory=extract_directory, key='getServerInfo')][0]
     return info
 
 
 def process_entity(extract_directory, entity_type, key='key'):
     entities = list()
-    for entity in entity_reader(extract_directory=extract_directory, entity_type=entity_type):
-        entities.append(extract_path_value(path=key, js=entity))
+    for entity in object_reader(directory=extract_directory, key=entity_type):
+        entities.append(extract_path_value(path=key, obj=entity))
     return entities
 
 
 def process_devops_bindings(extract_directory):
     devops_bindings = dict()
-    for binding in entity_reader(extract_directory=extract_directory, entity_type='project_bindings'):
+    for binding in object_reader(directory=extract_directory, key='getProjectBindings'):
         if binding['key'] not in devops_bindings.keys():
             devops_bindings[binding['key']] = dict(
                 projects=[],
@@ -179,7 +179,7 @@ def process_devops_bindings(extract_directory):
 def format_quality_gates(extract_directory, gate_mapping):
     return "\n".join(["| {name} | {project_count} |".format(
         name=gate['name'], project_count=gate_mapping.get(gate['name'], 0)) for gate in
-        entity_reader(extract_directory=extract_directory, entity_type='gates') if not gate['isBuiltIn']]
+        object_reader(directory=extract_directory, key='getGates') if not gate['isBuiltIn']]
     )
 
 
@@ -189,7 +189,7 @@ def process_plugins(extract_directory):
                                                                        description=plugin['description'],
                                                                        version=plugin['version'],
                                                                        url=plugin['homepageUrl']) for plugin in
-               entity_reader(extract_directory=extract_directory, entity_type='plugins') if
+               object_reader(directory=extract_directory, key='getPlugins') if
                "sonar" not in plugin['organizationName'].lower()])
 
 
@@ -200,7 +200,7 @@ def process_permission_templates(extract_directory):
         TRK="Projects",
         VW="Portfolios"
     )
-    for template in entity_reader(extract_directory=extract_directory, entity_type='default_templates'):
+    for template in object_reader(directory=extract_directory, key='getDefaultTemplates'):
         if template['templateId'] not in default_templates.keys():
             default_templates[template['templateId']] = set()
         default_templates[template['templateId']].add(MAPPING[template['qualifier']])
@@ -210,7 +210,7 @@ def process_permission_templates(extract_directory):
         description=template.get('description', ""),
         pattern=template.get('projectKeyPattern', ""),
         defaults=", ".join(default_templates.get(template['id'], []))
-    ) for template in entity_reader(extract_directory=extract_directory, entity_type='templates')])
+    ) for template in object_reader(directory=extract_directory, key='getTemplates')])
 
 
 def format_plugins(extract_directory):
@@ -218,7 +218,7 @@ def format_plugins(extract_directory):
                                                                               description=plugin['description'],
                                                                               version=plugin['version'],
                                                                               url=plugin['homepageUrl']) for plugin in
-                      entity_reader(extract_directory=extract_directory, entity_type='plugins') if
+                      object_reader(directory=extract_directory, key='getPlugins') if
                       "sonar" not in plugin.get('organizationName', '').lower() and plugin['type'] != 'BUNDLED'])
 
 
@@ -233,14 +233,14 @@ def extract_selection_modes(portfolio):
 
 def process_portfolios(extract_directory):
     portfolios = dict()
-    for portfolio in entity_reader(extract_directory=extract_directory, entity_type='portfolio_details'):
+    for portfolio in object_reader(directory=extract_directory, key='getPortfolioDetails'):
         portfolios[portfolio['key']] = dict(
             name=portfolio['name'],
             projects=set(),
             selection=extract_selection_modes(portfolio=portfolio),
             children="Yes" if portfolio.get('subViews') else "No",
         )
-    for project in entity_reader(extract_directory=extract_directory, entity_type='portfolio_projects'):
+    for project in object_reader(directory=extract_directory, key='getPortfolioProjects'):
         if project['portfolioKey'] not in portfolios.keys():
             continue
         portfolios[project['portfolioKey']]['projects'].add(project['key'])
@@ -255,7 +255,7 @@ def process_portfolios(extract_directory):
 
 def format_quality_profiles(profile_mapping, extract_directory, profile_rules):
     profiles = list()
-    for profile in entity_reader(extract_directory=extract_directory, entity_type='profiles'):
+    for profile in object_reader(directory=extract_directory, key='getProfiles'):
         profiles.append(dict(
             language=profile['language'],
             name=profile['name'],
@@ -304,7 +304,7 @@ def format_project_metrics(projects, profile_rules):
 
 def process_sast_config(extract_directory):
     sast = False
-    for setting in entity_reader(extract_directory=extract_directory, entity_type='project_settings'):
+    for setting in object_reader(directory=extract_directory, key='getProjectSettings'):
         if 'security.conf' in setting['key'].lower():
             sast = True
             break
@@ -316,7 +316,7 @@ def generate_markdown(url, extract_directory):
         template_content = f.read()
     server_info = load_server_info(extract_directory=extract_directory)
     projects, profile_mapping, gate_mapping = process_project_details(extract_directory=extract_directory)
-    user_count = process_entity(extract_directory=extract_directory, entity_type='users', key='$.paging.total')
+    user_count = process_entity(extract_directory=extract_directory, entity_type='getUsers', key='$.paging.total')
     template_rules, plugin_rules = process_rules(extract_directory=extract_directory)
     profile_rules = process_profile_rules(extract_directory=extract_directory, plugin_rules=plugin_rules,
                                           template_rules=template_rules)
@@ -331,7 +331,7 @@ def generate_markdown(url, extract_directory):
         server_url=url,
         project_count=len(projects),
         lines_of_code=sum(
-            process_entity(extract_directory=extract_directory, entity_type='usage', key='$.linesOfCode')
+            process_entity(extract_directory=extract_directory, entity_type='getUsage', key='$.linesOfCode')
         ),
         user_count=user_count[0] if user_count else 0,
         auth_method="",
