@@ -1,12 +1,13 @@
 {
   "dependencies": [
     {
-      "key": "",
+      "key": "generateProfileMappings",
       "strategy": "each"
     }
   ],
   "editions": [
-    "enterprise"
+    "enterprise",
+    "teams"
   ],
   "operations": [
     {
@@ -14,7 +15,7 @@
       "kwargs": {
         "url": {
           "value": {
-            "raw": ""
+            "raw": "/api/qualityprofiles/create"
           }
         },
         "client": {
@@ -33,11 +34,104 @@
             "raw": "x-www-form-urlencoded"
           }
         },
+        "outputKey": {
+          "value": {
+            "raw": null
+          }
+        },
         "payload": {
           "value": {
             "map": {
+              "name": {
+                "value": {
+                  "source": "generateProfileMappings",
+                  "path": "name"
+                }
+              },
+              "language": {
+                "value": {
+                  "source": "generateProfileMappings",
+                  "path": "language"
+                }
+              },
+              "organization": {
+                "value": {
+                  "source": "generateProfileMappings",
+                  "path": "sonarcloud_org_key"
+                }
+              }
             }
           }
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "sourceProfileKey"
+          }
+        },
+        "value": {
+          "source": "generateProfileMappings",
+          "path": "source_profile_key"
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "sonarCloudOrgKey"
+          }
+        },
+        "value": {
+          "source": "generateProfileMappings",
+          "path": "sonarcloud_org_key"
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "sourceServerUrl"
+          }
+        },
+        "value": {
+          "source": "generateProfileMappings",
+          "path": "server_url"
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "isDefault"
+          }
+        },
+        "value": {
+          "source": "generateProfileMappings",
+          "path": "is_default"
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "parentName"
+          }
+        },
+        "value": {
+          "source": "generateProfileMappings",
+          "path": "parent_name"
         }
       }
     }

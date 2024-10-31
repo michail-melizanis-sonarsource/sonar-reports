@@ -48,11 +48,12 @@ def export_csv(directory, name, data):
             writer.writerows(data)
 
 
-def export_jsonl(directory: str, name: str, data: list, idx=0):
+def export_jsonl(directory: str, name: str, data: list, idx=0, key='obj'):
     filename = f"{directory}/{name}/results.{idx + 1}.jsonl"
     with open(filename, 'wt') as f:
         for i in data:
-            f.write(json.dumps(i['obj']) + '\n')
+            obj = i[key] if key is not None else i
+            f.write(json.dumps(obj) + '\n')
     return filename
 
 

@@ -1,7 +1,7 @@
 {
   "dependencies": [
     {
-      "key": "",
+      "key": "createProfiles",
       "strategy": "each"
     }
   ],
@@ -10,11 +10,32 @@
   ],
   "operations": [
     {
+      "operation": "apply_filter",
+      "kwargs": {
+        "left": {
+          "value": {
+            "source": "createProfiles",
+            "path": "parentName"
+          }
+        },
+        "right": {
+          "value": {
+            "raw": null
+          }
+        },
+        "operator": {
+          "value": {
+            "raw": "neq"
+          }
+        }
+      }
+    },
+    {
       "operation": "http_request",
       "kwargs": {
         "url": {
           "value": {
-            "raw": ""
+            "raw": "/api/qualityprofiles/change_parent"
           }
         },
         "client": {
@@ -36,6 +57,30 @@
         "payload": {
           "value": {
             "map": {
+              "organization": {
+                "value": {
+                  "source": "createProfiles",
+                  "path": "sonarcloudOrgKey"
+                }
+              },
+              "language": {
+                "value": {
+                  "source": "createProfiles",
+                  "path": "language"
+                }
+              },
+              "parentQualityProfile": {
+                "value": {
+                  "source": "createProfiles",
+                  "path": "parentName"
+                }
+              },
+              "qualityProfile": {
+                "value": {
+                  "source": "createProfiles",
+                  "path": "name"
+                }
+              }
             }
           }
         }

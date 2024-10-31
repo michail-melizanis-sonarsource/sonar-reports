@@ -1,12 +1,17 @@
 {
   "dependencies": [
     {
-      "key": "projectMappings",
+      "key": "generateProjectMappings",
       "strategy": "each"
+    },
+    {
+      "key": "addGroupToTemplates",
+      "strategy": "none"
     }
   ],
   "editions": [
-    "enterprise"
+    "enterprise",
+    "team"
   ],
   "operations": [
     {
@@ -33,6 +38,11 @@
             "raw": "x-www-form-urlencoded"
           }
         },
+        "outputKey": {
+          "value": {
+            "raw": "project"
+          }
+        },
         "payload": {
           "value": {
             "map": {
@@ -49,14 +59,14 @@
                           "array": [
                             {
                               "value": {
-                                "source": "projectMappings",
-                                "path": "sonarCloudOrgKey"
+                                "source": "generateProjectMappings",
+                                "path": "sonarcloud_org_key"
                               }
                             },
                             {
                               "value": {
                                 "source": "projectMappings",
-                                "path": "projectKey"
+                                "path": "key"
                               }
                             }
                           ]
@@ -73,20 +83,31 @@
               },
               "name": {
                 "value": {
-                  "source": "projectMappings",
+                  "source": "generateProjectMappings",
                   "path": "name"
                 }
               },
               "organization": {
                 "value": {
-                  "source": "organizations",
-                  "path": "sonarCloudOrgKey"
+                  "source": "generateProjectMappings",
+                  "path": "sonarcloud_org_key"
                 }
               },
               "visibility": {
                 "value": {
-                  "source": "projectMappings",
-                  "path": "visibility"
+                  "raw": "private"
+                }
+              },
+              "newCodeDefinitionType": {
+                "value": {
+                  "source": "generateProjectMappings",
+                  "path": "new_code_type"
+                }
+              },
+              "newCodeDefinitionValue": {
+                "value": {
+                  "source": "generateProjectMappings",
+                  "path": "new_code_value"
                 }
               }
             }
@@ -99,12 +120,54 @@
       "kwargs": {
         "key": {
           "value": {
-            "raw": "sourceProjectKey"
+            "raw": "isCloudBinding"
           }
         },
         "val": {
-          "source": "projectMappings",
-          "path": "projectKey"
+          "source": "generateProjectMappings",
+          "path": "is_cloud_binding"
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "sourceServerUrl"
+          }
+        },
+        "val": {
+          "source": "generateProjectMappings",
+          "path": "server_url"
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "repository"
+          }
+        },
+        "val": {
+          "source": "generateProjectMappings",
+          "path": "repository"
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "mainBranch"
+          }
+        },
+        "val": {
+          "source": "generateProjectMappings",
+          "path": "main_branch"
         }
       }
     }

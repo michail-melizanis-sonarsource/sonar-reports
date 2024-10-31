@@ -1,15 +1,12 @@
 {
   "dependencies": [
     {
-      "key": "getGroups",
-      "strategy": "each"
-    },
-    {
-      "key": "generateOrgMappings",
+      "key": "generateGroupMappings",
       "strategy": "each"
     }
   ],
   "editions": [
+    "team",
     "enterprise"
   ],
   "operations": [
@@ -37,6 +34,11 @@
             "raw": "x-www-form-urlencoded"
           }
         },
+        "outputKey": {
+          "value": {
+            "raw": "group"
+          }
+        },
         "responseKey": {
           "value": {
             "raw": "group"
@@ -47,20 +49,20 @@
             "map": {
               "name": {
                 "value": {
-                  "source": "getGroups",
+                  "source": "generateGroupMappings",
                   "path": "name"
                 }
               },
               "description": {
                 "value": {
-                  "source": "getGroups",
+                  "source": "generateGroupMappings",
                   "path": "description"
                 }
               },
               "organization": {
                 "value": {
-                  "source": "",
-                  "path": "sonarCloudOrgKey"
+                  "source": "generateGroupMappings",
+                  "path": "sonarcloud_org_key"
                 }
               }
             }
@@ -73,12 +75,26 @@
       "kwargs": {
         "key": {
           "value": {
-            "raw": "sourceGroupId"
+            "raw": "sourceServerUrl"
           }
         },
         "val": {
-          "source": "groupMapping",
-          "path": "id"
+          "source": "generateGroupMappings",
+          "path": "server_url"
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "sourceGroupName"
+          }
+        },
+        "val": {
+          "source": "generateGroupMappings",
+          "path": "name"
         }
       }
     },
@@ -91,8 +107,8 @@
           }
         },
         "val": {
-          "source": "groupMapping",
-          "path": "sonarCloudOrgKey"
+          "source": "generateGroupMappings",
+          "path": "sonarcloud_org_key"
         }
       }
     }

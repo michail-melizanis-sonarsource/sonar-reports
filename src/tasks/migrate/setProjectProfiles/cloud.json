@@ -1,7 +1,11 @@
 {
   "dependencies": [
     {
-      "key": "",
+      "key": "createProfiles",
+      "strategy": "each"
+    },
+    {
+      "key": "createProjects",
       "strategy": "each"
     }
   ],
@@ -10,11 +14,70 @@
   ],
   "operations": [
     {
+      "operation": "apply_filter",
+      "kwargs": {
+        "left": {
+          "value": {
+            "source": "createProjects",
+            "path": "sonarcloudOrgKey"
+          }
+        },
+        "right": {
+          "value": {
+            "source": "createGates",
+            "path": "sonarcloudOrgKey"
+          }
+        },
+        "operator": {
+          "value": {
+            "raw": "eq"
+          }
+        }
+      }
+    },
+    {
+      "operation": "expand_list",
+      "kwargs": {
+        "inputKey": {
+          "value": {
+            "source": "createProjects",
+            "path": "qualityProfiles"
+          }
+        },
+        "outputKey": {
+          "value": {
+            "raw": "profile"
+          }
+        }
+      }
+    },
+    {
+      "operation": "apply_filter",
+      "kwargs": {
+        "left": {
+          "value": {
+            "path": "profile"
+          }
+        },
+        "right": {
+          "value": {
+            "source": "createProfiles",
+            "path": "name"
+          }
+        },
+        "operator": {
+          "value": {
+            "raw": "eq"
+          }
+        }
+      }
+    },
+    {
       "operation": "http_request",
       "kwargs": {
         "url": {
           "value": {
-            "raw": ""
+            "raw": "/api/qualityprofiles/add_project"
           }
         },
         "client": {
@@ -36,6 +99,30 @@
         "payload": {
           "value": {
             "map": {
+              "language": {
+                "value": {
+                  "source": "createProfiles",
+                  "path": "language"
+                }
+              },
+              "organization": {
+                "value": {
+                  "source": "createProjects",
+                  "path": "sonarcloudOrgKey"
+                }
+              },
+              "project": {
+                "value": {
+                  "source": "createProjects",
+                  "path": "key"
+                }
+              },
+              "qualityProfile": {
+                "value": {
+                  "source": "createProfiles",
+                  "path": "name"
+                }
+              }
             }
           }
         }

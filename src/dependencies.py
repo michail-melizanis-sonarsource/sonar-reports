@@ -44,7 +44,8 @@ def load_dependency(dependency, directory, run_ids):
         'each': load_each,
         'chunk': load_chunk,
         'all': load_all,
-        'map': load_map
+        'map': load_map,
+        "none": lambda **kwargs: []
     }
     load_strategy = dependency.get('loadStrategy', 'each')
     for results in strategy_mapper[load_strategy](dependency=dependency, directory=directory, run_ids=run_ids):

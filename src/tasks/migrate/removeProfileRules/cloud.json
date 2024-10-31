@@ -5,6 +5,10 @@
       "strategy": "each"
     },
     {
+      "key": "addProfileRules",
+      "strategy": "none"
+    },
+    {
       "key": "getDeactivedProfileRules",
       "strategy": "each"
     }

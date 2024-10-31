@@ -1,11 +1,11 @@
 {
   "dependencies": [
     {
-      "key": "getGroups",
+      "key": "createProjects",
       "strategy": "each"
     },
     {
-      "key": "createGroups",
+      "key": "getProjectSettings",
       "strategy": "each"
     }
   ],
@@ -18,14 +18,35 @@
       "kwargs": {
         "left": {
           "value": {
-            "source": "getGroups",
-            "path": "name"
+            "source": "getProjectSettings",
+            "path": "value"
           }
         },
         "right": {
           "value": {
-            "source": "createGroups",
-            "path": "sourceGroupName"
+            "raw": null
+          }
+        },
+        "operator": {
+          "value": {
+            "raw": "neq"
+          }
+        }
+      }
+    },
+    {
+      "operation": "apply_filter",
+      "kwargs": {
+        "left": {
+          "value": {
+            "source": "getProjectSettings",
+            "path": "project"
+          }
+        },
+        "right": {
+          "value": {
+            "source": "createProjects",
+            "path": "sourceProjectKey"
           }
         },
         "operator": {
@@ -40,13 +61,13 @@
       "kwargs": {
         "left": {
           "value": {
-            "source": "getGroups",
+            "source": "getProjectSettings",
             "path": "serverUrl"
           }
         },
         "right": {
           "value": {
-            "source": "createGroups",
+            "source": "createProjects",
             "path": "sourceServerUrl"
           }
         },
@@ -58,27 +79,11 @@
       }
     },
     {
-      "operation": "expand_list",
-      "kwargs": {
-        "inputKey": {
-          "value": {
-            "source": "getGroups",
-            "path": "permissions"
-          }
-        },
-        "outputKey": {
-          "value": {
-            "raw": "permission"
-          }
-        }
-      }
-    },
-    {
       "operation": "http_request",
       "kwargs": {
         "url": {
           "value": {
-            "raw": "/api/permissions/add_group"
+            "raw": "/api/settings/set"
           }
         },
         "client": {
@@ -100,21 +105,28 @@
         "payload": {
           "value": {
             "map": {
+              "key": {
+                "value": {
+                  "source": "getProjectSettings",
+                  "path": "key"
+                }
+              },
+              "component": {
+                "value": {
+                  "source": "createProjects",
+                  "path": "key"
+                }
+              },
               "organization": {
                 "value": {
-                  "source": "createGroups",
-                  "path": "sonarCloudOrgKey"
+                  "source": "createProjects",
+                  "path": "sonarcloudOrgKey"
                 }
               },
-              "groupName": {
+              "value": {
                 "value": {
-                  "source": "createGroups",
-                  "path": "name"
-                }
-              },
-              "permission": {
-                "value": {
-                  "path": "permission"
+                  "source": "getProjectSettings",
+                  "path": "value"
                 }
               }
             }

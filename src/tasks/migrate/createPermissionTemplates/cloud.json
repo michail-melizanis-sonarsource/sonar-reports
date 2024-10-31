@@ -1,11 +1,12 @@
 {
   "dependencies": [
     {
-      "key": "",
+      "key": "generateTemplateMappings",
       "strategy": "each"
     }
   ],
   "editions": [
+    "teams",
     "enterprise"
   ],
   "operations": [
@@ -14,7 +15,7 @@
       "kwargs": {
         "url": {
           "value": {
-            "raw": ""
+            "raw": "/api/permissions/create_template"
           }
         },
         "client": {
@@ -33,13 +34,70 @@
             "raw": "x-www-form-urlencoded"
           }
         },
+        "outputKey": {
+          "value": {
+            "raw": "permissionTemplate"
+          }
+        },
         "payload": {
           "value": {
             "map": {
+              "name": {
+                "value": {
+                  "source": "generateTemplateMappings",
+                  "path": "name"
+                }
+              },
+              "descriptions": {
+                "value": {
+                  "source": "generateTemplateMappings",
+                  "path": "description"
+                }
+              },
+              "organization": {
+                "value": {
+                  "source": "generateTemplateMappings",
+                  "path": "sonarcloud_org_key"
+                }
+              },
+              "projectKeyPattern": {
+                "value": {
+                  "source": "generateTemplateMappings",
+                  "path": "project_key_pattern"
+                }
+              }
             }
           }
         }
       }
+    },
+    {
+        "operation": "set_key",
+        "kwargs": {
+            "key": {
+            "value": {
+                "raw": "sonarCloudOrgKey"
+            }
+            },
+            "val": {
+            "source": "generateTemplateMappings",
+            "path": "sonarcloud_org_key"
+            }
+        }
+    },
+    {
+        "operation": "set_key",
+        "kwargs": {
+            "key": {
+            "value": {
+                "raw": "sourceTemplateKey"
+            }
+            },
+            "val": {
+            "source": "generateTemplateMappings",
+            "path": "source_template_key"
+            }
+        }
     }
   ]
 }

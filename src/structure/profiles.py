@@ -23,6 +23,7 @@ def add_profile(profile_map, results, org_key, server_url, profile_key):
                 name=dependency['name'],
                 language=dependency['language'],
                 server_url=server_url,
+                is_default=profile_map[profile_key].get('isDefault', False),
                 source_profile_key=profile_key,
                 sonarqube_org_key=org_key,
             )

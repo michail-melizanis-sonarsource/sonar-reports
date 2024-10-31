@@ -19,7 +19,29 @@
         "left": {
           "value": {
             "source": "createGates",
-            "path": "gateName"
+            "path": "sourceServerUrl"
+          }
+        },
+        "right": {
+          "value": {
+            "source": "getGateConditions",
+            "path": "sourceServerUrl"
+          }
+        },
+        "operator": {
+          "value": {
+            "raw": "eq"
+          }
+        }
+      }
+    },
+    {
+      "operation": "apply_filter",
+      "kwargs": {
+        "left": {
+          "value": {
+            "source": "createGates",
+            "path": "name"
           }
         },
         "right": {
@@ -65,7 +87,7 @@
               "gateId": {
                 "value": {
                   "source": "createGates",
-                  "path": "gateId"
+                  "path": "id"
                 }
               },
               "organization": {

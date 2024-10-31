@@ -1,7 +1,11 @@
 {
   "dependencies": [
     {
-      "key": "",
+      "key": "createGates",
+      "strategy": "each"
+    },
+    {
+      "key": "createProjects",
       "strategy": "each"
     }
   ],
@@ -10,11 +14,55 @@
   ],
   "operations": [
     {
+      "operation": "apply_filter",
+      "kwargs": {
+        "left": {
+          "value": {
+            "source": "createProjects",
+            "path": "sonarcloudOrgKey"
+          }
+        },
+        "right": {
+          "value": {
+            "source": "createGates",
+            "path": "sonarcloudOrgKey"
+          }
+        },
+        "operator": {
+          "value": {
+            "raw": "eq"
+          }
+        }
+      }
+    },
+    {
+      "operation": "apply_filter",
+      "kwargs": {
+        "left": {
+          "value": {
+            "source": "createGates",
+            "path": "name"
+          }
+        },
+        "right": {
+          "value": {
+            "source": "createProjects",
+            "path": "gateName"
+          }
+        },
+        "operator": {
+          "value": {
+            "raw": "eq"
+          }
+        }
+      }
+    },
+    {
       "operation": "http_request",
       "kwargs": {
         "url": {
           "value": {
-            "raw": ""
+            "raw": "/api/qualitygates/select"
           }
         },
         "client": {
@@ -36,6 +84,24 @@
         "payload": {
           "value": {
             "map": {
+              "gateId": {
+                "value": {
+                  "source": "createGates",
+                  "path": "id"
+                }
+              },
+              "organization": {
+                "value": {
+                  "source": "createGates",
+                  "path": "sonarcloudOrgKey"
+                }
+              },
+              "projectKey": {
+                "value": {
+                  "source": "createProjects",
+                  "path": "key"
+                }
+              }
             }
           }
         }

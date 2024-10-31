@@ -40,8 +40,10 @@ def get_available_task_configs(client_version, edition):
 
 def generate_task_plan(target_tasks, task_configs, completed=None):
     tasks = set()
+    if completed is None:
+        completed = set()
     for task in target_tasks:
-        dependencies = extract_dependencies(task=task, task_configs=task_configs)
+        dependencies = extract_dependencies(task=task, task_configs=task_configs, completed=completed)
         if dependencies is None:
             continue
         tasks.add(task)
@@ -49,13 +51,15 @@ def generate_task_plan(target_tasks, task_configs, completed=None):
     return plan_tasks(tasks=tasks, task_configs=task_configs, completed=completed)
 
 
-def extract_dependencies(task, task_configs):
+def extract_dependencies(task, task_configs, completed):
     dependencies = set()
     entity_config = task_configs.get(task)
     if entity_config is None:
         return None
     for dependency in entity_config.get('dependencies', []):
-        nested_dependencies = extract_dependencies(task=dependency['key'], task_configs=task_configs)
+        if dependency['key'] in completed:
+            continue
+        nested_dependencies = extract_dependencies(task=dependency['key'], task_configs=task_configs, completed=completed)
         if nested_dependencies is None:
             dependencies = None
             break

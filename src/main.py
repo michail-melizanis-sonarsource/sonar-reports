@@ -1,7 +1,5 @@
-import csv
 import json
 from datetime import datetime, UTC
-from email.policy import default
 
 from constants import REPORT_TASKS, MIGRATION_TASKS
 import click
@@ -60,7 +58,7 @@ def extract(url, token, export_directory: str, extract_type, pem_file_path=None,
                 url=url,
                 target_tasks=target_tasks,
                 available_configs=list(configs.keys()),
-                extract_id=extract_id,
+                run_id=extract_id,
             ), f
         )
     execute_plan(execution_plan=plan, inputs=dict(url=url), concurrency=concurrency, task_configs=configs,
@@ -131,11 +129,24 @@ def migrate(token, edition, url, concurrency, run_id, export_directory):
     extract_mapping = get_unique_extracts(directory=export_directory)
     configure_logger(name='http_request', level='INFO', output_file=os.path.join(run_dir, 'requests.log'))
     configs = get_available_task_configs(client_version='cloud', edition=edition)
+    target_tasks = list([k for k in configs.keys() if not k.startswith('get')])
     plan = generate_task_plan(
-        target_tasks=list([k for k, v in configs.keys() if not k.startswith('get')]),
-        task_configs=configs, completed=completed)
-    execute_plan(execution_plan=plan, inputs=dict(url=url), concurrency=concurrency, task_configs=configs,
-                 output_directory=export_directory, current_run_id=run_id, run_ids=set(extract_mapping.values()).union({run_id}))
+        target_tasks=target_tasks,
+        task_configs=configs, completed=completed.union(MIGRATION_TASKS))
+    with open(os.path.join(run_dir, 'plan.json'), 'wt') as f:
+        json.dump(
+            dict(
+                plan=plan,
+                version='cloud',
+                edition=edition,
+                url=url,
+                target_tasks=target_tasks,
+                available_configs=list(configs.keys()),
+                run_id=run_id,
+            ), f
+        )
+    # execute_plan(execution_plan=plan, inputs=dict(url=url), concurrency=concurrency, task_configs=configs,
+    #              output_directory=export_directory, current_run_id=run_id, run_ids=set(extract_mapping.values()).union({run_id}))
 
 
 if __name__ == '__main__':

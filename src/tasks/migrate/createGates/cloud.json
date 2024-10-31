@@ -6,7 +6,8 @@
     }
   ],
   "editions": [
-    "enterprise"
+    "enterprise",
+    "team"
   ],
   "operations": [
     {
@@ -28,6 +29,11 @@
             "raw": "POST"
           }
         },
+        "outputKey": {
+          "value": {
+            "raw": null
+          }
+        },
         "encoding": {
           "value": {
             "raw": "x-www-form-urlencoded"
@@ -39,13 +45,13 @@
               "name": {
                 "value": {
                   "source": "generateGateMappings",
-                  "path": "$.gate.name"
+                  "path": "name"
                 }
               },
               "organization": {
                 "value": {
                   "source": "generateGateMappings",
-                  "path": "$.gate.sonarCloudOrgKey"
+                  "path": "sonarcloud_org_key"
                 }
               }
             }
@@ -63,7 +69,35 @@
         },
         "val": {
           "source": "generateGateMappings",
-          "path": "$.gate.sonarCloudOrgKey"
+          "path": "sonarcloud_org_key"
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "sourceServerUrl"
+          }
+        },
+        "val": {
+          "source": "generateGateMappings",
+          "path": "server_url"
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "isDefault"
+          }
+        },
+        "val": {
+          "source": "generateGateMappings",
+          "path": "is_default"
         }
       }
     }

@@ -1,7 +1,7 @@
 {
   "dependencies": [
     {
-      "key": "createGates",
+      "key": "createProjects",
       "strategy": "each"
     }
   ],
@@ -14,18 +14,18 @@
       "kwargs": {
         "left": {
           "value": {
-            "source": "createGates",
-            "path": "isDefault"
+            "source": "createProjects",
+            "path": "mainBranch"
           }
         },
         "right": {
           "value": {
-            "raw": true
+            "raw": "master"
           }
         },
         "operator": {
           "value": {
-            "raw": "eq"
+            "raw": "neq"
           }
         }
       }
@@ -35,7 +35,7 @@
       "kwargs": {
         "url": {
           "value": {
-            "raw": "/api/qualitygates/set_as_default"
+            "raw": "/api/project_branches/rename"
           }
         },
         "client": {
@@ -57,16 +57,16 @@
         "payload": {
           "value": {
             "map": {
-              "id": {
+              "project": {
                 "value": {
-                  "source": "createGates",
-                  "path": "id"
+                  "source": "createProjects",
+                  "path": "key"
                 }
               },
-              "organization": {
+              "name": {
                 "value": {
-                  "source": "createGates",
-                  "path": "sonarcloudOrgKey"
+                  "source": "createProjects",
+                  "path": "mainBranch"
                 }
               }
             }

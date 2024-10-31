@@ -79,4 +79,8 @@ def map_project_structure(export_directory, extract_mapping):
             monorepo=project_binding.get('project_binding', dict()).get('monorepo', False),
             summary_comment_enabled=project_binding.get('project_binding', dict()).get('summaryCommentEnabled', False),
         )
+        # TODO add main branch
+        # todo add new code definition
+        # add gate
+        # add profiles
     return list(unique_bindings.values()), list(projects.values())
