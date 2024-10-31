@@ -102,6 +102,24 @@
           "operations": []
         }
       }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "serverUrl"
+          },
+          "operations": []
+        },
+        "val": {
+          "value": {
+            "source": "inputs",
+            "path": "url"
+          },
+          "operations": []
+        }
+      }
     }
   ]
 }

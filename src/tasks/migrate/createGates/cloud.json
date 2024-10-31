@@ -1,7 +1,7 @@
 {
   "dependencies": [
     {
-      "key": "getGates",
+      "key": "generateGateMappings",
       "strategy": "each"
     }
   ],
@@ -45,7 +45,7 @@
               "organization": {
                 "value": {
                   "source": "generateGateMappings",
-                  "path": "sonarCloudOrgKey"
+                  "path": "$.gate.sonarCloudOrgKey"
                 }
               }
             }
@@ -63,7 +63,7 @@
         },
         "val": {
           "source": "generateGateMappings",
-          "path": "sonarCloudOrgKey"
+          "path": "$.gate.sonarCloudOrgKey"
         }
       }
     }

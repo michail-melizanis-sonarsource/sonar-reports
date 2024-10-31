@@ -5,32 +5,35 @@ from copy import deepcopy
 
 from logs import log_event
 from dependencies import load_dependencies
+from utils import export_jsonl
 
 
-def execute_plan(execution_plan, inputs, concurrency, task_configs, output_directory):
+def execute_plan(execution_plan, inputs, concurrency, task_configs, output_directory, current_run_id, run_ids):
     for idx, phase in enumerate(execution_plan):
         log_event(level='WARNING', status='success', process_type='execute_plan', payload=dict(message=f"Executing phase {idx + 1} of {len(execution_plan)}"))
 
         execute_phase(phase=phase, inputs=inputs, concurrency=concurrency, task_configs=task_configs,
-                      output_directory=output_directory)
+                      output_directory=output_directory, current_run_id=current_run_id, run_ids=run_ids)
 
 
-def execute_phase(phase, inputs, concurrency, task_configs, output_directory):
+def execute_phase(phase, inputs, concurrency, task_configs, output_directory, current_run_id, run_ids):
     for task in phase:
         log_event(level='WARNING', status='success', process_type='execute_phase', payload=dict(message=f"Executing task {task} - {phase.index(task) + 1} of {len(phase)}"))
         execute_task(task=task, task_config=task_configs[task], inputs=inputs, concurrency=concurrency,
-                     output_directory=output_directory)
+                     output_directory=output_directory, run_id=current_run_id, run_ids=run_ids)
 
 
-def execute_task(task, concurrency, inputs, task_config, output_directory):
+def execute_task(task, concurrency, inputs, task_config, output_directory, run_id, run_ids):
     dependencies = load_dependencies(
         inputs=inputs,
         task=task,
         task_config=task_config,
         concurrency=concurrency,
-        output_directory=output_directory
+        output_directory=output_directory,
+        run_ids=run_ids
     )
-    os.makedirs(f"{output_directory}/{task}", exist_ok=True)
+    export_dir = f"{output_directory}{run_id}/"
+    os.makedirs(f"{export_dir}/{task}", exist_ok=True)
 
     for idx, chunk in enumerate(dependencies):
         output = True
@@ -40,9 +43,7 @@ def execute_task(task, concurrency, inputs, task_config, output_directory):
                 output = False
                 break
         if output:
-            with open(f"{output_directory}/{task}/results.{idx+1}.jsonl", 'wt') as f:
-                for i in chunk:
-                    f.write(json.dumps(i['obj']) + '\n')
+            export_jsonl(directory=export_dir, name=task, data=chunk, idx=idx)
 
 
 def execute_operation(operation_config, idx, chunk):

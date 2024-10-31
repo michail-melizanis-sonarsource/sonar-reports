@@ -38,7 +38,7 @@ def get_available_task_configs(client_version, edition):
     return available_tasks
 
 
-def generate_task_plan(target_tasks, task_configs):
+def generate_task_plan(target_tasks, task_configs, completed=None):
     tasks = set()
     for task in target_tasks:
         dependencies = extract_dependencies(task=task, task_configs=task_configs)
@@ -46,7 +46,7 @@ def generate_task_plan(target_tasks, task_configs):
             continue
         tasks.add(task)
         tasks = tasks.union(dependencies)
-    return plan_tasks(tasks=tasks, task_configs=task_configs)
+    return plan_tasks(tasks=tasks, task_configs=task_configs, completed=completed)
 
 
 def extract_dependencies(task, task_configs):
@@ -64,8 +64,9 @@ def extract_dependencies(task, task_configs):
     return dependencies
 
 
-def plan_tasks(tasks: set, task_configs: dict):
-    completed = set()
+def plan_tasks(tasks: set, task_configs: dict, completed: set = None):
+    if completed is None:
+        completed = set()
     task_plan = list()
     continue_planning = True
     while continue_planning:

@@ -1,7 +1,11 @@
 {
   "dependencies": [
     {
-      "key": "groupMapping",
+      "key": "getGroups",
+      "strategy": "each"
+    },
+    {
+      "key": "generateOrgMappings",
       "strategy": "each"
     }
   ],
@@ -43,19 +47,19 @@
             "map": {
               "name": {
                 "value": {
-                  "source": "groupMapping",
+                  "source": "getGroups",
                   "path": "name"
                 }
               },
               "description": {
                 "value": {
-                  "source": "groupMapping",
+                  "source": "getGroups",
                   "path": "description"
                 }
               },
               "organization": {
                 "value": {
-                  "source": "groupMapping",
+                  "source": "",
                   "path": "sonarCloudOrgKey"
                 }
               }

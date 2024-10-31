@@ -1,10 +1,40 @@
 {
   "dependencies": [
+    {
+      "key": "generateProjectMappings",
+      "strategy": "map",
+      "groupKey": "projectKey"
+    },
+    {
+      "key": "getProfileMappings",
+      "strategy": "each"
+    }
   ],
   "editions": [
     "enterprise"
   ],
   "operations": [
-
+    {
+      "operation": "apply_filter",
+      "kwargs": {
+        "left": {
+          "value": {
+            "source": "generateProjectMappings",
+            "path": "$.sonarCloudOrgKey"
+          }
+        },
+        "right": {
+          "value": {
+            "source": "getProfileMappings",
+            "path": "sonarCloudOrgKey"
+          }
+        },
+        "operator": {
+          "value": {
+            "raw": "contains"
+          }
+        }
+      }
+    }
   ]
 }

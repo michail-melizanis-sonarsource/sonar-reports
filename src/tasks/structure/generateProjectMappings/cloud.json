@@ -26,18 +26,40 @@
       }
     },
     {
-        "operation": "set_key",
-        "kwargs": {
-            "key": {
-            "value": {
-                "raw": "sonarCloudOrgKey"
-            }
-            },
-            "val": {
-            "source": "groupMapping",
-            "path": "generateOrgMappings"
-            }
+      "operation": "apply_filter",
+      "kwargs": {
+        "left": {
+          "value": {
+            "source": "generateOrgMappings",
+            "path": "sonarQubeOrgKey"
+          }
+        },
+        "right": {
+          "value": {
+            "source": "project",
+            "path": "sonarQubeOrgKey"
+          }
+        },
+        "operator": {
+          "value": {
+            "raw": "eq"
+          }
         }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "sonarCloudOrgKey"
+          }
+        },
+        "val": {
+          "source": "generateOrgMappings",
+          "path": "sonarCloudOrgKey"
+        }
+      }
     }
   ]
 }

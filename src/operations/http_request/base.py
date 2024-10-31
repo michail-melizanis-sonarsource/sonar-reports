@@ -109,7 +109,7 @@ def process_errors(exc, method, url, log_attributes):
                 method=method,
                 url=url,
                 status=status_code,
-                content=exc.response.content,
+                content=exc.response.text,
                 created_ts=datetime.now(tz=timezone.utc).timestamp(),
                 **log_attributes,
             ),

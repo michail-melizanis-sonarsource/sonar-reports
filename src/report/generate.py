@@ -311,7 +311,7 @@ def process_sast_config(extract_directory):
     return sast
 
 
-def generate_markdown(url, extract_directory):
+def generate_markdown(extract_directory):
     with open(MARKDOWN_PATH, 'rt') as f:
         template_content = f.read()
     server_info = load_server_info(extract_directory=extract_directory)
@@ -328,7 +328,7 @@ def generate_markdown(url, extract_directory):
             version=server_info['Application Nodes'][0]['System']['Version'] if server_info.get(
                 'Application Nodes') else server_info['System']['Version']
         ),
-        server_url=url,
+        server_url=server_info['serverUrl'],
         project_count=len(projects),
         lines_of_code=sum(
             process_entity(extract_directory=extract_directory, entity_type='getUsage', key='$.linesOfCode')

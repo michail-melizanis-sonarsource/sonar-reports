@@ -1,7 +1,7 @@
 from collections import defaultdict
 from utils import object_reader
-
-def load_dependencies(task, inputs, task_config, concurrency, output_directory) -> list:
+import os
+def load_dependencies(task, inputs, task_config, concurrency, output_directory, run_ids) -> list:
     from functools import partial
     from itertools import product
     # required_keys = plan_dependency_values(config=task_config, task=task)
@@ -11,6 +11,7 @@ def load_dependencies(task, inputs, task_config, concurrency, output_directory) 
             load_dependency,
             dependency=dependency,
             directory=output_directory,
+            run_ids=run_ids
             # required_keys=required_keys[dependency['key']]
         )
         for dependency in dependencies
@@ -38,7 +39,7 @@ def load_dependencies(task, inputs, task_config, concurrency, output_directory) 
         if chunk:
             yield chunk
 
-def load_dependency(dependency, directory):
+def load_dependency(dependency, directory, run_ids):
     strategy_mapper = {
         'each': load_each,
         'chunk': load_chunk,
@@ -46,38 +47,42 @@ def load_dependency(dependency, directory):
         'map': load_map
     }
     load_strategy = dependency.get('loadStrategy', 'each')
-    for results in strategy_mapper[load_strategy](dependency=dependency, directory=directory):
+    for results in strategy_mapper[load_strategy](dependency=dependency, directory=directory, run_ids=run_ids):
         yield results
 
 
-def load_chunk(dependency, directory):
+def load_chunk(dependency, directory, run_ids: set[str]):
     objs = list()
-    for obj in object_reader(directory=directory, key=dependency['key']):
-        # results = clean_entity(entity=obj, required_keys=required_keys)
-        objs.append(obj)
-        if len(objs) >= dependency['chunkSize']:
-            yield objs
-            objs = list()
+    for run_id in run_ids:
+        for obj in object_reader(directory=os.path.join(directory, run_id), key=dependency['key']):
+            # results = clean_entity(entity=obj, required_keys=required_keys)
+            objs.append(obj)
+            if len(objs) >= dependency['chunkSize']:
+                yield objs
+                objs = list()
     if objs:
         yield objs
 
 
-def load_all(dependency, directory):
+def load_all(dependency, directory, run_ids: set[str]):
     objs = list()
-    for obj in object_reader(directory=directory, key=dependency['key']):
-        objs.append(obj)
+    for run_id in run_ids:
+        for obj in object_reader(directory=os.path.join(directory, run_id), key=dependency['key']):
+            objs.append(obj)
     yield objs
 
 
-def load_each(dependency, directory):
-    for obj in object_reader(directory=directory, key=dependency['key']):
-        yield obj
+def load_each(dependency, directory, run_ids: set[str]):
+    for run_id in run_ids:
+        for obj in object_reader(directory=os.path.join(directory, run_id), key=dependency['key']):
+            yield obj
 
 
-def load_map(dependency, directory):
+def load_map(dependency, directory, run_ids: set[str]):
     objs = defaultdict(list)
-    for obj in object_reader(directory=directory,  key=dependency['key']):
-        objs[obj[dependency['uniqueKey']]].append(obj)
+    for run_id in run_ids:
+        for obj in object_reader(directory=os.path.join(directory, run_id),  key=dependency['key']):
+            objs[obj[dependency['groupKey']]].append(obj)
     yield objs
 
 

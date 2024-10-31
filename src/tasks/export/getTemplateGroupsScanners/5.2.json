@@ -83,7 +83,7 @@
               },
               "permission": {
                 "value": {
-                  "raw": "user"
+                  "raw": "scan"
                 },
                 "operations": []
               }
@@ -106,6 +106,24 @@
           "value": {
             "source": "getTemplates",
             "path": "$.id"
+          },
+          "operations": []
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "serverUrl"
+          },
+          "operations": []
+        },
+        "val": {
+          "value": {
+            "source": "inputs",
+            "path": "url"
           },
           "operations": []
         }

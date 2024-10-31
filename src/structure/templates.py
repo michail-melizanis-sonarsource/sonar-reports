@@ -1,0 +1,38 @@
+from utils import multi_extract_object_reader
+import re
+
+def add_template(results, org_key, template, server_url, is_default):
+    unique_key = org_key + template['id']
+    results[unique_key] = dict(
+        unique_key=unique_key,
+        source_template_key=template['id'],
+        name=template['name'],
+        description=template.get('description'),
+        server_url=server_url,
+        is_default=is_default,
+        sonarqube_org_key=org_key,
+    )
+    return results
+
+def map_templates(project_org_mapping, extract_mapping, export_directory):
+    results = dict()
+    org_keys = set(project_org_mapping.values())
+    default_templates = set()
+    for server_url, template in multi_extract_object_reader(directory=export_directory, mapping=extract_mapping,
+                                                            key='getDefaultTemplates'):
+        template_key = server_url + template['templateId']
+        default_templates.add(template_key)
+    for server_url, template in multi_extract_object_reader(directory=export_directory, mapping=extract_mapping,
+                                                            key='getTemplates'):
+        template_key = server_url + template['id']
+        if template_key in default_templates:
+            for org_key in org_keys:
+                results = add_template(results=results, org_key=org_key, template=template, server_url=server_url,
+                                       is_default=True)
+        elif template.get('projectKeyPattern', ''):
+            regex = re.compile(template['projectKeyPattern'])
+            for matched in filter(regex.match, project_org_mapping.keys()):
+                org_key = project_org_mapping[matched]
+                results = add_template(results=results, org_key=org_key, template=template, server_url=server_url,
+                                       is_default=False)
+    return list(results.values())
