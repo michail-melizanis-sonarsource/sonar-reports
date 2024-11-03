@@ -19,7 +19,7 @@
       "kwargs": {
         "url": {
           "value": {
-            "raw": "/api/settings/set"
+            "raw": "/api/projects/create"
           }
         },
         "client": {
@@ -38,7 +38,7 @@
             "raw": "x-www-form-urlencoded"
           }
         },
-        "outputKey": {
+        "resultKey": {
           "value": {
             "raw": "project"
           }
@@ -65,7 +65,7 @@
                             },
                             {
                               "value": {
-                                "source": "projectMappings",
+                                "source": "generateProjectMappings",
                                 "path": "key"
                               }
                             }
@@ -100,14 +100,12 @@
               },
               "newCodeDefinitionType": {
                 "value": {
-                  "source": "generateProjectMappings",
-                  "path": "new_code_type"
+                  "raw": "days"
                 }
               },
               "newCodeDefinitionValue": {
                 "value": {
-                  "source": "generateProjectMappings",
-                  "path": "new_code_value"
+                  "raw": 30
                 }
               }
             }
@@ -124,8 +122,10 @@
           }
         },
         "val": {
-          "source": "generateProjectMappings",
-          "path": "is_cloud_binding"
+          "value": {
+            "source": "generateProjectMappings",
+            "path": "is_cloud_binding"
+          }
         }
       }
     },
@@ -138,8 +138,10 @@
           }
         },
         "val": {
-          "source": "generateProjectMappings",
-          "path": "server_url"
+          "value": {
+            "source": "generateProjectMappings",
+            "path": "server_url"
+          }
         }
       }
     },
@@ -152,8 +154,10 @@
           }
         },
         "val": {
-          "source": "generateProjectMappings",
-          "path": "repository"
+          "value": {
+            "source": "generateProjectMappings",
+            "path": "repository"
+          }
         }
       }
     },
@@ -166,8 +170,58 @@
           }
         },
         "val": {
-          "source": "generateProjectMappings",
-          "path": "main_branch"
+          "value": {
+            "source": "generateProjectMappings",
+            "path": "main_branch"
+          }
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "gateName"
+          }
+        },
+        "val": {
+          "value": {
+            "source": "generateProjectMappings",
+            "path": "gate_name"
+          }
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "sonarCloudOrgKey"
+          }
+        },
+        "val": {
+          "value": {
+            "source": "generateProjectMappings",
+            "path": "sonarcloud_org_key"
+          }
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "profiles"
+          }
+        },
+        "val": {
+          "value": {
+            "source": "generateProjectMappings",
+            "path": "profiles"
+          }
         }
       }
     }

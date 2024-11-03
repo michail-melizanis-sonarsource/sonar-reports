@@ -54,6 +54,11 @@
             "raw": "x-www-form-urlencoded"
           }
         },
+        "resultKey": {
+          "value": {
+            "raw": "$"
+          }
+        },
         "payload": {
           "value": {
             "map": {

@@ -63,6 +63,11 @@
             "raw": "x-www-form-urlencoded"
           }
         },
+        "resultKey": {
+          "value": {
+            "raw": "$"
+          }
+        },
         "payload": {
           "targetKey": {
             "value": {

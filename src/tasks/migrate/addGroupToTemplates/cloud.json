@@ -6,7 +6,7 @@
     },
     {
       "key": "createGroups",
-      "strategy": "each"
+      "strategy": "none"
     },
     {
       "key": "createPermissionTemplates",
@@ -24,34 +24,12 @@
         "left": {
           "value": {
             "source": "getTemplateGroupsViewers",
-            "path": "name"
-          }
-        },
-        "right": {
-          "value": {
-            "source": "createGroups",
-            "path": "sourceGroupName"
-          }
-        },
-        "operator": {
-          "value": {
-            "raw": "eq"
-          }
-        }
-      }
-    },
-    {
-      "operation": "apply_filter",
-      "kwargs": {
-        "left": {
-          "value": {
-            "source": "getTemplateGroupsViewers",
             "path": "serverUrl"
           }
         },
         "right": {
           "value": {
-            "source": "createGroups",
+            "source": "createPermissionTemplates",
             "path": "sourceServerUrl"
           }
         },
@@ -87,13 +65,13 @@
     {
       "operation": "expand_list",
       "kwargs": {
-        "inputKey": {
+        "inputs": {
           "value": {
             "source": "getTemplateGroupsViewers",
             "path": "permissions"
           }
         },
-        "outputKey": {
+        "resultKey": {
           "value": {
             "raw": "permission"
           }
@@ -129,7 +107,7 @@
             "map": {
               "groupName": {
                 "value": {
-                  "source": "createGroups",
+                  "source": "getTemplateGroupsViewers",
                   "path": "name"
                 }
               },
@@ -142,7 +120,7 @@
               "organization": {
                 "value": {
                   "source": "createPermissionTemplates",
-                  "path": "sonarcloudOrgKey"
+                  "path": "sonarCloudOrgKey"
                 }
               },
               "permission": {

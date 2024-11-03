@@ -54,6 +54,11 @@
             "raw": "x-www-form-urlencoded"
           }
         },
+        "resultKey": {
+          "value": {
+            "raw": "$"
+          }
+        },
         "payload": {
           "value": {
             "map": {
@@ -66,7 +71,7 @@
               "organization": {
                 "value": {
                   "source": "createGates",
-                  "path": "sonarcloudOrgKey"
+                  "path": "sonarCloudOrgKey"
                 }
               }
             }

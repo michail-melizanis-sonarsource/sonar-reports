@@ -1,12 +1,13 @@
 {
   "dependencies": [
     {
-      "key": "",
+      "key": "getPortfolios",
       "strategy": "each"
     }
   ],
   "editions": [
-    "enterprise"
+    "enterprise",
+    "teams"
   ],
   "operations": [
     {
@@ -14,7 +15,7 @@
       "kwargs": {
         "url": {
           "value": {
-            "raw": ""
+            "raw": "/enterprise/portfolios/delete"
           }
         },
         "client": {
@@ -23,14 +24,14 @@
             "path": "url"
           }
         },
-        "method": {
-          "value": {
-            "raw": "POST"
-          }
-        },
         "resultKey": {
           "value": {
             "raw": "$"
+          }
+        },
+        "method": {
+          "value": {
+            "raw": "POST"
           }
         },
         "encoding": {
@@ -41,6 +42,12 @@
         "payload": {
           "value": {
             "map": {
+              "project": {
+                "value": {
+                  "source": "getProjects",
+                  "path": "$.key"
+                }
+              }
             }
           }
         }

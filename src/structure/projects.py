@@ -42,7 +42,7 @@ def map_project_structure(export_directory, extract_mapping):
         server_url, project_binding in
         multi_extract_object_reader(directory=export_directory, key='getProjectBindings', mapping=extract_mapping)
     }
-    for server_url, project in multi_extract_object_reader(directory=export_directory, key='getProjects',
+    for server_url, project in multi_extract_object_reader(directory=export_directory, key='getProjectDetails',
                                                            mapping=extract_mapping):
         project_binding = project_bindings.get(server_url + project['key'], dict(binding=dict(key=server_url)))
         unique_binding_key = generate_unique_binding_key(
@@ -72,8 +72,11 @@ def map_project_structure(export_directory, extract_mapping):
         projects[unique_project_key] = dict(
             key=project['key'],
             name=project['name'],
+            gate_name=project.get('qualityGate', dict()).get('name'),
+            profiles = project.get('qualityProfiles', []),
             server_url=server_url,
             sonarqube_org_key=unique_binding_key,
+            main_branch=project.get('branch', 'master'),
             is_cloud_binding=is_cloud_binding(binding=project_binding['binding']),
             repository=project_binding.get('project_binding', dict()).get('repository'),
             monorepo=project_binding.get('project_binding', dict()).get('monorepo', False),
@@ -81,6 +84,4 @@ def map_project_structure(export_directory, extract_mapping):
         )
         # TODO add main branch
         # todo add new code definition
-        # add gate
-        # add profiles
     return list(unique_bindings.values()), list(projects.values())

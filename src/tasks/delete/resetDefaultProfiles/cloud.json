@@ -1,20 +1,42 @@
 {
   "dependencies": [
     {
-      "key": "",
+      "key": "getProfiles",
       "strategy": "each"
     }
   ],
   "editions": [
-    "enterprise"
+    "enterprise",
+    "teams"
   ],
   "operations": [
+    {
+      "operation": "apply_filter",
+      "kwargs": {
+        "operator": {
+          "value": {
+            "raw": "eq"
+          }
+        },
+        "left": {
+          "value": {
+            "source": "getProfiles",
+            "path": "$.name"
+          }
+        },
+        "right": {
+          "value": {
+            "raw": "Sonar way"
+          }
+        }
+      }
+    },
     {
       "operation": "http_request",
       "kwargs": {
         "url": {
           "value": {
-            "raw": ""
+            "raw": "/api/qualityprofiles/set_default"
           }
         },
         "client": {
@@ -41,6 +63,12 @@
         "payload": {
           "value": {
             "map": {
+              "key": {
+                "value": {
+                  "source": "getProfiles",
+                  "path": "$.key"
+                }
+              }
             }
           }
         }

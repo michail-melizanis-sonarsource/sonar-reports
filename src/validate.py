@@ -5,6 +5,7 @@ def validate_migration(directory, run_id):
     os.makedirs(run_dir, exist_ok=True)
     completed = set()
     mappings = [
+        "organizations",
         'projects',
         'templates',
         'profiles',

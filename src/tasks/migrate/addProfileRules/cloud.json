@@ -22,7 +22,7 @@
       "kwargs": {
         "left": {
           "value": {
-            "source": "createProfile",
+            "source": "createProfiles",
             "path": "sourceProfileKey"
           }
         },
@@ -56,6 +56,11 @@
         "method": {
           "value": {
             "raw": "POST"
+          }
+        },
+        "resultKey": {
+          "value": {
+            "raw": "$"
           }
         },
         "encoding": {
@@ -98,8 +103,10 @@
           }
         },
         "val": {
-          "source": "createProfiles",
-          "path": "sonarCloudOrgKey"
+          "value": {
+            "source": "createProfiles",
+            "path": "sonarCloudOrgKey"
+          }
         }
       }
     }

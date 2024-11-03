@@ -34,9 +34,9 @@
             "raw": "x-www-form-urlencoded"
           }
         },
-        "outputKey": {
+        "resultKey": {
           "value": {
-            "raw": null
+            "raw": "profile"
           }
         },
         "payload": {
@@ -73,9 +73,11 @@
             "raw": "sourceProfileKey"
           }
         },
-        "value": {
-          "source": "generateProfileMappings",
-          "path": "source_profile_key"
+        "val": {
+          "value": {
+            "source": "generateProfileMappings",
+            "path": "source_profile_key"
+          }
         }
       }
     },
@@ -87,9 +89,11 @@
             "raw": "sonarCloudOrgKey"
           }
         },
-        "value": {
-          "source": "generateProfileMappings",
-          "path": "sonarcloud_org_key"
+        "val": {
+          "value": {
+            "source": "generateProfileMappings",
+            "path": "sonarcloud_org_key"
+          }
         }
       }
     },
@@ -101,9 +105,11 @@
             "raw": "sourceServerUrl"
           }
         },
-        "value": {
-          "source": "generateProfileMappings",
-          "path": "server_url"
+        "val": {
+          "value": {
+            "source": "generateProfileMappings",
+            "path": "server_url"
+          }
         }
       }
     },
@@ -115,9 +121,11 @@
             "raw": "isDefault"
           }
         },
-        "value": {
-          "source": "generateProfileMappings",
-          "path": "is_default"
+        "val": {
+          "value": {
+            "source": "generateProfileMappings",
+            "path": "is_default"
+          }
         }
       }
     },
@@ -129,9 +137,11 @@
             "raw": "parentName"
           }
         },
-        "value": {
-          "source": "generateProfileMappings",
-          "path": "parent_name"
+        "val": {
+          "value": {
+            "source": "generateProfileMappings",
+            "path": "parent_name"
+          }
         }
       }
     }

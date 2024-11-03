@@ -25,6 +25,7 @@ def map_portfolios(export_directory, extract_mapping):
         portfolio_details[unique_key] = dict(
             source_portfolio_name=portfolio['portfolioKey'],
             server_url=server_url,
+            description=portfolio.get('description',''),
         )
     unique_portfolios = dict()
     for key, projects in portfolio_projects.items():

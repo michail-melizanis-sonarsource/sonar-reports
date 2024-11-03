@@ -60,13 +60,13 @@
     {
       "operation": "expand_list",
       "kwargs": {
-        "inputKey": {
+        "inputs": {
           "value": {
             "source": "getGroups",
             "path": "permissions"
           }
         },
-        "outputKey": {
+        "resultKey": {
           "value": {
             "raw": "permission"
           }
@@ -95,6 +95,11 @@
         "encoding": {
           "value": {
             "raw": "x-www-form-urlencoded"
+          }
+        },
+        "resultKey": {
+          "value": {
+            "raw": "$"
           }
         },
         "payload": {

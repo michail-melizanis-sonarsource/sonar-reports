@@ -19,13 +19,13 @@
         "left": {
           "value": {
             "source": "createProjects",
-            "path": "sonarcloudOrgKey"
+            "path": "sonarCloudOrgKey"
           }
         },
         "right": {
           "value": {
             "source": "createGates",
-            "path": "sonarcloudOrgKey"
+            "path": "sonarCloudOrgKey"
           }
         },
         "operator": {
@@ -71,6 +71,11 @@
             "path": "url"
           }
         },
+        "resultKey": {
+          "value": {
+            "raw": "$"
+          }
+        },
         "method": {
           "value": {
             "raw": "POST"
@@ -93,7 +98,7 @@
               "organization": {
                 "value": {
                   "source": "createGates",
-                  "path": "sonarcloudOrgKey"
+                  "path": "sonarCloudOrgKey"
                 }
               },
               "projectKey": {

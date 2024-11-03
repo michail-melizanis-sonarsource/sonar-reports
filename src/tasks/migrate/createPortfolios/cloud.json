@@ -1,7 +1,11 @@
 {
   "dependencies": [
     {
-      "key": "",
+      "key": "generatePortfolioMappings",
+      "strategy": "each"
+    },
+    {
+      "key": "getEnterprises",
       "strategy": "each"
     }
   ],
@@ -10,17 +14,39 @@
   ],
   "operations": [
     {
+      "operation": "apply_filter",
+        "kwargs": {
+            "left": {
+            "value": {
+                "source": "getEnterprises",
+                "path": "key"
+            }
+            },
+            "right": {
+            "value": {
+                "source": "inputs",
+                "path": "enterprise_key"
+            }
+            },
+            "operator": {
+            "value": {
+                "raw": "eq"
+            }
+            }
+        }
+    },
+    {
       "operation": "http_request",
       "kwargs": {
         "url": {
           "value": {
-            "raw": ""
+            "raw": "/enterprises/portfolios"
           }
         },
         "client": {
           "value": {
             "source": "inputs",
-            "path": "url"
+            "path": "api_url"
           }
         },
         "method": {
@@ -30,12 +56,40 @@
         },
         "encoding": {
           "value": {
-            "raw": "x-www-form-urlencoded"
+            "raw": "json"
+          }
+        },
+        "resultKey": {
+          "value": {
+            "raw": "$"
           }
         },
         "payload": {
           "value": {
             "map": {
+              "description": {
+                "value": {
+                  "source": "generatePortfolioMappings",
+                  "path": "description"
+                }
+              },
+              "name": {
+                "value": {
+                  "source": "generatePortfolioMappings",
+                  "path": "source_portfolio_name"
+                }
+              },
+              "enterpriseId": {
+                "value": {
+                  "source": "getEnterprises",
+                  "path": "id"
+                }
+              },
+              "selection": {
+                "value": {
+                  "raw": "projects"
+                }
+              }
             }
           }
         }

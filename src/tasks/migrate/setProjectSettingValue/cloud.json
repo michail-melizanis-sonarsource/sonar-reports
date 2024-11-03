@@ -7,6 +7,10 @@
     {
       "key": "getProjectSettings",
       "strategy": "each"
+    },
+    {
+      "key": "setOrganizationSettingValue",
+      "strategy": "none"
     }
   ],
   "editions": [
@@ -102,6 +106,11 @@
             "raw": "x-www-form-urlencoded"
           }
         },
+        "resultKey": {
+          "value": {
+            "raw": "$"
+          }
+        },
         "payload": {
           "value": {
             "map": {
@@ -120,7 +129,7 @@
               "organization": {
                 "value": {
                   "source": "createProjects",
-                  "path": "sonarcloudOrgKey"
+                  "path": "sonarCloudOrgKey"
                 }
               },
               "value": {

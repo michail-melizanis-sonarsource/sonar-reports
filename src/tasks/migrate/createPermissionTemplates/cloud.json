@@ -34,7 +34,7 @@
             "raw": "x-www-form-urlencoded"
           }
         },
-        "outputKey": {
+        "resultKey": {
           "value": {
             "raw": "permissionTemplate"
           }
@@ -72,32 +72,36 @@
       }
     },
     {
-        "operation": "set_key",
-        "kwargs": {
-            "key": {
-            "value": {
-                "raw": "sonarCloudOrgKey"
-            }
-            },
-            "val": {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "sonarCloudOrgKey"
+          }
+        },
+        "val": {
+          "value": {
             "source": "generateTemplateMappings",
             "path": "sonarcloud_org_key"
-            }
+          }
         }
+      }
     },
     {
-        "operation": "set_key",
-        "kwargs": {
-            "key": {
-            "value": {
-                "raw": "sourceTemplateKey"
-            }
-            },
-            "val": {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "sourceTemplateKey"
+          }
+        },
+        "val": {
+          "value": {
             "source": "generateTemplateMappings",
             "path": "source_template_key"
-            }
+          }
         }
+      }
     }
   ]
 }

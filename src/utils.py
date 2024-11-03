@@ -26,9 +26,9 @@ def get_unique_extracts(directory):
     url_mappings = defaultdict(set)
     for extract_id in os.listdir(directory):
         if not os.path.isdir(os.path.join(directory, extract_id)) or not os.path.exists(
-                os.path.join(directory, extract_id, 'plan.json')):
+                os.path.join(directory, extract_id, 'extract.json')):
             continue
-        with open(os.path.join(directory, extract_id, 'plan.json'), 'rt') as f:
+        with open(os.path.join(directory, extract_id, 'extract.json'), 'rt') as f:
             plan = json.load(f)
             url_mappings[plan['url']].add(extract_id)
     return {k: max(v) for k, v in url_mappings.items()}
@@ -45,7 +45,7 @@ def export_csv(directory, name, data):
         with open(os.path.join(directory, f'{name}.csv'), 'wt') as f:
             writer = csv.DictWriter(f, fieldnames=data[0].keys())
             writer.writeheader()
-            writer.writerows(data)
+            writer.writerows([{k:json.dumps(v) if any([isinstance(v, i) for i in [dict, list, bool]]) else v for k, v in row.items()} for row in data])
 
 
 def export_jsonl(directory: str, name: str, data: list, idx=0, key='obj'):
@@ -57,15 +57,38 @@ def export_jsonl(directory: str, name: str, data: list, idx=0, key='obj'):
     return filename
 
 
-def load_csv(directory, filename, coerce_booleans=True):
+def load_csv(directory, filename, coerce_types=True):
     if not os.path.exists(os.path.join(directory, filename)):
         return []
     with open(os.path.join(directory, filename), 'rt') as f:
         reader = csv.DictReader(f)
         data = list(reader)
-        if coerce_booleans:
+        if coerce_types:
             for row in data:
                 for k, v in row.items():
-                    if v.lower() in ['true', 'false']:
-                        row[k] = v.lower() == 'true'
+                    if v:
+                        try:
+                            row[k] = json.loads(v)
+                        except json.JSONDecodeError:
+                            pass
         return data
+
+def filter_completed(plan, directory:str):
+    filtered = list()
+    completed = list()
+    for phase in plan:
+        for task in phase:
+            path = os.path.join(directory, task)
+            if os.path.exists(path):
+                completed.append(task)
+            else:
+                break
+    completed = completed[:-1]
+    for phase in plan:
+        filtered_phase = []
+        for task in phase:
+            if task not in completed:
+                filtered_phase.append(task)
+        if filtered_phase:
+            filtered.append(filtered_phase)
+    return filtered

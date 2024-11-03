@@ -9,6 +9,8 @@ from utils import export_jsonl
 
 
 def execute_plan(execution_plan, inputs, concurrency, task_configs, output_directory, current_run_id, run_ids):
+    log_event(level='WARNING', status='success', process_type='execute_plan',
+              payload=dict(message=list(run_ids)))
     for idx, phase in enumerate(execution_plan):
         log_event(level='WARNING', status='success', process_type='execute_plan', payload=dict(message=f"Executing phase {idx + 1} of {len(execution_plan)}"))
 
@@ -34,7 +36,6 @@ def execute_task(task, concurrency, inputs, task_config, output_directory, run_i
     )
     export_dir = f"{output_directory}{run_id}/"
     os.makedirs(f"{export_dir}/{task}", exist_ok=True)
-
     for idx, chunk in enumerate(dependencies):
         output = True
         for operation_config in task_config['operations']:

@@ -1,31 +1,40 @@
 {
   "dependencies": [
     {
-      "key": "createProfiles",
+      "key": "getProfiles",
       "strategy": "each"
+    },
+    {
+      "key": "deleteProjects",
+      "strategy": "none"
+    },
+    {
+      "key": "resetDefaultProfiles",
+      "strategy": "none"
     }
   ],
   "editions": [
-    "enterprise"
+    "enterprise",
+    "teams"
   ],
   "operations": [
     {
       "operation": "apply_filter",
       "kwargs": {
+        "operator": {
+          "value": {
+            "raw": "neq"
+          }
+        },
         "left": {
           "value": {
-            "source": "createProfiles",
-            "path": "isDefault"
+            "source": "getProfiles",
+            "path": "$.isBuiltIn"
           }
         },
         "right": {
           "value": {
             "raw": true
-          }
-        },
-        "operator": {
-          "value": {
-            "raw": "eq"
           }
         }
       }
@@ -35,7 +44,7 @@
       "kwargs": {
         "url": {
           "value": {
-            "raw": "/api/qualityprofiles/set_default"
+            "raw": "/api/qualityprofiles/delete"
           }
         },
         "client": {
@@ -49,35 +58,23 @@
             "raw": "POST"
           }
         },
-        "encoding": {
-          "value": {
-            "raw": "x-www-form-urlencoded"
-          }
-        },
         "resultKey": {
           "value": {
             "raw": "$"
           }
         },
+        "encoding": {
+          "value": {
+            "raw": "x-www-form-urlencoded"
+          }
+        },
         "payload": {
           "value": {
             "map": {
-              "language": {
+              "key": {
                 "value": {
-                  "source": "createProfiles",
-                  "path": "language"
-                }
-              },
-              "qualityProfile": {
-                "value": {
-                  "source": "createProfiles",
-                  "path": "name"
-                }
-              },
-              "organization": {
-                "value": {
-                  "source": "createProfiles",
-                  "path": "sonarCloudOrgKey"
+                  "source": "getProfiles",
+                  "path": "$.key"
                 }
               }
             }

@@ -29,9 +29,9 @@
             "raw": "POST"
           }
         },
-        "outputKey": {
+        "resultKey": {
           "value": {
-            "raw": null
+            "raw": "$"
           }
         },
         "encoding": {
@@ -68,8 +68,10 @@
           }
         },
         "val": {
-          "source": "generateGateMappings",
-          "path": "sonarcloud_org_key"
+          "value": {
+            "source": "generateGateMappings",
+            "path": "sonarcloud_org_key"
+          }
         }
       }
     },
@@ -82,8 +84,10 @@
           }
         },
         "val": {
-          "source": "generateGateMappings",
-          "path": "server_url"
+          "value": {
+            "source": "generateGateMappings",
+            "path": "server_url"
+          }
         }
       }
     },
@@ -96,8 +100,10 @@
           }
         },
         "val": {
-          "source": "generateGateMappings",
-          "path": "is_default"
+          "value": {
+            "source": "generateGateMappings",
+            "path": "is_default"
+          }
         }
       }
     }

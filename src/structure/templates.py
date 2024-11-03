@@ -22,14 +22,15 @@ def map_templates(project_org_mapping, extract_mapping, export_directory):
                                                             key='getDefaultTemplates'):
         template_key = server_url + template['templateId']
         default_templates.add(template_key)
+
     for server_url, template in multi_extract_object_reader(directory=export_directory, mapping=extract_mapping,
                                                             key='getTemplates'):
         template_key = server_url + template['id']
-        if template_key in default_templates:
+        if template_key in default_templates or not template.get('projectKeyPattern', ''):
             for org_key in org_keys:
                 results = add_template(results=results, org_key=org_key, template=template, server_url=server_url,
-                                       is_default=True)
-        elif template.get('projectKeyPattern', ''):
+                                       is_default=template_key in default_templates)
+        else:
             regex = re.compile(template['projectKeyPattern'])
             for matched in filter(regex.match, project_org_mapping.keys()):
                 org_key = project_org_mapping[matched]

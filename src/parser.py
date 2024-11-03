@@ -24,7 +24,7 @@ def parse_value_field(obj, value_config):
         for k, v in value_config["map"].items():
             val[k] = parse_field(obj=obj, field_config=v)
     elif 'array' in value_config.keys():
-        val = [parse_field(obj=obj, field_config=v) for v in value_config['list']]
+        val = [parse_field(obj=obj, field_config=v) for v in value_config['array']]
     return val
 
 

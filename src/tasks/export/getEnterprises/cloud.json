@@ -1,10 +1,5 @@
 {
-  "dependencies": [
-    {
-      "key": "",
-      "strategy": "each"
-    }
-  ],
+  "dependencies": [],
   "editions": [
     "enterprise"
   ],
@@ -14,29 +9,33 @@
       "kwargs": {
         "url": {
           "value": {
-            "raw": ""
+            "raw": "/enterprises/enterprises"
           }
         },
         "client": {
           "value": {
             "source": "inputs",
-            "path": "url"
+            "path": "api_url"
           }
         },
         "method": {
           "value": {
-            "raw": "POST"
+            "raw": "GET"
           }
         },
         "encoding": {
           "value": {
-            "raw": "x-www-form-urlencoded"
+            "raw": "json"
           }
         },
-        "payload": {
+        "resultKeys": {
           "value": {
-            "map": {
-            }
+            "raw": "$"
+          }
+        },
+        "params": {
+          "value": {
+            "map": {}
           }
         }
       }

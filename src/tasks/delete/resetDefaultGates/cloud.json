@@ -1,31 +1,32 @@
 {
   "dependencies": [
     {
-      "key": "createProfiles",
+      "key": "getGates",
       "strategy": "each"
     }
   ],
   "editions": [
-    "enterprise"
+    "enterprise",
+    "teams"
   ],
   "operations": [
     {
       "operation": "apply_filter",
       "kwargs": {
+        "operator": {
+          "value": {
+            "raw": "eq"
+          }
+        },
         "left": {
           "value": {
-            "source": "createProfiles",
-            "path": "parentName"
+            "source": "getGates",
+            "path": "$.name"
           }
         },
         "right": {
           "value": {
-            "raw": null
-          }
-        },
-        "operator": {
-          "value": {
-            "raw": "neq"
+            "raw": "Sonar way"
           }
         }
       }
@@ -35,7 +36,7 @@
       "kwargs": {
         "url": {
           "value": {
-            "raw": "/api/qualityprofiles/change_parent"
+            "raw": "/api/qualitygates/set_as_default"
           }
         },
         "client": {
@@ -64,26 +65,14 @@
             "map": {
               "organization": {
                 "value": {
-                  "source": "createProfiles",
-                  "path": "sonarCloudOrgKey"
+                  "source": "inputs",
+                  "path": "org_key"
                 }
               },
-              "language": {
+              "id": {
                 "value": {
-                  "source": "createProfiles",
-                  "path": "language"
-                }
-              },
-              "parentQualityProfile": {
-                "value": {
-                  "source": "createProfiles",
-                  "path": "parentName"
-                }
-              },
-              "qualityProfile": {
-                "value": {
-                  "source": "createProfiles",
-                  "path": "name"
+                  "source": "getGates",
+                  "path": "$.id"
                 }
               }
             }

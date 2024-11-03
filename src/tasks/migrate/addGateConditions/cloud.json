@@ -25,7 +25,7 @@
         "right": {
           "value": {
             "source": "getGateConditions",
-            "path": "sourceServerUrl"
+            "path": "serverUrl"
           }
         },
         "operator": {
@@ -81,6 +81,11 @@
             "raw": "x-www-form-urlencoded"
           }
         },
+        "resultKey": {
+          "value": {
+            "raw": "$"
+          }
+        },
         "payload": {
           "value": {
             "map": {
@@ -128,8 +133,10 @@
           }
         },
         "val": {
-          "source": "createGates",
-          "path": "sonarCloudOrgKey"
+          "value": {
+            "source": "createGates",
+            "path": "sonarCloudOrgKey"
+          }
         }
       }
     }

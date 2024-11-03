@@ -1,6 +1,7 @@
 import httpx
 from tenacity import retry, stop_after_attempt, wait_random_exponential
 
+
 httpx_client: tuple = None, None
 from logs import log_event
 from datetime import datetime, timezone
@@ -54,6 +55,7 @@ def safe_json_request(host, method, url, stop=stop_after_attempt(3), reraise=Tru
         log_attributes = {
             k: v for k, v in kwargs.items() if k not in ['headers', 'files']
         }
+    log_event(level='info', status='success', process_type='request_started', payload=log_attributes, logger_name='http_request')
     args = dict(
         client=client, method=method, url=url, stop=stop, reraise=reraise, wait=wait,
         raise_over=raise_over,
@@ -62,15 +64,27 @@ def safe_json_request(host, method, url, stop=stop_after_attempt(3), reraise=Tru
     return async_safe_json_request(**args)
 
 
-async def async_safe_json_request(client, method, url, log_attributes, raise_over, reraise,
+async def async_safe_json_request(client, method, url, log_attributes:dict, raise_over, reraise,
                                   stop, wait, **kwargs):
     import httpx
     @retry(stop=stop, reraise=reraise, wait=wait)
     async def make_async_request():
         resp = await client.request(method=method, url=url, **kwargs)
+        log_event(
+            level='info', status='success', process_type='request_completed', payload=dict(
+                method=method,
+                url=url,
+                status=resp.status_code,
+                created_ts=datetime.now(tz=timezone.utc).timestamp(),
+                response=resp.text,
+                **log_attributes,
+            ),
+            logger_name='http_request'
+        )
         status, json_response = process_response(
             resp=resp, raise_over=raise_over
         )
+
         return status, json_response
 
     try:
@@ -118,3 +132,6 @@ def process_errors(exc, method, url, log_attributes):
         js = format_response_body(response=exc.response)
         status_code = exc.response.status_code
     return status_code, js
+
+def get_enterprise_id(url, token):
+    url = url.replace('https://', 'https://api.')

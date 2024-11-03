@@ -1,11 +1,13 @@
 from collections import defaultdict
+
+from logs import log_event
 from utils import object_reader
 import os
 def load_dependencies(task, inputs, task_config, concurrency, output_directory, run_ids) -> list:
     from functools import partial
     from itertools import product
     # required_keys = plan_dependency_values(config=task_config, task=task)
-    dependencies = task_config.get('dependencies', [])
+    dependencies = [i for i in task_config.get('dependencies', []) if i.get('strategy', 'each') != 'none']
     load_funcs = [
         partial(
             load_dependency,

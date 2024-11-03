@@ -12,21 +12,21 @@ def flatten_dependencies(profile_map, profile_key):
 
 def add_profile(profile_map, results, org_key, server_url, profile_key):
     if profile_key in profile_map.keys() and not profile_map[profile_key].get('isBuiltIn'):
-        dependencies = flatten_dependencies(profile_map=profile_map, profile_key=profile_key)
-        for dependency_key in dependencies:
-            dependency = profile_map[dependency_key]
-            if dependency.get('isBuiltIn'):
-                continue
-            unique_key = org_key + profile_key
-            results[unique_key] = dict(
-                unique_key=unique_key,
-                name=dependency['name'],
-                language=dependency['language'],
-                server_url=server_url,
-                is_default=profile_map[profile_key].get('isDefault', False),
-                source_profile_key=profile_key,
-                sonarqube_org_key=org_key,
-            )
+        profile = profile_map[profile_key]
+        unique_key = org_key + profile_key
+        results[unique_key] = dict(
+            unique_key=unique_key,
+            name=profile['name'],
+            language=profile['language'],
+            parent_name=profile_map.get(profile.get('parentKey'), dict()).get('name'),
+            server_url=server_url,
+            is_default=profile_map[profile_key].get('isDefault', False),
+            source_profile_key=profile_key,
+            sonarqube_org_key=org_key,
+        )
+        if profile.get('parentKey'):
+            results = add_profile(profile_map=profile_map, results=results, org_key=org_key, server_url=server_url,
+                                  profile_key=profile['parentKey'])
     return results
 
 
