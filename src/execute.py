@@ -38,8 +38,8 @@ def execute_task(task, concurrency, inputs, task_config, output_directory, run_i
     os.makedirs(f"{export_dir}/{task}", exist_ok=True)
     for idx, chunk in enumerate(dependencies):
         output = True
-        for operation_config in task_config['operations']:
-            chunk = execute_operation(operation_config=operation_config, idx=idx, chunk=chunk)
+        for op_idx, operation_config in enumerate(task_config['operations']):
+            chunk = execute_operation(operation_config=operation_config, idx=idx, op_idx=op_idx, total_ops=len(task_config['operations']), chunk=chunk)
             if not chunk:
                 output = False
                 break
@@ -47,11 +47,11 @@ def execute_task(task, concurrency, inputs, task_config, output_directory, run_i
             export_jsonl(directory=export_dir, name=task, data=chunk, idx=idx)
 
 
-def execute_operation(operation_config, idx, chunk):
+def execute_operation(operation_config, idx, op_idx, total_ops, chunk):
     from operations import load_operation
     from parser import extract_inputs
     log_event(level='WARNING', status='success', process_type='execute_task',
-              payload=dict(message=f"Executing operation {operation_config['operation']} on chunk {idx + 1}"))
+              payload=dict(message=f"Executing operation #{op_idx+1} of {total_ops}: {operation_config['operation']} on chunk {idx + 1}"))
     op = load_operation(name=operation_config['operation'])
     inputs = [extract_inputs(obj=obj, operation_config=operation_config) for obj in chunk]
     res = op.process_chunk(chunk=inputs)

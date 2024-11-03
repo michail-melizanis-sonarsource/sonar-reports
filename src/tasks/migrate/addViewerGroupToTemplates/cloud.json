@@ -6,7 +6,7 @@
     },
     {
       "key": "createGroups",
-      "strategy": "none"
+      "strategy": "each"
     },
     {
       "key": "createPermissionTemplates",
@@ -24,13 +24,13 @@
         "left": {
           "value": {
             "source": "getTemplateGroupsViewers",
-            "path": "serverUrl"
+            "path": "templateId"
           }
         },
         "right": {
           "value": {
             "source": "createPermissionTemplates",
-            "path": "sourceServerUrl"
+            "path": "sourceTemplateKey"
           }
         },
         "operator": {
@@ -46,13 +46,35 @@
         "left": {
           "value": {
             "source": "getTemplateGroupsViewers",
-            "path": "templateId"
+            "path": "name"
           }
         },
         "right": {
           "value": {
+            "source": "createGroups",
+            "path": "name"
+          }
+        },
+        "operator": {
+          "value": {
+            "raw": "eq"
+          }
+        }
+      }
+    },
+    {
+      "operation": "apply_filter",
+      "kwargs": {
+        "left": {
+          "value": {
             "source": "createPermissionTemplates",
-            "path": "sourceTemplateKey"
+            "path": "sonarCloudOrgKey"
+          }
+        },
+        "right": {
+          "value": {
+            "source": "createGroups",
+            "path": "sonarCloudOrgKey"
           }
         },
         "operator": {
@@ -100,6 +122,11 @@
         "encoding": {
           "value": {
             "raw": "x-www-form-urlencoded"
+          }
+        },
+        "resultKey": {
+          "value": {
+            "raw": "$"
           }
         },
         "payload": {

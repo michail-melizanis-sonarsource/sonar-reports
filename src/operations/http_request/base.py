@@ -1,6 +1,7 @@
 import httpx
 from tenacity import retry, stop_after_attempt, wait_random_exponential
-
+from asyncio import gather
+from parser import extract_path_value
 
 httpx_client: tuple = None, None
 from logs import log_event
@@ -55,7 +56,8 @@ def safe_json_request(host, method, url, stop=stop_after_attempt(3), reraise=Tru
         log_attributes = {
             k: v for k, v in kwargs.items() if k not in ['headers', 'files']
         }
-    log_event(level='info', status='success', process_type='request_started', payload=log_attributes, logger_name='http_request')
+    log_event(level='info', status='success', process_type='request_started', payload=log_attributes,
+              logger_name='http_request')
     args = dict(
         client=client, method=method, url=url, stop=stop, reraise=reraise, wait=wait,
         raise_over=raise_over,
@@ -64,7 +66,7 @@ def safe_json_request(host, method, url, stop=stop_after_attempt(3), reraise=Tru
     return async_safe_json_request(**args)
 
 
-async def async_safe_json_request(client, method, url, log_attributes:dict, raise_over, reraise,
+async def async_safe_json_request(client, method, url, log_attributes: dict, raise_over, reraise,
                                   stop, wait, **kwargs):
     import httpx
     @retry(stop=stop, reraise=reraise, wait=wait)
@@ -133,5 +135,21 @@ def process_errors(exc, method, url, log_attributes):
         status_code = exc.response.status_code
     return status_code, js
 
-def get_enterprise_id(url, token):
-    url = url.replace('https://', 'https://api.')
+
+async def process_request_chunk(chunk, max_threads):
+    results = await gather(
+        *[
+            safe_json_request(
+                host=chunk[0]['kwargs']['client'],
+                method=chunk[0]['kwargs']['method'],
+                raise_over=300,
+                url=payload['kwargs']['url'],
+                data={k: v for k, v in payload['kwargs']['payload'].items() if v is not None} if payload['kwargs'][
+                                                                                                     'encoding'] == 'x-www-form-urlencoded' else None,
+                json={k: v for k, v in payload['kwargs']['payload'].items() if v is not None} if payload['kwargs'][
+                                                                                                     'encoding'] == 'json' else None,
+            ) for payload in chunk
+        ]
+    )
+    return [[extract_path_value(obj=result[1], path=chunk[idx]['kwargs']['resultKey'])] for idx, result in
+            enumerate(results)]

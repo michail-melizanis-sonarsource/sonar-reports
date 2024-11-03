@@ -1,15 +1,10 @@
 from asyncio import get_event_loop
 from .get import extract_chunk
-from .base import generate_auth_headers, configure_client_cert, configure_client
-
-from .post import create_chunk
+from .base import generate_auth_headers, configure_client_cert, configure_client, process_request_chunk
 
 MAPPING = dict(
     GET=extract_chunk,
-    POST=create_chunk
 )
-
-
 
 
 def get_server_details(url, cert, token):
@@ -36,7 +31,11 @@ def get_server_details(url, cert, token):
 def process_chunk(chunk):
     loop = get_event_loop()
     results = loop.run_until_complete(
-        MAPPING[chunk[0]['kwargs']['method']](chunk=chunk,
-                                              max_threads=max(25, len(chunk)))
+        MAPPING.get(
+            chunk[0]['kwargs']['method'], process_request_chunk
+        )(
+            chunk=chunk,
+            max_threads=max(25, len(chunk))
+        )
     )
     return results

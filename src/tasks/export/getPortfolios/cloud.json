@@ -1,9 +1,14 @@
 {
   "editions": [
-    "enterprise",
-    "datacenter"
+    "community",
+    "teams"
   ],
-  "dependencies": [],
+  "dependencies": [
+    {
+        "key": "getEnterprises",
+        "strategy": "each"
+    }
+  ],
   "operations": [
     {
       "operation": "http_request",
@@ -11,12 +16,12 @@
         "client": {
           "value": {
             "source": "inputs",
-            "path": "url"
+            "path": "api_url"
           }
         },
         "url": {
           "value": {
-            "raw": "/api/views/search"
+            "raw": "/enterprises/portfolios"
           },
           "operations": []
         },
@@ -47,7 +52,7 @@
         "resultKeys": {
           "value": {
             "raw": [
-              "components"
+              "portfolios"
             ]
           },
           "operations": []
@@ -60,31 +65,20 @@
         },
         "totalKey": {
           "value": {
-            "raw": "$.paging.total"
+            "raw": "$.page.total"
           },
           "operations": []
         },
         "params": {
           "value": {
-            "map": {}
-          },
-          "operations": []
-        }
-      }
-    },
-    {
-      "operation": "set_key",
-      "kwargs": {
-        "key": {
-          "value": {
-            "raw": "serverUrl"
-          },
-          "operations": []
-        },
-        "val": {
-          "value": {
-            "source": "inputs",
-            "path": "url"
+            "map": {
+              "enterpriseId": {
+                "value": {
+                  "source": "getEnterprises",
+                  "path": "$.id"
+                }
+              }
+            }
           },
           "operations": []
         }

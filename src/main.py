@@ -202,7 +202,7 @@ def reset(token, edition, url, enterprise_key, concurrency, export_directory, or
                 run_id=run_id,
             ), f
         )
-    execute_plan(execution_plan=plan, inputs=dict(url=url, api_url=api_url, enterprise_id=enterprise_key, org_key=org_key), concurrency=concurrency,
+    execute_plan(execution_plan=plan, inputs=dict(url=url, api_url=api_url, enterprise_key=enterprise_key, org_key=org_key), concurrency=concurrency,
                  task_configs=configs,
                  output_directory=export_directory, current_run_id=run_id,
                  run_ids={run_id})
