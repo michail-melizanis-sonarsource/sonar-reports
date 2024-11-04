@@ -1,0 +1,127 @@
+{
+  "editions": [
+    "community",
+    "enterprise",
+    "developer",
+    "datacenter"
+  ],
+  "dependencies": [
+    {
+      "key": "getRules",
+      "strategy": "each"
+    }
+  ],
+  "operations": [
+    {
+      "operation": "apply_filter",
+      "kwargs": {
+        "operator": {
+          "value": {
+            "raw": "eq"
+          }
+        },
+        "left": {
+          "value": {
+            "source": "getRules",
+            "path": "$.is_template"
+          }
+        },
+        "right": {
+          "value": {
+            "raw": true
+          }
+        }
+      }
+    },
+    {
+      "operation": "http_request",
+      "kwargs": {
+        "client": {
+          "value": {
+            "source": "inputs",
+            "path": "url"
+          }
+        },
+        "url": {
+          "value": {
+            "raw": "/api/issues/search"
+          },
+          "operations": []
+        },
+        "method": {
+          "value": {
+            "raw": "GET"
+          },
+          "operations": []
+        },
+        "paginationKey": {
+          "value": {
+            "raw": null
+          },
+          "operations": []
+        },
+        "pageSizeKey": {
+          "value": {
+            "raw": null
+          },
+          "operations": []
+        },
+        "pageLimit": {
+          "value": {
+            "raw": null
+          },
+          "operations": []
+        },
+        "resultKey": {
+          "value": {
+            "raw": null
+          },
+          "operations": []
+        },
+        "maxPageSize": {
+          "value": {
+            "raw": null
+          },
+          "operations": []
+        },
+        "totalKey": {
+          "value": {
+            "raw": null
+          },
+          "operations": []
+        },
+        "params": {
+          "value": {
+            "map": {
+              "issueStatuses": {
+                "value": {
+                  "raw": "CONFIRMED,FALSE_POSITIVE,ACCEPTED"
+                },
+                "operations": []
+              }
+            }
+          },
+          "operations": []
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "serverUrl"
+          },
+          "operations": []
+        },
+        "val": {
+          "value": {
+            "source": "inputs",
+            "path": "url"
+          },
+          "operations": []
+        }
+      }
+    }
+  ]
+}

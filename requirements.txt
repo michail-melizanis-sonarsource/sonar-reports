@@ -8,3 +8,4 @@ gevent
 click
 markdown
 pytest-cov
+tenacity

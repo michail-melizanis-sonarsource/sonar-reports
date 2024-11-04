@@ -1,0 +1,81 @@
+{
+  "editions": [
+    "community",
+    "teams"
+  ],
+  "dependencies": [],
+  "operations": [
+    {
+      "operation": "http_request",
+      "kwargs": {
+        "client": {
+          "value": {
+            "source": "inputs",
+            "path": "url"
+          }
+        },
+        "url": {
+          "value": {
+            "raw": "/api/projects/search"
+          },
+          "operations": []
+        },
+        "method": {
+          "value": {
+            "raw": "GET"
+          },
+          "operations": []
+        },
+        "paginationKey": {
+          "value": {
+            "raw": "p"
+          },
+          "operations": []
+        },
+        "pageSizeKey": {
+          "value": {
+            "raw": "ps"
+          },
+          "operations": []
+        },
+        "pageLimit": {
+          "value": {
+            "raw": null
+          },
+          "operations": []
+        },
+        "resultKey": {
+          "value": {
+            "raw": "components"
+          },
+          "operations": []
+        },
+        "maxPageSize": {
+          "value": {
+            "raw": null
+          },
+          "operations": []
+        },
+        "totalKey": {
+          "value": {
+            "raw": "$.paging.total"
+          },
+          "operations": []
+        },
+        "params": {
+          "value": {
+            "map": {
+              "organization": {
+                "value": {
+                  "source": "inputs",
+                  "path": "org_key"
+                }
+              }
+            }
+          },
+          "operations": []
+        }
+      }
+    }
+  ]
+}

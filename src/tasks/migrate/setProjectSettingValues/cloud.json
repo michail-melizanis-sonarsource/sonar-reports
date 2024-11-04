@@ -1,0 +1,138 @@
+{
+  "dependencies": [
+    {
+      "key": "createProjects",
+      "strategy": "each"
+    },
+    {
+      "key": "getProjectSettings",
+      "strategy": "each"
+    }
+  ],
+  "editions": [
+    "enterprise",
+    "teams"
+  ],
+  "operations": [
+    {
+      "operation": "apply_filter",
+      "kwargs": {
+        "left": {
+          "value": {
+            "source": "getProjectSettings",
+            "path": "values"
+          }
+        },
+        "right": {
+          "value": {
+            "raw": null
+          }
+        },
+        "operator": {
+          "value": {
+            "raw": "neq"
+          }
+        }
+      }
+    },
+    {
+      "operation": "apply_filter",
+      "kwargs": {
+        "left": {
+          "value": {
+            "source": "getProjectSettings",
+            "path": "project"
+          }
+        },
+        "right": {
+          "value": {
+            "source": "createProjects",
+            "path": "sourceProjectKey"
+          }
+        },
+        "operator": {
+          "value": {
+            "raw": "eq"
+          }
+        }
+      }
+    },
+    {
+      "operation": "apply_filter",
+      "kwargs": {
+        "left": {
+          "value": {
+            "source": "getProjectSettings",
+            "path": "serverUrl"
+          }
+        },
+        "right": {
+          "value": {
+            "source": "createProjects",
+            "path": "sourceServerUrl"
+          }
+        },
+        "operator": {
+          "value": {
+            "raw": "eq"
+          }
+        }
+      }
+    },
+    {
+      "operation": "http_request",
+      "kwargs": {
+        "url": {
+          "value": {
+            "raw": "/api/settings/set"
+          }
+        },
+        "client": {
+          "value": {
+            "source": "inputs",
+            "path": "url"
+          }
+        },
+        "method": {
+          "value": {
+            "raw": "POST"
+          }
+        },
+        "encoding": {
+          "value": {
+            "raw": "x-www-form-urlencoded"
+          }
+        },
+        "resultKey": {
+          "value": {
+            "raw": "$"
+          }
+        },
+        "payload": {
+          "value": {
+            "map": {
+              "key": {
+                "value": {
+                  "source": "getProjectSettings",
+                  "path": "key"
+                }
+              },
+              "component": {
+                "value": {
+                  "source": "createProjects",
+                  "path": "key"
+                }
+              },
+              "values": {
+                "value": {
+                  "source": "getProjectSettings",
+                  "path": "values"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

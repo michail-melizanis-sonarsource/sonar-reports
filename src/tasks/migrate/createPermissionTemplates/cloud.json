@@ -1,0 +1,123 @@
+{
+  "dependencies": [
+    {
+      "key": "generateTemplateMappings",
+      "strategy": "each"
+    }
+  ],
+  "editions": [
+    "teams",
+    "enterprise"
+  ],
+  "operations": [
+    {
+      "operation": "http_request",
+      "kwargs": {
+        "url": {
+          "value": {
+            "raw": "/api/permissions/create_template"
+          }
+        },
+        "client": {
+          "value": {
+            "source": "inputs",
+            "path": "url"
+          }
+        },
+        "method": {
+          "value": {
+            "raw": "POST"
+          }
+        },
+        "encoding": {
+          "value": {
+            "raw": "x-www-form-urlencoded"
+          }
+        },
+        "resultKey": {
+          "value": {
+            "raw": "permissionTemplate"
+          }
+        },
+        "payload": {
+          "value": {
+            "map": {
+              "name": {
+                "value": {
+                  "source": "generateTemplateMappings",
+                  "path": "name"
+                }
+              },
+              "descriptions": {
+                "value": {
+                  "source": "generateTemplateMappings",
+                  "path": "description"
+                }
+              },
+              "organization": {
+                "value": {
+                  "source": "generateTemplateMappings",
+                  "path": "sonarcloud_org_key"
+                }
+              },
+              "projectKeyPattern": {
+                "value": {
+                  "source": "generateTemplateMappings",
+                  "path": "project_key_pattern"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "sonarCloudOrgKey"
+          }
+        },
+        "val": {
+          "value": {
+            "source": "generateTemplateMappings",
+            "path": "sonarcloud_org_key"
+          }
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "sourceTemplateKey"
+          }
+        },
+        "val": {
+          "value": {
+            "source": "generateTemplateMappings",
+            "path": "source_template_key"
+          }
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "isDefault"
+          }
+        },
+        "val": {
+          "value": {
+            "source": "generateTemplateMappings",
+            "path": "is_default"
+          }
+        }
+      }
+    }
+  ]
+}

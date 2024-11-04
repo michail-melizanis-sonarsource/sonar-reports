@@ -1,0 +1,57 @@
+{
+  "dependencies": [
+    {
+      "key": "getGroups",
+      "strategy": "each"
+    }
+  ],
+  "editions": [
+    "enterprise",
+    "teams"
+  ],
+  "operations": [
+    {
+      "operation": "http_request",
+      "kwargs": {
+        "url": {
+          "value": {
+            "raw": "/api/user_groups/delete"
+          }
+        },
+        "client": {
+          "value": {
+            "source": "inputs",
+            "path": "url"
+          }
+        },
+        "method": {
+          "value": {
+            "raw": "POST"
+          }
+        },
+        "resultKey": {
+          "value": {
+            "raw": "$"
+          }
+        },
+        "encoding": {
+          "value": {
+            "raw": "x-www-form-urlencoded"
+          }
+        },
+        "payload": {
+          "value": {
+            "map": {
+              "id": {
+                "value": {
+                  "source": "getGroups",
+                  "path": "$.id"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

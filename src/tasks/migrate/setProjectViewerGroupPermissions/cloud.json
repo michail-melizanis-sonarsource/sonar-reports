@@ -1,0 +1,116 @@
+{
+  "dependencies": [
+    {
+      "key": "createProjects",
+      "strategy": "each"
+    },
+    {
+      "key": "getProjectGroupsViewers",
+      "strategy": "each"
+    }
+  ],
+  "editions": [
+    "enterprise",
+    "teams"
+  ],
+  "operations": [
+    {
+      "operation": "apply_filter",
+      "kwargs": {
+        "left": {
+          "value": {
+            "source": "getProjectGroupsViewers",
+            "path": "project"
+          }
+        },
+        "right": {
+          "value": {
+            "source": "createProjects",
+            "path": "sourceProjectKey"
+          }
+        },
+        "operator": {
+          "value": {
+            "raw": "eq"
+          }
+        }
+      }
+    },
+   {
+      "operation": "expand_list",
+      "kwargs": {
+        "inputs": {
+          "value": {
+            "source": "getProjectGroupsViewers",
+            "path": "permissions"
+          }
+        },
+        "resultKey": {
+          "value": {
+            "raw": "permission"
+          }
+        }
+      }
+    },
+    {
+      "operation": "http_request",
+      "kwargs": {
+        "url": {
+          "value": {
+            "raw": "/api/permissions/add_group"
+          }
+        },
+        "client": {
+          "value": {
+            "source": "inputs",
+            "path": "url"
+          }
+        },
+        "method": {
+          "value": {
+            "raw": "POST"
+          }
+        },
+        "encoding": {
+          "value": {
+            "raw": "x-www-form-urlencoded"
+          }
+        },
+        "resultKey": {
+          "value": {
+            "raw": "$"
+          }
+        },
+        "payload": {
+          "value": {
+            "map": {
+              "organization": {
+                "value": {
+                  "source": "createProjects",
+                  "path": "sonarCloudOrgKey"
+                }
+              },
+              "projectKey": {
+                "value": {
+                  "source": "createProjects",
+                  "path": "key"
+                }
+              },
+              "groupName": {
+                "value": {
+                  "source": "getProjectGroupsViewers",
+                  "path": "name"
+                }
+              },
+              "permission": {
+                "value": {
+                  "path": "permission"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

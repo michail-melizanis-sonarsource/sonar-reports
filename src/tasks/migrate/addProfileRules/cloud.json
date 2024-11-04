@@ -1,0 +1,114 @@
+{
+  "dependencies": [
+    {
+      "key": "createProfiles",
+      "strategy": "each"
+    },
+    {
+      "key": "setProfileParent",
+      "strategy": "none"
+    },
+    {
+      "key": "getActiveProfileRules",
+      "strategy": "each"
+    }
+  ],
+  "editions": [
+    "enterprise"
+  ],
+  "operations": [
+    {
+      "operation": "apply_filter",
+      "kwargs": {
+        "left": {
+          "value": {
+            "source": "createProfiles",
+            "path": "sourceProfileKey"
+          }
+        },
+        "right": {
+          "value": {
+            "source": "getActiveProfileRules",
+            "path": "profileKey"
+          }
+        },
+        "operator": {
+          "value": {
+            "raw": "eq"
+          }
+        }
+      }
+    },
+    {
+      "operation": "http_request",
+      "kwargs": {
+        "url": {
+          "value": {
+            "raw": "/api/qualityprofiles/activate_rules"
+          }
+        },
+        "client": {
+          "value": {
+            "source": "inputs",
+            "path": "url"
+          }
+        },
+        "method": {
+          "value": {
+            "raw": "POST"
+          }
+        },
+        "resultKey": {
+          "value": {
+            "raw": "$"
+          }
+        },
+        "encoding": {
+          "value": {
+            "raw": "x-www-form-urlencoded"
+          }
+        },
+        "payload": {
+          "value": {
+            "map": {
+              "targetKey": {
+                "value": {
+                  "source": "createProfiles",
+                  "path": "key"
+                }
+              },
+              "organization": {
+                "value": {
+                  "source": "createProfiles",
+                  "path": "sonarCloudOrgKey"
+                }
+              },
+              "rule_key": {
+                "value": {
+                  "source": "getActiveProfileRules",
+                  "path": "key"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "sonarCloudOrgKey"
+          }
+        },
+        "val": {
+          "value": {
+            "source": "createProfiles",
+            "path": "sonarCloudOrgKey"
+          }
+        }
+      }
+    }
+  ]
+}

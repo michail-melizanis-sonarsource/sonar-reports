@@ -1,0 +1,61 @@
+{
+  "dependencies": [
+    {
+      "key": "getTemplates",
+      "strategy": "each"
+    },
+    {
+      "key": "resetPermissionTemplates",
+      "strategy": "none"
+    }
+  ],
+  "editions": [
+    "enterprise",
+    "teams"
+  ],
+  "operations": [
+    {
+      "operation": "http_request",
+      "kwargs": {
+        "url": {
+          "value": {
+            "raw": "/api/permissions/delete_template"
+          }
+        },
+        "client": {
+          "value": {
+            "source": "inputs",
+            "path": "url"
+          }
+        },
+        "method": {
+          "value": {
+            "raw": "POST"
+          }
+        },
+        "resultKey": {
+          "value": {
+            "raw": "$"
+          }
+        },
+        "encoding": {
+          "value": {
+            "raw": "x-www-form-urlencoded"
+          }
+        },
+        "payload": {
+          "value": {
+            "map": {
+              "templateId": {
+                "value": {
+                  "source": "getTemplates",
+                  "path": "$.id"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

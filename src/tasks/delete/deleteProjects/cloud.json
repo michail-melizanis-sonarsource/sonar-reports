@@ -1,0 +1,57 @@
+{
+  "dependencies": [
+    {
+      "key": "getProjects",
+      "strategy": "each"
+    }
+  ],
+  "editions": [
+    "enterprise",
+    "teams"
+  ],
+  "operations": [
+    {
+      "operation": "http_request",
+      "kwargs": {
+        "url": {
+          "value": {
+            "raw": "/api/projects/delete"
+          }
+        },
+        "client": {
+          "value": {
+            "source": "inputs",
+            "path": "url"
+          }
+        },
+        "method": {
+          "value": {
+            "raw": "POST"
+          }
+        },
+        "resultKey": {
+          "value": {
+            "raw": "$"
+          }
+        },
+        "encoding": {
+          "value": {
+            "raw": "x-www-form-urlencoded"
+          }
+        },
+        "payload": {
+          "value": {
+            "map": {
+              "project": {
+                "value": {
+                  "source": "getProjects",
+                  "path": "$.key"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
