@@ -3,6 +3,18 @@
     {
       "key": "getGroups",
       "strategy": "each"
+    },
+    {
+      "key": "deleteProjects",
+      "strategy": "none"
+    },
+    {
+      "key": "deleteProfiles",
+      "strategy": "none"
+    },
+    {
+      "key": "deletePortfolios",
+      "strategy": "none"
     }
   ],
   "editions": [
@@ -10,6 +22,27 @@
     "teams"
   ],
   "operations": [
+    {
+      "operation": "apply_filter",
+      "kwargs": {
+        "left": {
+          "value": {
+            "source": "getGroups",
+            "path": "name"
+          }
+        },
+        "right": {
+          "value": {
+            "raw": "Owners"
+          }
+        },
+        "operator": {
+          "value": {
+            "raw": "neq"
+          }
+        }
+      }
+    },
     {
       "operation": "http_request",
       "kwargs": {

@@ -23,7 +23,8 @@ def map_portfolios(export_directory, extract_mapping):
         unique_key = server_url + portfolio['portfolioKey']
         portfolio_projects[unique_key].add(portfolio['refKey'])
         portfolio_details[unique_key] = dict(
-            source_portfolio_name=portfolio['portfolioKey'],
+            source_portfolio_key=portfolio['portfolioKey'],
+            name=portfolio['portfolioName'],
             server_url=server_url,
             description=portfolio.get('description',''),
         )

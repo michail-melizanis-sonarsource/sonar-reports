@@ -3,6 +3,10 @@
     {
       "key": "generateTemplateMappings",
       "strategy": "each"
+    },
+    {
+      "key": "addMigrationUserToGroups",
+      "strategy": "none"
     }
   ],
   "editions": [

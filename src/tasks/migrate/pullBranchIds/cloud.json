@@ -1,12 +1,16 @@
 {
   "editions": [
     "enterprise",
-    "datacenter"
+    "teams"
   ],
   "dependencies": [
     {
-      "key": "getPortfolios",
+      "key": "createProjects",
       "strategy": "each"
+    },
+    {
+      "key": "renameProjectBranch",
+      "strategy": "none"
     }
   ],
   "operations": [
@@ -21,7 +25,7 @@
         },
         "url": {
           "value": {
-            "raw": "/api/views/projects_status"
+            "raw": "/api/project_branches/list"
           },
           "operations": []
         },
@@ -33,13 +37,13 @@
         },
         "paginationKey": {
           "value": {
-            "raw": "p"
+            "raw": null
           },
           "operations": []
         },
         "pageSizeKey": {
           "value": {
-            "raw": "ps"
+            "raw": null
           },
           "operations": []
         },
@@ -51,28 +55,28 @@
         },
         "resultKey": {
           "value": {
-            "raw": "projects"
+            "raw": "branches"
           },
           "operations": []
         },
         "maxPageSize": {
           "value": {
-            "raw": 500
+            "raw": null
           },
           "operations": []
         },
         "totalKey": {
           "value": {
-            "raw": "$.paging.total"
+            "raw": null
           },
           "operations": []
         },
         "params": {
           "value": {
             "map": {
-              "portfolio": {
+              "project": {
                 "value": {
-                  "source": "getPortfolios",
+                  "source": "createProjects",
                   "path": "$.key"
                 },
                 "operations": []
@@ -88,13 +92,13 @@
       "kwargs": {
         "key": {
           "value": {
-            "raw": "portfolioKey"
+            "raw": "projectKey"
           },
           "operations": []
         },
         "val": {
           "value": {
-            "source": "getPortfolios",
+            "source": "createProjects",
             "path": "$.key"
           },
           "operations": []
@@ -106,32 +110,14 @@
       "kwargs": {
         "key": {
           "value": {
-            "raw": "portfolioName"
+            "raw": "sourceProjectKey"
           },
           "operations": []
         },
         "val": {
           "value": {
-            "source": "getPortfolios",
-            "path": "$.name"
-          },
-          "operations": []
-        }
-      }
-    },
-    {
-      "operation": "set_key",
-      "kwargs": {
-        "key": {
-          "value": {
-            "raw": "serverUrl"
-          },
-          "operations": []
-        },
-        "val": {
-          "value": {
-            "source": "inputs",
-            "path": "url"
+            "source": "createProjects",
+            "path": "$.sourceProjectKey"
           },
           "operations": []
         }

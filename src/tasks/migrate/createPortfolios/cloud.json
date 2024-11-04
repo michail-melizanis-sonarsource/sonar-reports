@@ -15,25 +15,25 @@
   "operations": [
     {
       "operation": "apply_filter",
-        "kwargs": {
-            "left": {
-            "value": {
-                "source": "getEnterprises",
-                "path": "key"
-            }
-            },
-            "right": {
-            "value": {
-                "source": "inputs",
-                "path": "enterprise_key"
-            }
-            },
-            "operator": {
-            "value": {
-                "raw": "eq"
-            }
-            }
+      "kwargs": {
+        "left": {
+          "value": {
+            "source": "getEnterprises",
+            "path": "key"
+          }
+        },
+        "right": {
+          "value": {
+            "source": "inputs",
+            "path": "enterprise_key"
+          }
+        },
+        "operator": {
+          "value": {
+            "raw": "eq"
+          }
         }
+      }
     },
     {
       "operation": "http_request",
@@ -76,7 +76,7 @@
               "name": {
                 "value": {
                   "source": "generatePortfolioMappings",
-                  "path": "source_portfolio_name"
+                  "path": "name"
                 }
               },
               "enterpriseId": {
@@ -91,6 +91,22 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "sourcePortfolioKey"
+          }
+        },
+        "val": {
+          "value": {
+            "source": "generatePortfolioMappings",
+            "path": "source_portfolio_key"
           }
         }
       }

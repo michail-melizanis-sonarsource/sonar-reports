@@ -18,7 +18,7 @@ def parse_value_field(obj, value_config):
         val = extract_path_value(obj=obj[value_config.get('source', 'obj')], path=value_config["path"])
     elif "path" in value_config.keys() and isinstance(value_config["path"], dict):
         path = parse_field(obj=obj, field_config=value_config["path"])
-        val = extract_path_value(obj=obj, path=path)
+        val = extract_path_value(obj=obj[value_config.get('source', 'obj')], path=path)
     elif "map" in value_config.keys():
         val = dict()
         for k, v in value_config["map"].items():
