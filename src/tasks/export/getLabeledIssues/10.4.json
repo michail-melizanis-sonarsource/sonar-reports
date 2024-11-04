@@ -46,7 +46,7 @@
           },
           "operations": []
         },
-        "resultKeys": {
+        "resultKey": {
           "value": {
             "raw": null
           },

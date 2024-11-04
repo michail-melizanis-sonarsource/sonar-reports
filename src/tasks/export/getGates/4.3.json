@@ -46,11 +46,9 @@
           },
           "operations": []
         },
-        "resultKeys": {
+        "resultKey": {
           "value": {
-            "raw": [
-              "qualitygates"
-            ]
+            "raw": "qualitygates"
           },
           "operations": []
         },

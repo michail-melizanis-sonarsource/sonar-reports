@@ -7,14 +7,11 @@
     {
       "key": "getProjectSettings",
       "strategy": "each"
-    },
-    {
-      "key": "setOrganizationSettingValues",
-      "strategy": "none"
     }
   ],
   "editions": [
-    "enterprise"
+    "enterprise",
+    "teams"
   ],
   "operations": [
     {
@@ -124,12 +121,6 @@
                 "value": {
                   "source": "createProjects",
                   "path": "key"
-                }
-              },
-              "organization": {
-                "value": {
-                  "source": "createProjects",
-                  "path": "sonarCloudOrgKey"
                 }
               },
               "values": {

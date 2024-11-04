@@ -28,9 +28,9 @@
             "raw": "json"
           }
         },
-        "resultKeys": {
+        "resultKey": {
           "value": {
-            "raw": "$"
+            "raw": null
           }
         },
         "params": {

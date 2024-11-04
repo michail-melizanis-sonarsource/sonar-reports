@@ -44,11 +44,9 @@
           },
           "operations": []
         },
-        "resultKeys": {
+        "resultKey": {
           "value": {
-            "raw": [
-              "permissionTemplates"
-            ]
+            "raw": "permissionTemplates"
           },
           "operations": []
         },

@@ -8,7 +8,7 @@
   "dependencies": [
     {
       "key": "getRules",
-      "loadStrategy": "each"
+      "strategy": "each"
     }
   ],
   "operations": [
@@ -72,7 +72,7 @@
           },
           "operations": []
         },
-        "resultKeys": {
+        "resultKey": {
           "value": {
             "raw": null
           },

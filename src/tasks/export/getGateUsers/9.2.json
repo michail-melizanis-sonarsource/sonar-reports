@@ -8,7 +8,7 @@
   "dependencies": [
     {
       "key": "getGates",
-      "loadStrategy": "each"
+      "strategy": "each"
     }
   ],
   "operations": [
@@ -72,11 +72,9 @@
           },
           "operations": []
         },
-        "resultKeys": {
+        "resultKey": {
           "value": {
-            "raw": [
-              "users"
-            ]
+            "raw": "users"
           },
           "operations": []
         },

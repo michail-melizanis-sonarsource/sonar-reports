@@ -5,7 +5,7 @@
       "strategy": "each"
     },
     {
-      "key": "getProjectSettings",
+      "key": "getProjectGroupsScanners",
       "strategy": "each"
     }
   ],
@@ -19,28 +19,7 @@
       "kwargs": {
         "left": {
           "value": {
-            "source": "getProjectSettings",
-            "path": "value"
-          }
-        },
-        "right": {
-          "value": {
-            "raw": null
-          }
-        },
-        "operator": {
-          "value": {
-            "raw": "neq"
-          }
-        }
-      }
-    },
-    {
-      "operation": "apply_filter",
-      "kwargs": {
-        "left": {
-          "value": {
-            "source": "getProjectSettings",
+            "source": "getProjectGroupsScanners",
             "path": "project"
           }
         },
@@ -58,23 +37,17 @@
       }
     },
     {
-      "operation": "apply_filter",
+      "operation": "expand_list",
       "kwargs": {
-        "left": {
+        "inputs": {
           "value": {
-            "source": "getProjectSettings",
-            "path": "serverUrl"
+            "source": "getProjectGroupsScanners",
+            "path": "permissions"
           }
         },
-        "right": {
+        "resultKey": {
           "value": {
-            "source": "createProjects",
-            "path": "sourceServerUrl"
-          }
-        },
-        "operator": {
-          "value": {
-            "raw": "eq"
+            "raw": "permission"
           }
         }
       }
@@ -84,7 +57,7 @@
       "kwargs": {
         "url": {
           "value": {
-            "raw": "/api/settings/set"
+            "raw": "/api/permissions/add_group"
           }
         },
         "client": {
@@ -111,22 +84,27 @@
         "payload": {
           "value": {
             "map": {
-              "key": {
+              "organization": {
                 "value": {
-                  "source": "getProjectSettings",
-                  "path": "key"
+                  "source": "createProjects",
+                  "path": "sonarCloudOrgKey"
                 }
               },
-              "component": {
+              "projectKey": {
                 "value": {
                   "source": "createProjects",
                   "path": "key"
                 }
               },
-              "value": {
+              "groupName": {
                 "value": {
-                  "source": "getProjectSettings",
-                  "path": "value"
+                  "source": "getProjectGroupsScanners",
+                  "path": "name"
+                }
+              },
+              "permission": {
+                "value": {
+                  "path": "permission"
                 }
               }
             }

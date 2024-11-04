@@ -46,11 +46,9 @@
           },
           "operations": []
         },
-        "resultKeys": {
+        "resultKey": {
           "value": {
-            "raw": [
-              "defaultTemplates"
-            ]
+            "raw": "defaultTemplates"
           },
           "operations": []
         },

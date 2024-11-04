@@ -3,10 +3,6 @@
     {
       "key": "getTemplates",
       "strategy": "each"
-    },
-    {
-      "key": "resetPermissionTemplates",
-      "strategy": "none"
     }
   ],
   "editions": [
@@ -15,11 +11,32 @@
   ],
   "operations": [
     {
+      "operation": "apply_filter",
+      "kwargs": {
+        "operator": {
+          "value": {
+            "raw": "eq"
+          }
+        },
+        "left": {
+          "value": {
+            "source": "getTemplates",
+            "path": "$.name"
+          }
+        },
+        "right": {
+          "value": {
+            "raw": "Default template"
+          }
+        }
+      }
+    },
+    {
       "operation": "http_request",
       "kwargs": {
         "url": {
           "value": {
-            "raw": "/api/permissions/delete_template"
+            "raw": "/api/permissions/set_default_template"
           }
         },
         "client": {
@@ -33,14 +50,14 @@
             "raw": "POST"
           }
         },
-        "resultKey": {
-          "value": {
-            "raw": "$"
-          }
-        },
         "encoding": {
           "value": {
             "raw": "x-www-form-urlencoded"
+          }
+        },
+        "resultKey": {
+          "value": {
+            "raw": "$"
           }
         },
         "payload": {
@@ -49,7 +66,12 @@
               "templateId": {
                 "value": {
                   "source": "getTemplates",
-                  "path": "$.id"
+                  "path": "id"
+                }
+              },
+              "qualifier": {
+                "value": {
+                  "raw": "TRK"
                 }
               }
             }

@@ -7,7 +7,7 @@
   "dependencies": [
     {
       "key": "getProjects",
-      "loadStrategy": "each"
+      "strategy": "each"
     }
   ],
   "operations": [
@@ -50,11 +50,9 @@
           },
           "operations": []
         },
-        "resultKeys": {
+        "resultKey": {
           "value": {
-            "raw": [
-              "pullRequests"
-            ]
+            "raw": "pullRequests"
           },
           "operations": []
         },

@@ -30,7 +30,7 @@ async def extract_chunk(max_threads, chunk):
                 extract_entity_page,
                 host=chunk[0]['kwargs']['client'],
                 idx=idx,
-                result_keys=payload['kwargs']['resultKeys'],
+                result_key=payload['kwargs']['resultKey'],
                 url=payload['kwargs']['url'],
                 params=params
             )
@@ -74,23 +74,24 @@ def get_paginated_params(params, pagination_key, page_limit, total_pages, page_s
         yield params
 
 
-async def extract_entity_page(host: str, idx, url, result_keys, params: dict):
+async def extract_entity_page(host: str, idx, url, result_key, params: dict):
     status, js = await safe_json_request(
         host=host, method='GET', url=url, params=params
     )
     results = list()
     if status is not None and status < 300:
-        results = extract_entity_results(js=js, result_keys=result_keys)
+        results = extract_entity_results(js=js, result_key=result_key)
     return idx, results
 
 
-def extract_entity_results(js, result_keys: list | None):
+def extract_entity_results(js, result_key: list | None):
     results = []
-    if result_keys:
-        for result_key in result_keys:
-            res = extract_path_value(obj=js, path=result_key)
-            if isinstance(res, list):
-                results.extend(res)
+    if result_key:
+        res = extract_path_value(obj=js, path=result_key)
+        if isinstance(res, list):
+            results.extend(res)
+        elif res:
+            results.append(res)
     else:
         results.append(js)
     return results

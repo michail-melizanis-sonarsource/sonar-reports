@@ -5,7 +5,11 @@
       "strategy": "each"
     },
     {
-      "key": "addGroupToTemplates",
+      "key": "addViewerGroupToTemplates",
+      "strategy": "none"
+    },
+    {
+      "key": "addScannerGroupToTemplates",
       "strategy": "none"
     }
   ],
@@ -221,6 +225,22 @@
           "value": {
             "source": "generateProjectMappings",
             "path": "profiles"
+          }
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "sourceProjectKey"
+          }
+        },
+        "val": {
+          "value": {
+            "source": "generateProjectMappings",
+            "path": "key"
           }
         }
       }

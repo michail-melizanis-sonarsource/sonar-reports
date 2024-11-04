@@ -8,7 +8,7 @@
   "dependencies": [
     {
       "key": "rules",
-      "loadStrategy": "each"
+      "strategy": "each"
     }
   ],
   "operations": [

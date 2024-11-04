@@ -51,7 +51,7 @@ def execute_operation(operation_config, idx, op_idx, total_ops, chunk):
     from operations import load_operation
     from parser import extract_inputs
     log_event(level='WARNING', status='success', process_type='execute_task',
-              payload=dict(message=f"Executing operation #{op_idx+1} of {total_ops}: {operation_config['operation']} on chunk {idx + 1}"))
+              payload=dict(message=f"Executing operation {op_idx+1} of {total_ops}: {operation_config['operation']} on chunk {idx + 1}"))
     op = load_operation(name=operation_config['operation'])
     inputs = [extract_inputs(obj=obj, operation_config=operation_config) for obj in chunk]
     res = op.process_chunk(chunk=inputs)

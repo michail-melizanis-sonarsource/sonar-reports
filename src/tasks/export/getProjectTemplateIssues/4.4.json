@@ -8,11 +8,11 @@
   "dependencies": [
     {
       "key": "getProjects",
-      "loadStrategy": "each"
+      "strategy": "each"
     },
     {
       "key": "getTemplateRules",
-      "loadStrategy": "chunk",
+      "strategy": "chunk",
       "chunkSize": 30
     }
   ],
@@ -56,7 +56,7 @@
           },
           "operations": []
         },
-        "resultKeys": {
+        "resultKey": {
           "value": {
             "raw": null
           },

@@ -5,7 +5,12 @@
     "developer",
     "datacenter"
   ],
-  "dependencies": [],
+  "dependencies": [
+    {
+      "key": "getRules",
+      "loadStrategy": "each"
+    }
+  ],
   "operations": [
     {
       "operation": "http_request",
@@ -18,7 +23,7 @@
         },
         "url": {
           "value": {
-            "raw": "/api/alm_settings/list"
+            "raw": "/api/rules/show"
           },
           "operations": []
         },
@@ -48,7 +53,7 @@
         },
         "resultKey": {
           "value": {
-            "raw": "almSettings"
+            "raw": "rule"
           },
           "operations": []
         },
@@ -66,7 +71,15 @@
         },
         "params": {
           "value": {
-            "map": {}
+            "map": {
+              "key": {
+                "value": {
+                  "source": "getRules",
+                  "path": "key"
+                },
+                "operations": []
+              }
+            }
           },
           "operations": []
         }

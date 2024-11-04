@@ -6,7 +6,7 @@
   "dependencies": [
     {
       "key": "getPortfolios",
-      "loadStrategy": "each"
+      "strategy": "each"
     }
   ],
   "operations": [
@@ -49,11 +49,9 @@
           },
           "operations": []
         },
-        "resultKeys": {
+        "resultKey": {
           "value": {
-            "raw": [
-              "projects"
-            ]
+            "raw": "projects"
           },
           "operations": []
         },

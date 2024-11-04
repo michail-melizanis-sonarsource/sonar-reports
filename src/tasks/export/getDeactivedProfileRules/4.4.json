@@ -8,7 +8,7 @@
   "dependencies": [
     {
       "key": "getProfiles",
-      "loadStrategy": "each"
+      "strategy": "each"
     }
   ],
   "operations": [
@@ -75,11 +75,9 @@
           },
           "operations": []
         },
-        "resultKeys": {
+        "resultKey": {
           "value": {
-            "raw": [
-              "rules"
-            ]
+            "raw": "rules"
           },
           "operations": []
         },

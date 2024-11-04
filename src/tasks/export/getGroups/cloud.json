@@ -46,11 +46,9 @@
           },
           "operations": []
         },
-        "resultKeys": {
+        "resultKey": {
           "value": {
-            "raw": [
-              "groups"
-            ]
+            "raw": "groups"
           },
           "operations": []
         },

@@ -34,8 +34,7 @@
       "kwargs": {
         "left": {
           "value": {
-            "source": "profile",
-            "path": "deleted"
+            "path": "$.profile.deleted"
           }
         },
         "right": {

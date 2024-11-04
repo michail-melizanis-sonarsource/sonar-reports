@@ -25,12 +25,13 @@ def cli():
 @click.option('--cert_password')
 @click.option('--export_directory', default='/app/files/')
 @click.option('--extract_type', default='all', help='Type of Extract to run')
+@click.option('--target_task')
 @click.option('--concurrency', default=25)
 @click.option('--timeout', default=60)
 @click.option('--extract_id', default=None)
-def extract(url, token, export_directory: str, extract_type, pem_file_path=None, key_file_path=None, cert_password=None,
-            concurrency=25,
-            timeout=60, extract_id=None, ):
+def extract(url, token, export_directory: str, extract_type, pem_file_path, key_file_path, cert_password,
+            concurrency, target_task,
+            timeout, extract_id):
     if not url.endswith('/'):
         url = f"{url}/"
     if extract_id is None:
@@ -49,6 +50,8 @@ def extract(url, token, export_directory: str, extract_type, pem_file_path=None,
         target_tasks = MIGRATION_TASKS
     else:
         target_tasks = list([k for k in configs.keys() if k.startswith('get')])
+    if target_task is not None:
+        target_tasks = [target_task]
     plan = generate_task_plan(target_tasks=target_tasks, task_configs=configs)
     with open(os.path.join(extract_directory, 'extract.json'), 'wt') as f:
         json.dump(

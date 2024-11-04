@@ -45,11 +45,9 @@
           },
           "operations": []
         },
-        "resultKeys": {
+        "resultKey": {
           "value": {
-            "raw": [
-              "components"
-            ]
+            "raw": "components"
           },
           "operations": []
         },

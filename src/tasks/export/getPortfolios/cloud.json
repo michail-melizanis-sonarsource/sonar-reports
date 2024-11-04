@@ -5,8 +5,8 @@
   ],
   "dependencies": [
     {
-        "key": "getEnterprises",
-        "strategy": "each"
+      "key": "getEnterprises",
+      "strategy": "each"
     }
   ],
   "operations": [
@@ -49,11 +49,9 @@
           },
           "operations": []
         },
-        "resultKeys": {
+        "resultKey": {
           "value": {
-            "raw": [
-              "portfolios"
-            ]
+            "raw": "portfolios"
           },
           "operations": []
         },

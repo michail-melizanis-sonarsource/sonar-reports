@@ -1,11 +1,7 @@
 {
   "dependencies": [
     {
-      "key": "generateOrganizationMappings",
-      "strategy": "each"
-    },
-    {
-      "key": "getRuleDetails",
+      "key": "createPermissionTemplates",
       "strategy": "each"
     }
   ],
@@ -16,20 +12,20 @@
     {
       "operation": "apply_filter",
       "kwargs": {
-        "operator": {
-          "value": {
-            "raw": "neq"
-          }
-        },
         "left": {
           "value": {
-            "source": "getRuleDetails",
-            "path": "$.mdNote"
+            "source": "createPermissionTemplates",
+            "path": "isDefault"
           }
         },
         "right": {
           "value": {
-            "raw": null
+            "raw": true
+          }
+        },
+        "operator": {
+          "value": {
+            "raw": "eq"
           }
         }
       }
@@ -39,7 +35,7 @@
       "kwargs": {
         "url": {
           "value": {
-            "raw": "/api/rules/update"
+            "raw": "/api/permissions/set_default_template"
           }
         },
         "client": {
@@ -53,35 +49,28 @@
             "raw": "POST"
           }
         },
-        "resultKey": {
-          "value": {
-            "raw": "$"
-          }
-        },
         "encoding": {
           "value": {
             "raw": "x-www-form-urlencoded"
           }
         },
+        "resultKey": {
+          "value": {
+            "raw": "$"
+          }
+        },
         "payload": {
           "value": {
             "map": {
-              "key": {
+              "templateId": {
                 "value": {
-                  "source": "getRuleDetails",
-                  "path": "key"
+                  "source": "createPermissionTemplates",
+                  "path": "id"
                 }
               },
-              "organization": {
+              "qualifier": {
                 "value": {
-                  "source": "generateOrganizationMappings",
-                  "path": "sonarcloud_org_key"
-                }
-              },
-              "markdown_note": {
-                "value": {
-                  "source": "getRuleDetails",
-                  "path": "mdNote"
+                  "raw": "TRK"
                 }
               }
             }
