@@ -8,7 +8,7 @@ def process_chunk(chunk):
     return results
 
 
-def execute(left, right, operator):
+def execute(left, right, operator, **kwargs):
     allowed = True
     if operator == 'neq':
         allowed = left != right

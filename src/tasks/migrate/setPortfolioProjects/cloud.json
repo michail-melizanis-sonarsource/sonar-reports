@@ -1,7 +1,12 @@
 {
   "dependencies": [
     {
-      "key": "",
+      "key": "labelPortfolioBranches",
+      "strategy": "map",
+      "groupKey": "portfolioId"
+    },
+    {
+      "key": "createPortfolios",
       "strategy": "each"
     }
   ],
@@ -10,27 +15,97 @@
   ],
   "operations": [
     {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "portfolioProjects"
+          }
+        },
+        "val": {
+          "value": {
+            "source": "labelPortfolioBranches",
+            "path": {
+              "value": {
+                "source": "createPortfolios",
+                "path": "id"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "operation": "apply_filter",
+      "kwargs": {
+        "left": {
+          "value": {
+            "path": "portfolioProjects"
+          }
+        },
+        "right": {
+          "value": {
+            "raw": null
+          }
+        },
+        "operator": {
+          "value": {
+            "raw": "neq"
+          }
+        }
+      }
+    },
+    {
       "operation": "http_request",
       "kwargs": {
         "url": {
           "value": {
-            "raw": ""
-          }
+            "raw": null
+          },
+          "operations": [
+            {
+              "operation": "join_string",
+              "kwargs": {
+                "strings": {
+                  "value": {
+                    "array": [
+                      {
+                        "value": {
+                          "raw": "/enterprises/portfolios/"
+                        }
+                      },
+                      {
+                        "value": {
+                          "source": "createPortfolios",
+                          "path": "id"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "delimiter": {
+                  "value": {
+                    "raw": ""
+                  }
+                }
+              }
+            }
+          ]
         },
         "client": {
           "value": {
             "source": "inputs",
-            "path": "url"
+            "path": "api_url"
           }
         },
         "method": {
           "value": {
-            "raw": "POST"
+            "raw": "PATCH"
           }
         },
         "encoding": {
           "value": {
-            "raw": "x-www-form-urlencoded"
+            "raw": "json"
           }
         },
         "resultKey": {
@@ -41,6 +116,43 @@
         "payload": {
           "value": {
             "map": {
+              "selection": {
+                "value": {
+                  "raw": "projects"
+                }
+              },
+              "projects": {
+                "value": {
+                  "raw": null
+                },
+                "operations": [
+                  {
+                    "operation": "process_array",
+                    "kwargs": {
+                      "input_array": {
+                        "value": {
+                          "path": "portfolioProjects"
+                        }
+                      },
+                      "output_format": {
+                        "value": {
+                          "map": {
+                            "branchId": {
+                              "value": {
+                                "raw": {
+                                  "value": {
+                                    "path": "branchId"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
             }
           }
         }

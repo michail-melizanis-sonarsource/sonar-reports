@@ -7,7 +7,7 @@
   ],
   "dependencies": [
     {
-      "key": "rules",
+      "key": "getRules",
       "strategy": "each"
     }
   ],
@@ -22,7 +22,7 @@
         },
         "left": {
           "value": {
-            "source": "rules",
+            "source": "getRules",
             "path": "$.repo"
           }
         },

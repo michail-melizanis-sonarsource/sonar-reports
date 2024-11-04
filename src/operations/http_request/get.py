@@ -86,7 +86,7 @@ async def extract_entity_page(host: str, idx, url, result_key, params: dict):
 
 def extract_entity_results(js, result_key: list | None):
     results = []
-    if result_key:
+    if result_key is not None:
         res = extract_path_value(obj=js, path=result_key)
         if isinstance(res, list):
             results.extend(res)

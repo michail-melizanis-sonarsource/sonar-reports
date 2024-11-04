@@ -9,7 +9,11 @@
       "strategy": "none"
     },
     {
-      "key": "addScannerGroupToTemplates",
+      "key": "addMigrationUserToTemplates",
+      "strategy": "none"
+    },
+    {
+      "key": "setDefaultTemplates",
       "strategy": "none"
     }
   ],

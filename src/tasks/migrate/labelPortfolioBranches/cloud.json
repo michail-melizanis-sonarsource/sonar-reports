@@ -1,0 +1,97 @@
+{
+  "dependencies": [
+    {
+      "key": "getPortfolioProjects",
+      "strategy": "each"
+    },
+    {
+      "key": "createPortfolios",
+      "strategy": "each"
+    },
+    {
+      "key": "pullBranchIds",
+      "strategy": "each"
+    }
+  ],
+  "editions": [
+    "enterprise"
+  ],
+  "operations": [
+    {
+      "operation": "apply_filter",
+      "kwargs": {
+        "left": {
+          "value": {
+            "source": "getPortfolioProjects",
+            "path": "refKey"
+          }
+        },
+        "right": {
+          "value": {
+            "source": "pullBranchIds",
+            "path": "sourceProjectKey"
+          }
+        },
+        "operator": {
+          "value": {
+            "raw": "eq"
+          }
+        }
+      }
+    },
+    {
+      "operation": "apply_filter",
+      "kwargs": {
+        "left": {
+          "value": {
+            "source": "getPortfolioProjects",
+            "path": "portfolioKey"
+          }
+        },
+        "right": {
+          "value": {
+            "source": "createPortfolios",
+            "path": "sourcePortfolioKey"
+          }
+        },
+        "operator": {
+          "value": {
+            "raw": "eq"
+          }
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "branchId"
+          }
+        },
+        "val": {
+          "value": {
+            "source": "pullBranchIds",
+            "path": "branchId"
+          }
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "portfolioId"
+          }
+        },
+        "val": {
+          "value": {
+            "source": "createPortfolios",
+            "path": "id"
+          }
+        }
+      }
+    }
+  ]
+}
