@@ -20,18 +20,23 @@ def cli():
 @cli.command()
 @click.argument('url')
 @click.argument('token')
-@click.option('--pem_file_path')
-@click.option('--key_file_path')
-@click.option('--cert_password')
-@click.option('--export_directory', default='/app/files/')
+@click.option('--pem_file_path', help="Path to client certificate pem file")
+@click.option('--key_file_path', help="Path to client certificate key file")
+@click.option('--cert_password', help="Password for client certificate")
+@click.option('--export_directory', default='/app/files/', help="Root Directory to output the export")
 @click.option('--extract_type', default='all', help='Type of Extract to run')
-@click.option('--target_task')
-@click.option('--concurrency', default=25)
-@click.option('--timeout', default=60)
-@click.option('--extract_id', default=None)
+@click.option('--concurrency', default=25, help='Maximum number of concurrent requests')
+@click.option('--timeout', default=60, help='Number of seconds before a request will timeout')
+@click.option('--extract_id', help='ID of an extract to resume in case of failures. Extract will start by retrying last completed task')
 def extract(url, token, export_directory: str, extract_type, pem_file_path, key_file_path, cert_password,
-            concurrency, target_task,
-            timeout, extract_id):
+            concurrency, target_task, timeout, extract_id):
+    """Extracts data from a SonarQube Server instance and stores it in the export directory as new line delimited json files
+
+    URL is the url of the SonarQube instance
+
+    TOKEN is an admin user token to the SonarQube instance
+
+    """
     if not url.endswith('/'):
         url = f"{url}/"
     if extract_id is None:
@@ -71,9 +76,10 @@ def extract(url, token, export_directory: str, extract_type, pem_file_path, key_
 
 
 @cli.command()
-@click.option('--export_directory', default='/app/files/')
+@click.option('--export_directory', default='/app/files/', help="Root Directory containing all of the SonarQube exports")
 @click.option('--extract_id', default=None)
 def report(export_directory, extract_id):
+    """Generates a markdown report based on data extracted from one or more SonarQube Server instances"""
     from report.generate import generate_markdown
     if extract_id is None:
         extract_id = get_latest_extract_id(export_directory)
@@ -86,8 +92,9 @@ def report(export_directory, extract_id):
 
 
 @cli.command()
-@click.option('--export_directory', default='/app/files/')
+@click.option('--export_directory', default='/app/files/', help="Root Directory containing all of the SonarQube exports")
 def structure(export_directory):
+    """Groups projects into organizations based on DevOps Bindings and Server Urls. Outputs organizations and projects as CSVs"""
     from structure import map_organization_structure, map_project_structure
     extract_mapping = get_unique_extracts(directory=export_directory)
     bindings, projects = map_project_structure(export_directory=export_directory, extract_mapping=extract_mapping)
@@ -97,8 +104,9 @@ def structure(export_directory):
 
 
 @cli.command()
-@click.option('--export_directory', default='/app/files/')
+@click.option('--export_directory', default='/app/files/', help="Root Directory containing all of the SonarQube exports")
 def mappings(export_directory):
+    """Maps groups, permission templates, quality profiles, quality gates, and portfolios to relevant organizations. Outputs CSVs for each entity type"""
     from structure import map_templates, map_groups, map_profiles, map_gates, map_portfolios
     extract_mapping = get_unique_extracts(directory=export_directory)
     projects = load_csv(directory=export_directory, filename='projects.csv')
@@ -124,11 +132,16 @@ def mappings(export_directory):
 @click.argument('enterprise_key')
 @click.option('--edition', default='enterprise')
 @click.option('--url', default='https://sonarcloud.io/')
-@click.option('--run_id', default=None)
-@click.option('--concurrency', default=25)
-@click.option('--export_directory', default='/app/files/')
-@click.option('--target_task')
+@click.option('--run_id', default=None, help='ID of a run to resume in case of failures. Migration will resume by retrying the last completed task')
+@click.option('--concurrency', default=25, help='Maximum number of concurrent requests')
+@click.option('--export_directory', default='/app/files/', help="Root Directory containing all of the SonarQube exports")
+@click.option('--target_task', help='Name of a specific migration task to complete. All dependent tasks will be be included')
 def migrate(token, edition, url, enterprise_key, concurrency, run_id, export_directory, target_task):
+    """Migrate SonarQube Server configurations to SonarQube Cloud. User must run the structure and mappings command and add the SonarQube Cloud organization keys to the organizations.csv in order to start the migration
+
+    TOKEN is a user token that has admin permissions at the enterprise level and all organizations
+    ENTERPRISE_KEY is the key of the SonarQube Cloud enterprise. All migrating organizations must be added to the enterprise
+    """
     create_plan = False
     configure_client(url=url, cert=None, server_version="cloud", token=token)
     api_url = url.replace('https://', 'https://api.')
@@ -171,13 +184,20 @@ def migrate(token, edition, url, enterprise_key, concurrency, run_id, export_dir
 
 @cli.command()
 @click.argument('token')
-@click.option('--enterprise_key')
-@click.option('--org_key')
-@click.option('--edition', default='enterprise')
-@click.option('--url', default='https://sonarcloud.io/')
-@click.option('--concurrency', default=25)
-@click.option('--export_directory', default='/app/files/')
-def reset(token, edition, url, enterprise_key, concurrency, export_directory, org_key):
+@click.argument('enterprise_key')
+@click.option('--edition', default='enterprise', help="SonarQube Cloud License Edition")
+@click.option('--url', default='https://sonarcloud.io/', help="Url of the SonarQube Cloud")
+@click.option('--concurrency', default=25, help="Maximum number of concurrent requests")
+@click.option('--export_directory', default='/app/files/', help="Directory to place all interim files")
+def reset(token, edition, url, enterprise_key, concurrency, export_directory):
+    """Resets a SonarQube cloud Enterprise back to its original state. Warning, this will delete everything in every organization within the enterprise.
+
+    TOKEN is a user token that has admin permissions at the enterprise level and all organizations
+
+    ENTERPRISE_KEY is the key of the SonarQube Cloud enterprise that will be reset.
+
+    """
+
     configs = get_available_task_configs(client_version='cloud', edition=edition)
     if not url.endswith('/'):
         url = f"{url}/"
@@ -205,7 +225,7 @@ def reset(token, edition, url, enterprise_key, concurrency, export_directory, or
                 run_id=run_id,
             ), f
         )
-    execute_plan(execution_plan=plan, inputs=dict(url=url, api_url=api_url, enterprise_key=enterprise_key, org_key=org_key), concurrency=concurrency,
+    execute_plan(execution_plan=plan, inputs=dict(url=url, api_url=api_url, enterprise_key=enterprise_key), concurrency=concurrency,
                  task_configs=configs,
                  output_directory=export_directory, current_run_id=run_id,
                  run_ids={run_id})
