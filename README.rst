@@ -42,6 +42,18 @@ Options:
   --extract_id TEXT        ID of an extract to resume in case of failures.
                            Extract will start by retrying last completed task
 
+REPORT
+------
+
+Usage: main.py report [OPTIONS]
+
+  Generates a markdown report based on data extracted from one or more
+  SonarQube Server instances
+
+Options:
+  --export_directory TEXT  Root Directory containing all of the SonarQube
+                           exports
+
 STRUCTURE
 ---------
 
@@ -56,6 +68,7 @@ Options:
 
 MAPPINGS
 --------
+
 Usage: sonarqube-reports mappings [OPTIONS]
 
   Maps groups, permission templates, quality profiles, quality gates, and
@@ -67,6 +80,7 @@ Options:
 
 MIGRATE
 -------
+
 Usage: sonarqube-reports migrate [OPTIONS] TOKEN ENTERPRISE_KEY
 
   Migrate SonarQube Server configurations to SonarQube Cloud. User must run
@@ -92,6 +106,7 @@ Options:
 
 RESET
 -----
+
 Usage: sonarqube-reports reset [OPTIONS] TOKEN ENTERPRISE_KEY
 
   Resets a SonarQube cloud Enterprise back to its original state. Warning,

@@ -29,7 +29,7 @@ def cli():
 @click.option('--timeout', default=60, help='Number of seconds before a request will timeout')
 @click.option('--extract_id', help='ID of an extract to resume in case of failures. Extract will start by retrying last completed task')
 def extract(url, token, export_directory: str, extract_type, pem_file_path, key_file_path, cert_password,
-            concurrency, target_task, timeout, extract_id):
+            concurrency, timeout, extract_id):
     """Extracts data from a SonarQube Server instance and stores it in the export directory as new line delimited json files
 
     URL is the url of the SonarQube instance
@@ -55,8 +55,6 @@ def extract(url, token, export_directory: str, extract_type, pem_file_path, key_
         target_tasks = MIGRATION_TASKS
     else:
         target_tasks = list([k for k in configs.keys() if k.startswith('get')])
-    if target_task is not None:
-        target_tasks = [target_task]
     plan = generate_task_plan(target_tasks=target_tasks, task_configs=configs)
     with open(os.path.join(extract_directory, 'extract.json'), 'wt') as f:
         json.dump(
@@ -77,14 +75,10 @@ def extract(url, token, export_directory: str, extract_type, pem_file_path, key_
 
 @cli.command()
 @click.option('--export_directory', default='/app/files/', help="Root Directory containing all of the SonarQube exports")
-@click.option('--extract_id', default=None)
-def report(export_directory, extract_id):
+def report(export_directory):
     """Generates a markdown report based on data extracted from one or more SonarQube Server instances"""
     from report.generate import generate_markdown
-    if extract_id is None:
-        extract_id = get_latest_extract_id(export_directory)
-    else:
-        extract_id = extract_id.strip()
+    extract_id = get_latest_extract_id(export_directory)
     if extract_id is None or not os.path.isdir(os.path.join(export_directory, extract_id)):
         click.echo("No Extracts Found")
         return
