@@ -2,6 +2,7 @@ import httpx
 from tenacity import retry, stop_after_attempt, wait_random_exponential
 from asyncio import gather
 from parser import extract_path_value
+from io import BytesIO
 
 httpx_client: tuple = None, None
 from logs import log_event
@@ -137,19 +138,46 @@ def process_errors(exc, method, url, log_attributes):
 
 
 async def process_request_chunk(chunk, max_threads):
-    results = await gather(
+    request_chunk = list()
+    results = list()
+    for c in chunk:
+        request_chunk.append(c)
+        if len(request_chunk) >= max_threads:
+            results = await process_sub_chunk(results=results, request_chunk=request_chunk)
+            request_chunk = list()
+    if request_chunk:
+        results = await process_sub_chunk(results=results, request_chunk=request_chunk)
+    return results
+
+
+async def process_sub_chunk(results, request_chunk):
+    sub_results = await gather(
         *[
             safe_json_request(
-                host=chunk[0]['kwargs']['client'],
-                method=chunk[0]['kwargs']['method'],
+                host=request_chunk[idx]['kwargs']['client'],
+                method=request_chunk[idx]['kwargs']['method'],
                 raise_over=300,
                 url=payload['kwargs']['url'],
-                data={k: v for k, v in payload['kwargs']['payload'].items() if v is not None} if payload['kwargs'][
-                                                                                                     'encoding'] == 'x-www-form-urlencoded' else None,
-                json={k: v for k, v in payload['kwargs']['payload'].items() if v is not None} if payload['kwargs'][
-                                                                                                     'encoding'] == 'json' else None,
-            ) for payload in chunk
+                files=None if payload['kwargs'].get('file') is None else {
+                    request_chunk[idx]['kwargs']['file']['name']: (
+                    'backup.xml', BytesIO(request_chunk[idx]['kwargs']['file']['content'].encode('utf-8')),
+                    request_chunk[idx]['kwargs']['file']['contentType'])
+                },
+                data={k: v for k, v in payload['kwargs']['payload'].items() if v is not None} if
+                payload['kwargs']['encoding'] in ['x-www-form-urlencoded', 'multipart/form-data'] else None,
+                json={k: v for k, v in payload['kwargs']['payload'].items() if v is not None} if
+                payload['kwargs']['encoding'] == 'json' else None,
+            ) for idx, payload in enumerate(request_chunk)
         ]
     )
-    return [[extract_path_value(obj=result[1], path=chunk[idx]['kwargs']['resultKey'])] for idx, result in
-            enumerate(results)]
+    results.extend(
+        [
+            [
+                extract_path_value(
+                    obj=result[1],
+                    path=request_chunk[idx]['kwargs']['resultKey']
+                )
+            ] for idx, result in enumerate(sub_results)
+        ]
+    )
+    return results

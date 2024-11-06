@@ -1,43 +1,30 @@
 {
   "dependencies": [
     {
-      "key": "createPermissionTemplates",
+      "key": "addMigrationUserToMigrationGroups",
+      "strategy": "none"
+    },
+    {
+      "key": "createMigrationGroups",
       "strategy": "each"
-    },
-    {
-      "key": "addScannerGroupToTemplates",
-      "strategy": "none"
-    },
-    {
-      "key": "addViewerGroupToTemplates",
-      "strategy": "none"
-    },
-    {
-      "key": "addMigrationGroupToTemplates",
-      "strategy": "none"
     }
   ],
   "editions": [
-    "enterprise"
+    "enterprise",
+    "teams"
   ],
   "operations": [
     {
-      "operation": "apply_filter",
+      "operation": "expand_list",
       "kwargs": {
-        "left": {
+        "inputs": {
           "value": {
-            "source": "createPermissionTemplates",
-            "path": "isDefault"
+            "raw": ["admin", "codeviewer", "issueadmin", "securityhotspotadmin", "scan", "user"]
           }
         },
-        "right": {
+        "resultKey": {
           "value": {
-            "raw": true
-          }
-        },
-        "operator": {
-          "value": {
-            "raw": "eq"
+            "raw": "permission"
           }
         }
       }
@@ -47,7 +34,7 @@
       "kwargs": {
         "url": {
           "value": {
-            "raw": "/api/permissions/set_default_template"
+            "raw": "/api/permissions/add_group_to_template"
           }
         },
         "client": {
@@ -74,15 +61,26 @@
         "payload": {
           "value": {
             "map": {
-              "templateId": {
+              "groupName": {
                 "value": {
-                  "source": "createPermissionTemplates",
-                  "path": "id"
+                  "source": "createMigrationGroups",
+                  "path": "name"
                 }
               },
-              "qualifier": {
+              "templateName": {
                 "value": {
-                  "raw": "TRK"
+                  "raw": "Default template"
+                }
+              },
+              "organization": {
+                "value": {
+                  "source": "createMigrationGroups",
+                  "path": "sonarCloudOrgKey"
+                }
+              },
+              "permission": {
+                "value": {
+                  "path": "permission"
                 }
               }
             }

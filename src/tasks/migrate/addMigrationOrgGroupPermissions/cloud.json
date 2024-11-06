@@ -1,20 +1,8 @@
 {
   "dependencies": [
     {
-      "key": "createPermissionTemplates",
+      "key": "createMigrationGroups",
       "strategy": "each"
-    },
-    {
-      "key": "addScannerGroupToTemplates",
-      "strategy": "none"
-    },
-    {
-      "key": "addViewerGroupToTemplates",
-      "strategy": "none"
-    },
-    {
-      "key": "addMigrationGroupToTemplates",
-      "strategy": "none"
     }
   ],
   "editions": [
@@ -22,22 +10,16 @@
   ],
   "operations": [
     {
-      "operation": "apply_filter",
+      "operation": "expand_list",
       "kwargs": {
-        "left": {
+        "inputs": {
           "value": {
-            "source": "createPermissionTemplates",
-            "path": "isDefault"
+            "raw": ["admin", "profileAdmin", "gateadmin", "securityhotspotadmin", "scan", "provisioning"]
           }
         },
-        "right": {
+        "resultKey": {
           "value": {
-            "raw": true
-          }
-        },
-        "operator": {
-          "value": {
-            "raw": "eq"
+            "raw": "permission"
           }
         }
       }
@@ -47,7 +29,7 @@
       "kwargs": {
         "url": {
           "value": {
-            "raw": "/api/permissions/set_default_template"
+            "raw": "/api/permissions/add_group"
           }
         },
         "client": {
@@ -74,15 +56,21 @@
         "payload": {
           "value": {
             "map": {
-              "templateId": {
+              "organization": {
                 "value": {
-                  "source": "createPermissionTemplates",
-                  "path": "id"
+                  "source": "createMigrationGroups",
+                  "path": "sonarCloudOrgKey"
                 }
               },
-              "qualifier": {
+              "groupName": {
                 "value": {
-                  "raw": "TRK"
+                  "source": "createMigrationGroups",
+                  "path": "name"
+                }
+              },
+              "permission": {
+                "value": {
+                  "path": "permission"
                 }
               }
             }

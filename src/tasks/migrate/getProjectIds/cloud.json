@@ -1,13 +1,13 @@
 {
+  "dependencies": [
+    {
+      "key": "createProjects",
+      "strategy": "each"
+    }
+  ],
   "editions": [
     "enterprise",
     "teams"
-  ],
-  "dependencies": [
-    {
-      "key": "getEnterpriseOrgKeys",
-      "strategy": "each"
-    }
   ],
   "operations": [
     {
@@ -21,7 +21,7 @@
         },
         "url": {
           "value": {
-            "raw": "/api/qualityprofiles/search"
+            "raw": "/api/navigation/component"
           },
           "operations": []
         },
@@ -51,7 +51,7 @@
         },
         "resultKey": {
           "value": {
-            "raw": "profiles"
+            "raw": null
           },
           "operations": []
         },
@@ -70,30 +70,14 @@
         "params": {
           "value": {
             "map": {
-              "organization": {
+              "component": {
                 "value": {
-                  "source": "getEnterpriseOrgKeys",
+                  "source": "createProjects",
                   "path": "key"
-                }
+                },
+                "operations": []
               }
             }
-          },
-          "operations": []
-        }
-      }
-    },
-    {
-      "operation": "set_key",
-      "kwargs": {
-        "key": {
-          "value": {
-            "raw": "orgKey"
-          }
-        },
-        "val": {
-          "value": {
-            "source": "getEnterpriseOrgKeys",
-            "path": "key"
           }
         }
       }
@@ -103,13 +87,29 @@
       "kwargs": {
         "key": {
           "value": {
-            "raw": "enterpriseKey"
+            "raw": "isCloud"
           }
         },
         "val": {
           "value": {
-            "source": "getEnterpriseOrgKeys",
-            "path": "enterpriseKey"
+            "source": "createProjects",
+            "path": "isCloudBinding"
+          }
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "repository"
+          }
+        },
+        "val": {
+          "value": {
+            "source": "createProjects",
+            "path": "repository"
           }
         }
       }

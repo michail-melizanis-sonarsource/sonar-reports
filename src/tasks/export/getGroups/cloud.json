@@ -5,7 +5,12 @@
     "developer",
     "datacenter"
   ],
-  "dependencies": [],
+  "dependencies": [
+    {
+      "key": "getEnterpriseOrgKeys",
+      "strategy": "each"
+    }
+  ],
   "operations": [
     {
       "operation": "http_request",
@@ -69,13 +74,45 @@
             "map": {
               "organization": {
                 "value": {
-                  "source": "inputs",
-                  "path": "org_key"
+                  "source": "getEnterpriseOrgKeys",
+                  "path": "key"
                 }
               }
             }
           },
           "operations": []
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "orgKey"
+          }
+        },
+        "val": {
+          "value": {
+            "source": "getEnterpriseOrgKeys",
+            "path": "key"
+          }
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "enterpriseKey"
+          }
+        },
+        "val": {
+          "value": {
+            "source": "getEnterpriseOrgKeys",
+            "path": "enterpriseKey"
+          }
         }
       }
     }

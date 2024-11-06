@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from utils import multi_extract_object_reader
 
 
@@ -30,8 +32,27 @@ def generate_unique_binding_key(server_url, key, alm, url, repository):
     return base_url + '/' + org_key
 
 
+def map_new_code_definitions(export_directory, extract_mapping):
+    new_code_definitions = dict()
+    for server_url, new_code_definition in multi_extract_object_reader(directory=export_directory,
+                                                                       key='getNewCodePeriods',
+                                                                       mapping=extract_mapping):
+        if new_code_definition['type'] not in ['PREVIOUS_VERSION', 'NUMBER_OF_DAYS']:
+            continue
+        if server_url not in new_code_definitions.keys():
+            new_code_definitions[server_url] = dict()
+        if new_code_definition['projectKey'] not in new_code_definitions[server_url].keys():
+            new_code_definitions[server_url][new_code_definition['projectKey']] = dict()
+        new_code_definitions[server_url][new_code_definition['projectKey']][new_code_definition['branchKey']] = dict(
+            type=new_code_definition['type'].lower(),
+            value=new_code_definition.get('value', 30 if new_code_definition['type'] == 'NUMBER_OF_DAYS' else 'previous_version'),
+        )
+    return new_code_definitions
+
+
 def map_project_structure(export_directory, extract_mapping):
     projects = dict()
+    new_code_definitions = map_new_code_definitions(export_directory=export_directory, extract_mapping=extract_mapping)
     binding_mapping = {server_url + binding['key']: binding for server_url, binding in
                        multi_extract_object_reader(directory=export_directory, key='getBindings',
                                                    mapping=extract_mapping)}
@@ -69,15 +90,23 @@ def map_project_structure(export_directory, extract_mapping):
             repository=project_binding.get('project_binding', dict()).get('repository'),
             monorepo=project_binding.get('project_binding', dict()).get('monorepo', False),
         )
+        branch_name = project.get('branch', 'master')
+        new_code_definition = new_code_definitions.get(server_url, dict()).get(project['key'], dict()).get(branch_name,
+                                                                                                           dict(
+                                                                                                               type='number_of_days',
+                                                                                                               value=30
+                                                                                                           ))
         projects[unique_project_key] = dict(
             key=project['key'],
             name=project['name'],
             gate_name=project.get('qualityGate', dict()).get('name'),
-            profiles = project.get('qualityProfiles', []),
+            profiles=project.get('qualityProfiles', []),
             server_url=server_url,
             sonarqube_org_key=unique_binding_key,
-            main_branch=project.get('branch', 'master'),
+            main_branch=branch_name,
             is_cloud_binding=is_cloud_binding(binding=project_binding['binding']),
+            new_code_definition_type=new_code_definition['type'],
+            new_code_definition_value=new_code_definition['value'],
             repository=project_binding.get('project_binding', dict()).get('repository'),
             monorepo=project_binding.get('project_binding', dict()).get('monorepo', False),
             summary_comment_enabled=project_binding.get('project_binding', dict()).get('summaryCommentEnabled', False),

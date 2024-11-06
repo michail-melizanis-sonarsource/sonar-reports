@@ -31,7 +31,10 @@ def parse_value_field(obj, value_config):
 def extract_path_value(obj, path: str | list):
     val = None
     if isinstance(path, str):
-        path = path.split('.')
+        if isinstance(obj, dict) and path in obj.keys():
+            path = [path]
+        else:
+            path = path.split('.')
     if path[0] == '$':
         val = obj
     elif isinstance(obj, dict):

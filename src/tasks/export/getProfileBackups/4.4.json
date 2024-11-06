@@ -1,11 +1,13 @@
 {
   "editions": [
+    "community",
     "enterprise",
-    "teams"
+    "developer",
+    "datacenter"
   ],
   "dependencies": [
     {
-      "key": "getEnterpriseOrgKeys",
+      "key": "getProfiles",
       "strategy": "each"
     }
   ],
@@ -21,7 +23,7 @@
         },
         "url": {
           "value": {
-            "raw": "/api/qualityprofiles/search"
+            "raw": "/api/qualityprofiles/backup"
           },
           "operations": []
         },
@@ -51,13 +53,13 @@
         },
         "resultKey": {
           "value": {
-            "raw": "profiles"
+            "raw": null
           },
           "operations": []
         },
         "maxPageSize": {
           "value": {
-            "raw": null
+            "raw": 500
           },
           "operations": []
         },
@@ -70,11 +72,19 @@
         "params": {
           "value": {
             "map": {
-              "organization": {
+              "language": {
                 "value": {
-                  "source": "getEnterpriseOrgKeys",
-                  "path": "key"
-                }
+                  "source": "getProfiles",
+                  "path": "$.language"
+                },
+                "operations": []
+              },
+              "qualityProfile": {
+                "value": {
+                  "source": "getProfiles",
+                  "path": "$.name"
+                },
+                "operations": []
               }
             }
           },
@@ -87,14 +97,16 @@
       "kwargs": {
         "key": {
           "value": {
-            "raw": "orgKey"
-          }
+            "raw": "profileName"
+          },
+          "operations": []
         },
         "val": {
           "value": {
-            "source": "getEnterpriseOrgKeys",
-            "path": "key"
-          }
+            "source": "getProfiles",
+            "path": "$.name"
+          },
+          "operations": []
         }
       }
     },
@@ -103,14 +115,52 @@
       "kwargs": {
         "key": {
           "value": {
-            "raw": "enterpriseKey"
-          }
+            "raw": "language"
+          },
+          "operations": []
         },
         "val": {
           "value": {
-            "source": "getEnterpriseOrgKeys",
-            "path": "enterpriseKey"
-          }
+            "source": "getProfiles",
+            "path": "$.language"
+          },
+          "operations": []
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "profileKey"
+          },
+          "operations": []
+        },
+        "val": {
+          "value": {
+            "source": "getProfiles",
+            "path": "$.key"
+          },
+          "operations": []
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "serverUrl"
+          },
+          "operations": []
+        },
+        "val": {
+          "value": {
+            "source": "inputs",
+            "path": "url"
+          },
+          "operations": []
         }
       }
     }

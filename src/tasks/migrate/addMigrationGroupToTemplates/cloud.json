@@ -1,11 +1,15 @@
 {
   "dependencies": [
     {
-      "key": "createProjects",
+      "key": "addMigrationUserToMigrationGroups",
+      "strategy": "none"
+    },
+    {
+      "key": "createMigrationGroups",
       "strategy": "each"
     },
     {
-      "key": "filterProjectSettingsValues",
+      "key": "createPermissionTemplates",
       "strategy": "each"
     }
   ],
@@ -19,14 +23,14 @@
       "kwargs": {
         "left": {
           "value": {
-            "source": "filterProjectSettingsValues",
-            "path": "projectKey"
+            "source": "createMigrationGroups",
+            "path": "sonarCloudOrgKey"
           }
         },
         "right": {
           "value": {
-            "source": "createProjects",
-            "path": "sourceProjectKey"
+            "source": "createPermissionTemplates",
+            "path": "sonarCloudOrgKey"
           }
         },
         "operator": {
@@ -37,23 +41,16 @@
       }
     },
     {
-      "operation": "apply_filter",
+      "operation": "expand_list",
       "kwargs": {
-        "left": {
+        "inputs": {
           "value": {
-            "source": "filterProjectSettingsValues",
-            "path": "serverUrl"
+            "raw": ["admin", "codeviewer", "issueadmin", "securityhotspotadmin", "scan", "user"]
           }
         },
-        "right": {
+        "resultKey": {
           "value": {
-            "source": "createProjects",
-            "path": "sourceServerUrl"
-          }
-        },
-        "operator": {
-          "value": {
-            "raw": "eq"
+            "raw": "permission"
           }
         }
       }
@@ -63,7 +60,7 @@
       "kwargs": {
         "url": {
           "value": {
-            "raw": "/api/settings/set"
+            "raw": "/api/permissions/add_group_to_template"
           }
         },
         "client": {
@@ -90,22 +87,27 @@
         "payload": {
           "value": {
             "map": {
-              "key": {
+              "groupName": {
                 "value": {
-                  "source": "filterProjectSettingsValues",
-                  "path": "key"
+                  "source": "createMigrationGroups",
+                  "path": "name"
                 }
               },
-              "component": {
+              "templateName": {
                 "value": {
-                  "source": "createProjects",
-                  "path": "key"
+                  "source": "createPermissionTemplates",
+                  "path": "name"
                 }
               },
-              "value": {
+              "organization": {
                 "value": {
-                  "source": "filterProjectSettingsValues",
-                  "path": "values"
+                  "source": "createPermissionTemplates",
+                  "path": "sonarCloudOrgKey"
+                }
+              },
+              "permission": {
+                "value": {
+                  "path": "permission"
                 }
               }
             }

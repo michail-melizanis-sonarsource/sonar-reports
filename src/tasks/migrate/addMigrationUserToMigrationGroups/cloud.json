@@ -5,7 +5,7 @@
       "strategy": "each"
     },
     {
-      "key": "createPermissionTemplates",
+      "key": "createMigrationGroups",
       "strategy": "each"
     }
   ],
@@ -15,26 +15,11 @@
   ],
   "operations": [
     {
-      "operation": "expand_list",
-      "kwargs": {
-        "inputs": {
-          "value": {
-            "raw": ["admin", "codeviewer", "issueadmin", "securityhotspotadmin", "scan", "user"]
-          }
-        },
-        "resultKey": {
-          "value": {
-            "raw": "permission"
-          }
-        }
-      }
-    },
-    {
       "operation": "http_request",
       "kwargs": {
         "url": {
           "value": {
-            "raw": "/api/permissions/add_user_to_template"
+            "raw": "/api/user_groups/add_user"
           }
         },
         "client": {
@@ -67,21 +52,16 @@
                   "path": "login"
                 }
               },
-              "templateName": {
+              "name": {
                 "value": {
-                  "source": "createPermissionTemplates",
+                  "source": "createMigrationGroups",
                   "path": "name"
                 }
               },
               "organization": {
                 "value": {
-                  "source": "createPermissionTemplates",
+                  "source": "createMigrationGroups",
                   "path": "sonarCloudOrgKey"
-                }
-              },
-              "permission": {
-                "value": {
-                  "path": "permission"
                 }
               }
             }

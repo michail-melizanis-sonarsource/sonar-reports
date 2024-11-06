@@ -1,11 +1,13 @@
 {
   "editions": [
+    "community",
     "enterprise",
-    "teams"
+    "developer",
+    "datacenter"
   ],
   "dependencies": [
     {
-      "key": "getEnterpriseOrgKeys",
+      "key": "createDefaultProjects",
       "strategy": "each"
     }
   ],
@@ -21,7 +23,7 @@
         },
         "url": {
           "value": {
-            "raw": "/api/qualityprofiles/search"
+            "raw": "/api/settings/values"
           },
           "operations": []
         },
@@ -51,7 +53,7 @@
         },
         "resultKey": {
           "value": {
-            "raw": "profiles"
+            "raw": "settings"
           },
           "operations": []
         },
@@ -70,11 +72,12 @@
         "params": {
           "value": {
             "map": {
-              "organization": {
+              "component": {
                 "value": {
-                  "source": "getEnterpriseOrgKeys",
-                  "path": "key"
-                }
+                  "source": "createDefaultProjects",
+                  "path": "$.key"
+                },
+                "operations": []
               }
             }
           },
@@ -87,30 +90,16 @@
       "kwargs": {
         "key": {
           "value": {
-            "raw": "orgKey"
-          }
+            "raw": "sonarCloudOrgKey"
+          },
+          "operations": []
         },
         "val": {
           "value": {
-            "source": "getEnterpriseOrgKeys",
-            "path": "key"
-          }
-        }
-      }
-    },
-    {
-      "operation": "set_key",
-      "kwargs": {
-        "key": {
-          "value": {
-            "raw": "enterpriseKey"
-          }
-        },
-        "val": {
-          "value": {
-            "source": "getEnterpriseOrgKeys",
-            "path": "enterpriseKey"
-          }
+            "source": "createDefaultProjects",
+            "path": "$.sonarCloudOrgKey"
+          },
+          "operations": []
         }
       }
     }

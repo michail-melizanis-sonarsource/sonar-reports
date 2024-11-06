@@ -28,6 +28,28 @@
         "left": {
           "value": {
             "source": "getGroups",
+            "path": "enterpriseKey"
+          }
+        },
+        "right": {
+          "value": {
+            "source": "inputs",
+            "path": "enterprise_key"
+          }
+        },
+        "operator": {
+          "value": {
+            "raw": "eq"
+          }
+        }
+      }
+    },
+    {
+      "operation": "apply_filter",
+      "kwargs": {
+        "left": {
+          "value": {
+            "source": "getGroups",
             "path": "name"
           }
         },
@@ -43,6 +65,7 @@
         }
       }
     },
+
     {
       "operation": "http_request",
       "kwargs": {

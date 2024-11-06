@@ -1,17 +1,13 @@
 {
   "dependencies": [
     {
-      "key": "getMigrationUser",
-      "strategy": "each"
-    },
-    {
-      "key": "createGroups",
+      "key": "generateOrganizationMappings",
       "strategy": "each"
     }
   ],
   "editions": [
-    "enterprise",
-    "teams"
+    "team",
+    "enterprise"
   ],
   "operations": [
     {
@@ -19,7 +15,7 @@
       "kwargs": {
         "url": {
           "value": {
-            "raw": "/api/user_groups/add_user"
+            "raw": "/api/user_groups/create"
           }
         },
         "client": {
@@ -40,31 +36,50 @@
         },
         "resultKey": {
           "value": {
-            "raw": "$"
+            "raw": "group"
+          }
+        },
+        "responseKey": {
+          "value": {
+            "raw": "group"
           }
         },
         "payload": {
           "value": {
             "map": {
-              "login": {
-                "value": {
-                  "source": "getMigrationUser",
-                  "path": "login"
-                }
-              },
               "name": {
                 "value": {
-                  "source": "createGroups",
-                  "path": "name"
+                  "raw": "Sonar Migration Admins"
+                }
+              },
+              "description": {
+                "value": {
+                  "raw": "Group for Migration Users"
                 }
               },
               "organization": {
                 "value": {
-                  "source": "createGroups",
-                  "path": "sonarCloudOrgKey"
+                  "source": "generateOrganizationMappings",
+                  "path": "sonarcloud_org_key"
                 }
               }
             }
+          }
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "sonarCloudOrgKey"
+          }
+        },
+        "val": {
+          "value": {
+            "source": "generateOrganizationMappings",
+            "path": "sonarcloud_org_key"
           }
         }
       }
