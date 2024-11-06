@@ -61,7 +61,6 @@ def process_profile_rules(extract_directory, template_rules, plugin_rules):
             template_rule = True
         if rule['indexKey'] in plugin_rules:
             plugin_rule = True
-
         for profile in rule['values']:
             if profile['qProfile'] not in profiles.keys():
                 profiles[profile['qProfile']] = dict(plugin_rules=0, template_rules=0)
@@ -318,6 +317,7 @@ def generate_markdown(extract_directory):
     projects, profile_mapping, gate_mapping = process_project_details(extract_directory=extract_directory)
     user_count = process_entity(extract_directory=extract_directory, entity_type='getUsers', key='$.paging.total')
     template_rules, plugin_rules = process_rules(extract_directory=extract_directory)
+    print(template_rules, plugin_rules)
     profile_rules = process_profile_rules(extract_directory=extract_directory, plugin_rules=plugin_rules,
                                           template_rules=template_rules)
     bindings = process_devops_bindings(extract_directory=extract_directory)
