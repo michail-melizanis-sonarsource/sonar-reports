@@ -88,8 +88,6 @@ REPORT_TASKS = [
     'getServerInfo',
     'getProjectBindings',
     'getGates',
-    'getFixedHotspots',
-    'getSafeHotspots',
     'getPlugins',
     'getDefaultTemplates',
     'getTemplates',
@@ -97,16 +95,9 @@ REPORT_TASKS = [
     'getPortfolioDetails',
     'getPortfolioProjects',
     'getProfiles',
-    'getProjectIssues',
-    'getProjectTemplateIssues',
-    'getProjectPluginIssues',
     'getProjectSettings',
     'getUsers',
-    'getProjectTemplateIssues',
-    'getProjectPluginIssues',
-    'getUsage',
-    'getAcceptedIssues',
-    'getFalsePositiveIssues'
+    'getUsage'
 ]
 
 MIGRATION_TASKS = [
@@ -131,11 +122,11 @@ MIGRATION_TASKS = [
     'getProjectWebhookDeliveries',
     'getNewCodePeriods',
     'getProjectUsersScanners',
-    'getProjectTasks', 'getRuleDetails',
+    'getProjectTasks', 'getRuleDetails', "getProfileBackups",
     'getUserGroups', 'getProjectSettings', 'getTemplateUsersScanners', 'getServerWebhooks',
     'getProjectGroupsViewers', 'getTemplateGroupsViewers', 'getUsage', 'getPluginRules',
     'getApplicationDetails', 'getProjectDetails', 'getProjectTemplateIssues', 'getBranches',
-    'getGateGroups', 'getDeactivedProfileRules', 'getBindings', 'getProjectWebhooks', 'getWebhooks',
+    'getGateGroups', 'getDeactivatedProfileRules', 'getBindings', 'getProjectWebhooks', 'getWebhooks',
     'getProjectIssues', 'getProfiles', 'getProjectBindings', 'getProfileGroups', 'getFixedHotspots',
     'getLabeledIssues', 'getProjectAnalyses', 'getGroups', 'getTemplateRules', 'getPluginIssues',
     'getGateConditions', 'getPlugins', 'getWebhookDeliveries', 'getPortfolioDetails', 'getGates',

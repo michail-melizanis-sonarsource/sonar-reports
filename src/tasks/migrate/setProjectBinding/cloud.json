@@ -1,17 +1,12 @@
 {
   "dependencies": [
     {
-      "key": "createProjects",
-      "strategy": "each"
-    },
-    {
-      "key": "filterProjectSettingsValues",
+      "key": "getProjectIds",
       "strategy": "each"
     }
   ],
   "editions": [
-    "enterprise",
-    "teams"
+    "enterprise"
   ],
   "operations": [
     {
@@ -19,19 +14,18 @@
       "kwargs": {
         "left": {
           "value": {
-            "source": "filterProjectSettingsValues",
-            "path": "projectKey"
+            "source": "getProjectIds",
+            "path": "repository"
           }
         },
         "right": {
           "value": {
-            "source": "createProjects",
-            "path": "sourceProjectKey"
+            "raw": null
           }
         },
         "operator": {
           "value": {
-            "raw": "eq"
+            "raw": "neq"
           }
         }
       }
@@ -41,14 +35,34 @@
       "kwargs": {
         "left": {
           "value": {
-            "source": "filterProjectSettingsValues",
-            "path": "serverUrl"
+            "source": "getProjectIds",
+            "path": "repository"
           }
         },
         "right": {
           "value": {
-            "source": "createProjects",
-            "path": "sourceServerUrl"
+            "raw": ""
+          }
+        },
+        "operator": {
+          "value": {
+            "raw": "neq"
+          }
+        }
+      }
+    },
+    {
+      "operation": "apply_filter",
+      "kwargs": {
+        "left": {
+          "value": {
+            "source": "getProjectIds",
+            "path": "isCloud"
+          }
+        },
+        "right": {
+          "value": {
+            "raw": true
           }
         },
         "operator": {
@@ -63,13 +77,18 @@
       "kwargs": {
         "url": {
           "value": {
-            "raw": "/api/settings/set"
+            "raw": "/dop-translation/project-bindings"
           }
         },
         "client": {
           "value": {
             "source": "inputs",
-            "path": "url"
+            "path": "api_url"
+          }
+        },
+        "resultKey": {
+          "value": {
+            "raw": "$"
           }
         },
         "method": {
@@ -79,33 +98,22 @@
         },
         "encoding": {
           "value": {
-            "raw": "x-www-form-urlencoded"
-          }
-        },
-        "resultKey": {
-          "value": {
-            "raw": "$"
+            "raw": "json"
           }
         },
         "payload": {
           "value": {
             "map": {
-              "key": {
+              "projectId": {
                 "value": {
-                  "source": "filterProjectSettingsValues",
-                  "path": "key"
+                  "source": "getProjectIds",
+                  "path": "id"
                 }
               },
-              "component": {
+              "repositoryId": {
                 "value": {
-                  "source": "createProjects",
-                  "path": "key"
-                }
-              },
-              "value": {
-                "value": {
-                  "source": "filterProjectSettingsValues",
-                  "path": "values"
+                  "source": "getProjectIds",
+                  "path": "repository"
                 }
               }
             }

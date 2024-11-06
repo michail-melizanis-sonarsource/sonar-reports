@@ -13,6 +13,28 @@
     {
       "operation": "apply_filter",
       "kwargs": {
+        "left": {
+          "value": {
+            "source": "getGates",
+            "path": "enterpriseKey"
+          }
+        },
+        "right": {
+          "value": {
+            "source": "inputs",
+            "path": "enterprise_key"
+          }
+        },
+        "operator": {
+          "value": {
+            "raw": "eq"
+          }
+        }
+      }
+    },
+    {
+      "operation": "apply_filter",
+      "kwargs": {
         "operator": {
           "value": {
             "raw": "eq"
@@ -65,8 +87,8 @@
             "map": {
               "organization": {
                 "value": {
-                  "source": "inputs",
-                  "path": "org_key"
+                  "source": "getGates",
+                  "path": "orgKey"
                 }
               },
               "id": {

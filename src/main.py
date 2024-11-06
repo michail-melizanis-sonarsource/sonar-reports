@@ -151,16 +151,18 @@ def migrate(token, edition, url, enterprise_key, concurrency, run_id, export_dir
         target_tasks = [target_task]
     else:
         target_tasks = list([k for k in configs.keys() if not any([k.startswith(i) for i in ['get', 'delete', 'reset']])])
+    completed = completed.union(MIGRATION_TASKS)
     if create_plan:
         plan = generate_task_plan(
             target_tasks=target_tasks,
-            task_configs=configs, completed=completed.union(MIGRATION_TASKS))
+            task_configs=configs, completed=completed)
         with open(os.path.join(run_dir, 'plan.json'), 'wt') as f:
             json.dump(
                 dict(
                     plan=plan,
                     version='cloud',
                     edition=edition,
+                    completed=list(completed),
                     url=url,
                     target_tasks=target_tasks,
                     available_configs=list(configs.keys()),

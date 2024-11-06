@@ -5,7 +5,7 @@ Sonarqube Reports
 ETL tool to extract data from SonarQube Server instances and migrate them to SonarQube Cloud. Commands should be run
 with a mounted volume in order to store data locally.
 
-`docker run -v ./{LOCAL_DIRECTORY}:/app/files ghcr.io/sonarsource-demos/sonar-reports:latest {COMMAND} --help`
+`docker run -v ./{LOCAL_DIRECTORY}:/app/files ghcr.io/sonarsource-demos/sonar-reports:latest {COMMAND}`
 
 Process
 -------
@@ -22,7 +22,7 @@ Commands
 EXTRACT
 -------
 
-Usage: sonarqube-reports extract [OPTIONS] URL TOKEN
+Usage: sonar-reports extract [OPTIONS] URL TOKEN
 
   Extracts data from a SonarQube Server instance and stores it in the export
   directory as new line delimited json files
@@ -45,7 +45,7 @@ Options:
 REPORT
 ------
 
-Usage: main.py report [OPTIONS]
+Usage: sonar-reports report [OPTIONS]
 
   Generates a markdown report based on data extracted from one or more
   SonarQube Server instances
@@ -57,7 +57,7 @@ Options:
 STRUCTURE
 ---------
 
-Usage: sonarqube-reports structure [OPTIONS]
+Usage: sonar-reports structure [OPTIONS]
 
   Groups projects into organizations based on DevOps Bindings and Server Urls.
   Outputs organizations and projects as CSVs
@@ -69,7 +69,7 @@ Options:
 MAPPINGS
 --------
 
-Usage: sonarqube-reports mappings [OPTIONS]
+Usage: sonar-reports mappings [OPTIONS]
 
   Maps groups, permission templates, quality profiles, quality gates, and
   portfolios to relevant organizations. Outputs CSVs for each entity type
@@ -81,7 +81,7 @@ Options:
 MIGRATE
 -------
 
-Usage: sonarqube-reports migrate [OPTIONS] TOKEN ENTERPRISE_KEY
+Usage: sonar-reports migrate [OPTIONS] TOKEN ENTERPRISE_KEY
 
   Migrate SonarQube Server configurations to SonarQube Cloud. User must run
   the structure and mappings command and add the SonarQube Cloud organization
@@ -107,7 +107,7 @@ Options:
 RESET
 -----
 
-Usage: sonarqube-reports reset [OPTIONS] TOKEN ENTERPRISE_KEY
+Usage: sonar-reports reset [OPTIONS] TOKEN ENTERPRISE_KEY
 
   Resets a SonarQube cloud Enterprise back to its original state. Warning,
   this will delete everything in every organization within the enterprise.

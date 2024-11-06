@@ -35,7 +35,7 @@ def process_chunk(chunk):
             chunk[0]['kwargs']['method'], process_request_chunk
         )(
             chunk=chunk,
-            max_threads=max(25, len(chunk))
+            max_threads=25
         )
     )
     return results

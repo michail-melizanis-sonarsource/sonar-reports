@@ -54,21 +54,23 @@ def process_rules(extract_directory):
 
 def process_profile_rules(extract_directory, template_rules, plugin_rules):
     profiles = dict()
-    for rule in object_reader(directory=extract_directory, key='getProfileRules'):
-        template_rule = False
-        plugin_rule = False
-        if rule['indexKey'] in template_rules:
-            template_rule = True
-        if rule['indexKey'] in plugin_rules:
-            plugin_rule = True
-
-        for profile in rule['values']:
-            if profile['qProfile'] not in profiles.keys():
-                profiles[profile['qProfile']] = dict(plugin_rules=0, template_rules=0)
-            if template_rule:
-                profiles[profile['qProfile']]['template_rules'] += 1
-            if plugin_rule:
-                profiles[profile['qProfile']]['plugin_rules'] += 1
+    for rule_dict in object_reader(directory=extract_directory, key='getProfileRules'):
+        for rule_key, actives in rule_dict.items():
+            if not isinstance(actives, list):
+                continue
+            template_rule = False
+            plugin_rule = False
+            if rule_key in template_rules:
+                template_rule = True
+            if rule_key in plugin_rules:
+                plugin_rule = True
+            for profile in actives:
+                if profile['qProfile'] not in profiles.keys():
+                    profiles[profile['qProfile']] = dict(plugin_rules=0, template_rules=0)
+                if template_rule:
+                    profiles[profile['qProfile']]['template_rules'] += 1
+                if plugin_rule:
+                    profiles[profile['qProfile']]['plugin_rules'] += 1
     return profiles
 
 

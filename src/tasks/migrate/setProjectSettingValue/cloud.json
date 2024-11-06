@@ -5,7 +5,7 @@
       "strategy": "each"
     },
     {
-      "key": "getProjectSettings",
+      "key": "filterProjectSettingsValue",
       "strategy": "each"
     }
   ],
@@ -19,29 +19,8 @@
       "kwargs": {
         "left": {
           "value": {
-            "source": "getProjectSettings",
-            "path": "value"
-          }
-        },
-        "right": {
-          "value": {
-            "raw": null
-          }
-        },
-        "operator": {
-          "value": {
-            "raw": "neq"
-          }
-        }
-      }
-    },
-    {
-      "operation": "apply_filter",
-      "kwargs": {
-        "left": {
-          "value": {
-            "source": "getProjectSettings",
-            "path": "project"
+            "source": "filterProjectSettingsValue",
+            "path": "projectKey"
           }
         },
         "right": {
@@ -62,7 +41,7 @@
       "kwargs": {
         "left": {
           "value": {
-            "source": "getProjectSettings",
+            "source": "filterProjectSettingsValue",
             "path": "serverUrl"
           }
         },
@@ -113,7 +92,7 @@
             "map": {
               "key": {
                 "value": {
-                  "source": "getProjectSettings",
+                  "source": "filterProjectSettingsValue",
                   "path": "key"
                 }
               },
@@ -125,7 +104,7 @@
               },
               "value": {
                 "value": {
-                  "source": "getProjectSettings",
+                  "source": "filterProjectSettingsValue",
                   "path": "value"
                 }
               }

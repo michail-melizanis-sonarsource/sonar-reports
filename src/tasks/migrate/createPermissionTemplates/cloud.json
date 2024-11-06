@@ -5,7 +5,7 @@
       "strategy": "each"
     },
     {
-      "key": "addMigrationUserToGroups",
+      "key": "addMigrationUserToMigrationGroups",
       "strategy": "none"
     }
   ],

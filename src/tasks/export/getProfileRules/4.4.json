@@ -1,14 +1,11 @@
 {
   "editions": [
+    "community",
     "enterprise",
-    "teams"
+    "developer",
+    "datacenter"
   ],
-  "dependencies": [
-    {
-      "key": "getEnterpriseOrgKeys",
-      "strategy": "each"
-    }
-  ],
+  "dependencies": [],
   "operations": [
     {
       "operation": "http_request",
@@ -21,7 +18,7 @@
         },
         "url": {
           "value": {
-            "raw": "/api/qualityprofiles/search"
+            "raw": "api/rules/search"
           },
           "operations": []
         },
@@ -33,13 +30,13 @@
         },
         "paginationKey": {
           "value": {
-            "raw": null
+            "raw": "p"
           },
           "operations": []
         },
         "pageSizeKey": {
           "value": {
-            "raw": null
+            "raw": "ps"
           },
           "operations": []
         },
@@ -51,29 +48,33 @@
         },
         "resultKey": {
           "value": {
-            "raw": "profiles"
+            "raw": "actives"
           },
           "operations": []
         },
         "maxPageSize": {
           "value": {
-            "raw": null
+            "raw": 500
           },
           "operations": []
         },
         "totalKey": {
           "value": {
-            "raw": null
+            "raw": "$.paging.total"
           },
           "operations": []
         },
         "params": {
           "value": {
             "map": {
-              "organization": {
+              "f": {
                 "value": {
-                  "source": "getEnterpriseOrgKeys",
-                  "path": "key"
+                  "raw": "actives"
+                }
+              },
+              "activation": {
+                "value": {
+                  "raw": true
                 }
               }
             }
@@ -87,30 +88,16 @@
       "kwargs": {
         "key": {
           "value": {
-            "raw": "orgKey"
-          }
+            "raw": "serverUrl"
+          },
+          "operations": []
         },
         "val": {
           "value": {
-            "source": "getEnterpriseOrgKeys",
-            "path": "key"
-          }
-        }
-      }
-    },
-    {
-      "operation": "set_key",
-      "kwargs": {
-        "key": {
-          "value": {
-            "raw": "enterpriseKey"
-          }
-        },
-        "val": {
-          "value": {
-            "source": "getEnterpriseOrgKeys",
-            "path": "enterpriseKey"
-          }
+            "source": "inputs",
+            "path": "url"
+          },
+          "operations": []
         }
       }
     }

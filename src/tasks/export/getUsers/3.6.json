@@ -30,13 +30,13 @@
         },
         "paginationKey": {
           "value": {
-            "raw": "p"
+            "raw": null
           },
           "operations": []
         },
         "pageSizeKey": {
           "value": {
-            "raw": "ps"
+            "raw": null
           },
           "operations": []
         },
@@ -48,7 +48,7 @@
         },
         "resultKey": {
           "value": {
-            "raw": "users"
+            "raw": null
           },
           "operations": []
         },

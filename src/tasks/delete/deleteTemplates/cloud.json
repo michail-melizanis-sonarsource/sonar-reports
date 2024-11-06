@@ -15,6 +15,28 @@
   ],
   "operations": [
     {
+      "operation": "apply_filter",
+      "kwargs": {
+        "left": {
+          "value": {
+            "source": "getTemplates",
+            "path": "enterpriseKey"
+          }
+        },
+        "right": {
+          "value": {
+            "source": "inputs",
+            "path": "enterprise_key"
+          }
+        },
+        "operator": {
+          "value": {
+            "raw": "eq"
+          }
+        }
+      }
+    },
+    {
       "operation": "http_request",
       "kwargs": {
         "url": {
