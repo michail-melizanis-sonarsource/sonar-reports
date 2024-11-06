@@ -71,6 +71,11 @@
                 "value": {
                   "raw": "actives"
                 }
+              },
+              "activation": {
+                "value": {
+                  "raw": true
+                }
               }
             }
           },

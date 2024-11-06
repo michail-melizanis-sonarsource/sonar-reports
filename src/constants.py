@@ -88,8 +88,6 @@ REPORT_TASKS = [
     'getServerInfo',
     'getProjectBindings',
     'getGates',
-    'getFixedHotspots',
-    'getSafeHotspots',
     'getPlugins',
     'getDefaultTemplates',
     'getTemplates',
@@ -97,16 +95,9 @@ REPORT_TASKS = [
     'getPortfolioDetails',
     'getPortfolioProjects',
     'getProfiles',
-    'getProjectIssues',
-    'getProjectTemplateIssues',
-    'getProjectPluginIssues',
     'getProjectSettings',
     'getUsers',
-    'getProjectTemplateIssues',
-    'getProjectPluginIssues',
-    'getUsage',
-    'getAcceptedIssues',
-    'getFalsePositiveIssues'
+    'getUsage'
 ]
 
 MIGRATION_TASKS = [
