@@ -92,3 +92,18 @@ def filter_completed(plan, directory:str):
         if filtered_phase:
             filtered.append(filtered_phase)
     return filtered
+
+def generate_hash_id(data):
+    """Generate a consistent uuid for a given input
+
+    :return: a UUID4 formatted string
+    """
+    import json
+    import uuid
+    import hashlib
+    hash_id = uuid.UUID(
+        hashlib.md5(
+            str(json.dumps(data, sort_keys=True)).encode('utf-8')
+        ).hexdigest()
+    )
+    return str(hash_id)
