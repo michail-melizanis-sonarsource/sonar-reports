@@ -8,6 +8,7 @@ def add_template(results, org_key, template, server_url, is_default):
         source_template_key=template['id'],
         name=template['name'],
         description=template.get('description'),
+        project_key_pattern=template.get('projectKeyPattern', ''),
         server_url=server_url,
         is_default=is_default,
         sonarqube_org_key=org_key,
