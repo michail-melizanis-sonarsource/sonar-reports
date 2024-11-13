@@ -66,9 +66,43 @@
               },
               "projectKeyPattern": {
                 "value": {
-                  "source": "generateTemplateMappings",
-                  "path": "project_key_pattern"
-                }
+                  "raw": null
+                },
+                "operations": [
+                  {
+                    "operation": "join_string",
+                    "kwargs": {
+                      "strings": {
+                        "value": {
+                          "array": [
+                            {
+                              "value": {
+                                "source": "generateTemplateMappings",
+                                "path": "sonarcloud_org_key"
+                              }
+                            },
+                            {
+                              "value": {
+                                "source": "generateTemplateMappings",
+                                "path": "project_key_pattern"
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "skip_empty_string": {
+                        "value": {
+                          "raw": true
+                        }
+                      },
+                      "delimiter": {
+                        "value": {
+                          "raw": "_"
+                        }
+                      }
+                    }
+                  }
+                ]
               }
             }
           }
