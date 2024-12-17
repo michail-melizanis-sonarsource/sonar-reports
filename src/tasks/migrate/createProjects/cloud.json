@@ -184,6 +184,22 @@
       "kwargs": {
         "key": {
           "value": {
+            "raw": "slug"
+          }
+        },
+        "val": {
+          "value": {
+            "source": "generateProjectMappings",
+            "path": "slug"
+          }
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
             "raw": "mainBranch"
           }
         },
@@ -255,6 +271,22 @@
           "value": {
             "source": "generateProjectMappings",
             "path": "key"
+          }
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "alm"
+          }
+        },
+        "val": {
+          "value": {
+            "source": "generateProjectMappings",
+            "path": "alm"
           }
         }
       }

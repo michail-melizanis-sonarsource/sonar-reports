@@ -45,7 +45,8 @@ def map_new_code_definitions(export_directory, extract_mapping):
             new_code_definitions[server_url][new_code_definition['projectKey']] = dict()
         new_code_definitions[server_url][new_code_definition['projectKey']][new_code_definition['branchKey']] = dict(
             type=new_code_definition['type'].lower(),
-            value=new_code_definition.get('value', 30 if new_code_definition['type'] == 'NUMBER_OF_DAYS' else 'previous_version'),
+            value=new_code_definition.get('value', 30 if new_code_definition[
+                                                             'type'] == 'NUMBER_OF_DAYS' else 'previous_version'),
         )
     return new_code_definitions
 
@@ -86,7 +87,7 @@ def map_project_structure(export_directory, extract_mapping):
         unique_project_key = generate_unique_project_key(
             server_url=server_url,
             key=project['key'],
-            alm=project_binding['binding'].get('alm'),
+            alm=project_binding.get('alm'),
             repository=project_binding.get('project_binding', dict()).get('repository'),
             monorepo=project_binding.get('project_binding', dict()).get('monorepo', False),
         )
@@ -107,10 +108,10 @@ def map_project_structure(export_directory, extract_mapping):
             is_cloud_binding=is_cloud_binding(binding=project_binding['binding']),
             new_code_definition_type=new_code_definition['type'],
             new_code_definition_value=new_code_definition['value'],
+            alm=project_binding['binding'].get('alm'),
             repository=project_binding.get('project_binding', dict()).get('repository'),
+            slug=project_binding.get('project_binding', dict()).get('slug'),
             monorepo=project_binding.get('project_binding', dict()).get('monorepo', False),
             summary_comment_enabled=project_binding.get('project_binding', dict()).get('summaryCommentEnabled', False),
         )
-        # TODO add main branch
-        # todo add new code definition
     return list(unique_bindings.values()), list(projects.values())

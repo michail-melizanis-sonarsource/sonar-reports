@@ -1,35 +1,38 @@
 {
   "dependencies": [
     {
-      "key": "createProjects",
+      "key": "generateOrganizationMappings",
       "strategy": "each"
     }
   ],
   "editions": [
     "enterprise",
-    "teams"
+    "team"
   ],
   "operations": [
     {
       "operation": "http_request",
       "kwargs": {
+        "url": {
+          "value": {
+            "raw": "/api/alm_integration/list_repositories"
+          }
+        },
         "client": {
           "value": {
             "source": "inputs",
             "path": "url"
           }
         },
-        "url": {
+        "resultKey": {
           "value": {
-            "raw": "/api/navigation/component"
-          },
-          "operations": []
+            "raw": "$.repositories"
+          }
         },
         "method": {
           "value": {
             "raw": "GET"
-          },
-          "operations": []
+          }
         },
         "paginationKey": {
           "value": {
@@ -44,12 +47,6 @@
           "operations": []
         },
         "pageLimit": {
-          "value": {
-            "raw": null
-          },
-          "operations": []
-        },
-        "resultKey": {
           "value": {
             "raw": null
           },
@@ -70,15 +67,16 @@
         "params": {
           "value": {
             "map": {
-              "component": {
+              "organization": {
                 "value": {
-                  "source": "createProjects",
-                  "path": "key"
+                  "source": "generateOrganizationMappings",
+                  "path": "sonarcloud_org_key"
                 },
                 "operations": []
               }
             }
-          }
+          },
+          "operations": []
         }
       }
     },
@@ -87,45 +85,13 @@
       "kwargs": {
         "key": {
           "value": {
-            "raw": "isCloud"
+            "raw": "sonarCloudOrgKey"
           }
         },
         "val": {
           "value": {
-            "source": "createProjects",
-            "path": "isCloudBinding"
-          }
-        }
-      }
-    },
-    {
-      "operation": "set_key",
-      "kwargs": {
-        "key": {
-          "value": {
-            "raw": "repository"
-          }
-        },
-        "val": {
-          "value": {
-            "source": "createProjects",
-            "path": "repository"
-          }
-        }
-      }
-    },
-    {
-      "operation": "set_key",
-      "kwargs": {
-        "key": {
-          "value": {
-            "raw": "slug"
-          }
-        },
-        "val": {
-          "value": {
-            "source": "createProjects",
-            "path": "slug"
+            "source": "generateOrganizationMappings",
+            "path": "sonarcloud_org_key"
           }
         }
       }
@@ -140,24 +106,8 @@
         },
         "val": {
           "value": {
-            "source": "createProjects",
+            "source": "generateOrganizationMappings",
             "path": "alm"
-          }
-        }
-      }
-    },
-    {
-      "operation": "set_key",
-      "kwargs": {
-        "key": {
-          "value": {
-            "raw": "sonarCloudOrgKey"
-          }
-        },
-        "val": {
-          "value": {
-            "source": "createProjects",
-            "path": "sonarCloudOrgKey"
           }
         }
       }
