@@ -1,13 +1,15 @@
 {
+  "editions": [
+    "community",
+    "enterprise",
+    "developer",
+    "datacenter"
+  ],
   "dependencies": [
     {
-      "key": "createProjects",
+      "key": "getProjects",
       "strategy": "each"
     }
-  ],
-  "editions": [
-    "enterprise",
-    "teams"
   ],
   "operations": [
     {
@@ -21,7 +23,7 @@
         },
         "url": {
           "value": {
-            "raw": "/api/navigation/component"
+            "raw": "/api/project_links/search"
           },
           "operations": []
         },
@@ -51,7 +53,7 @@
         },
         "resultKey": {
           "value": {
-            "raw": null
+            "raw": "links"
           },
           "operations": []
         },
@@ -70,15 +72,16 @@
         "params": {
           "value": {
             "map": {
-              "component": {
+              "projectKey": {
                 "value": {
-                  "source": "createProjects",
-                  "path": "key"
+                  "source": "getProjects",
+                  "path": "$.key"
                 },
                 "operations": []
               }
             }
-          }
+          },
+          "operations": []
         }
       }
     },
@@ -87,14 +90,16 @@
       "kwargs": {
         "key": {
           "value": {
-            "raw": "isCloud"
-          }
+            "raw": "projectKey"
+          },
+          "operations": []
         },
         "val": {
           "value": {
-            "source": "createProjects",
-            "path": "isCloudBinding"
-          }
+            "source": "getProjects",
+            "path": "$.key"
+          },
+          "operations": []
         }
       }
     },
@@ -103,62 +108,16 @@
       "kwargs": {
         "key": {
           "value": {
-            "raw": "repository"
-          }
+            "raw": "serverUrl"
+          },
+          "operations": []
         },
         "val": {
           "value": {
-            "source": "createProjects",
-            "path": "repository"
-          }
-        }
-      }
-    },
-    {
-      "operation": "set_key",
-      "kwargs": {
-        "key": {
-          "value": {
-            "raw": "slug"
-          }
-        },
-        "val": {
-          "value": {
-            "source": "createProjects",
-            "path": "slug"
-          }
-        }
-      }
-    },
-    {
-      "operation": "set_key",
-      "kwargs": {
-        "key": {
-          "value": {
-            "raw": "alm"
-          }
-        },
-        "val": {
-          "value": {
-            "source": "createProjects",
-            "path": "alm"
-          }
-        }
-      }
-    },
-    {
-      "operation": "set_key",
-      "kwargs": {
-        "key": {
-          "value": {
-            "raw": "sonarCloudOrgKey"
-          }
-        },
-        "val": {
-          "value": {
-            "source": "createProjects",
-            "path": "sonarCloudOrgKey"
-          }
+            "source": "inputs",
+            "path": "url"
+          },
+          "operations": []
         }
       }
     }

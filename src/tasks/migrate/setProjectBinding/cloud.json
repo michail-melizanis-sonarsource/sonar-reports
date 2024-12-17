@@ -1,7 +1,7 @@
 {
   "dependencies": [
     {
-      "key": "getProjectIds",
+      "key": "matchProjectRepos",
       "strategy": "each"
     }
   ],
@@ -9,69 +9,6 @@
     "enterprise"
   ],
   "operations": [
-    {
-      "operation": "apply_filter",
-      "kwargs": {
-        "left": {
-          "value": {
-            "source": "getProjectIds",
-            "path": "repository"
-          }
-        },
-        "right": {
-          "value": {
-            "raw": null
-          }
-        },
-        "operator": {
-          "value": {
-            "raw": "neq"
-          }
-        }
-      }
-    },
-    {
-      "operation": "apply_filter",
-      "kwargs": {
-        "left": {
-          "value": {
-            "source": "getProjectIds",
-            "path": "repository"
-          }
-        },
-        "right": {
-          "value": {
-            "raw": ""
-          }
-        },
-        "operator": {
-          "value": {
-            "raw": "neq"
-          }
-        }
-      }
-    },
-    {
-      "operation": "apply_filter",
-      "kwargs": {
-        "left": {
-          "value": {
-            "source": "getProjectIds",
-            "path": "isCloud"
-          }
-        },
-        "right": {
-          "value": {
-            "raw": true
-          }
-        },
-        "operator": {
-          "value": {
-            "raw": "eq"
-          }
-        }
-      }
-    },
     {
       "operation": "http_request",
       "kwargs": {
@@ -106,14 +43,14 @@
             "map": {
               "projectId": {
                 "value": {
-                  "source": "getProjectIds",
-                  "path": "id"
+                  "source": "matchProjectRepos",
+                  "path": "projectId"
                 }
               },
               "repositoryId": {
                 "value": {
-                  "source": "getProjectIds",
-                  "path": "repository"
+                  "source": "matchProjectRepos",
+                  "path": "integrationKey"
                 }
               }
             }
