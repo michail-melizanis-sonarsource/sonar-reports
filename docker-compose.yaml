@@ -2,7 +2,7 @@ services:
   extract:
     build: .
     command:
-      - "report"
+      - "extract"
       - ""
       - ""
       - "--timeout=60"

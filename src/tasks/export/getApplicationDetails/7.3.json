@@ -52,7 +52,7 @@
         },
         "resultKey": {
           "value": {
-            "raw": null
+            "raw": "$.application"
           },
           "operations": []
         },

@@ -8,7 +8,7 @@ from execute import execute_plan
 from logs import configure_logger
 from operations.http_request import configure_client, configure_client_cert, get_server_details
 from plan import generate_task_plan, get_available_task_configs
-from utils import get_latest_extract_id, get_unique_extracts, export_csv, load_csv, filter_completed
+from utils import get_unique_extracts, export_csv, load_csv, filter_completed
 from validate import validate_migration
 
 
@@ -75,14 +75,19 @@ def extract(url, token, export_directory: str, extract_type, pem_file_path, key_
 
 @cli.command()
 @click.option('--export_directory', default='/app/files/', help="Root Directory containing all of the SonarQube exports")
-def report(export_directory):
+def report(export_directory, report_type='migration'):
     """Generates a markdown report based on data extracted from one or more SonarQube Server instances"""
-    from report.generate import generate_markdown
-    extract_id = get_latest_extract_id(export_directory)
-    if extract_id is None or not os.path.isdir(os.path.join(export_directory, extract_id)):
+    from importlib import import_module
+    try:
+        module = import_module(f'report.{report_type}.generate')
+    except ImportError:
+        click.echo(f"Report Type {report_type} Not Found")
+        return
+    extract_mapping = get_unique_extracts(directory=export_directory)
+    if not extract_mapping:
         click.echo("No Extracts Found")
         return
-    generate_markdown(extract_directory=os.path.join(export_directory, extract_id.strip() + '/'))
+    module.generate_markdown(extract_directory=export_directory, extract_mapping=extract_mapping)
 
 
 @cli.command()
