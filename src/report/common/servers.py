@@ -66,7 +66,7 @@ def generate_server_markdown(directory, extract_mapping):
     return TEMPLATE.format(
         instance_count=len(server_details),
         project_count=sum([len(projects[server['server_id']]) for server in server_details]),
-        lines_of_code=sum([int(server.get('lines_of_code', 0)) for server in server_details]),
+        lines_of_code=sum([int(0 if not server.get('lines_of_code') else server.get('lines_of_code')) for server in server_details]),
         instances="\n".join(
             [
                 f"| {server['server_id']} | {server['url']} | {server['version']} | {len(projects[server['server_id']])} | {server['lines_of_code']} | {user_totals[server['server_id']]} | {sast_configs[server['server_id']]} |"
