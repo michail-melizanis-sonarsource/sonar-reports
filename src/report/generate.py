@@ -187,12 +187,13 @@ def format_quality_gates(extract_directory, gate_mapping):
 
 
 def process_plugins(extract_directory):
-    "\n".join(["| {name} | {description} | {version} | {url} |".format(name=plugin['name'],
-                                                                       description=plugin['description'],
-                                                                       version=plugin['version'],
-                                                                       url=plugin['homepageUrl']) for plugin in
-               object_reader(directory=extract_directory, key='getPlugins') if
-               "sonar" not in plugin['organizationName'].lower()])
+    return "\n".join(["| {name} | {description} | {version} | {url} |".format(
+        name=plugin.get('name') if plugin.get('name') is not None else 'N/A',
+        description=plugin.get('description') if plugin.get('description') is not None else 'N/A',
+        version=plugin.get('version') if plugin.get('version') is not None else 'N/A',
+        url=plugin.get('homepageUrl') if plugin.get('homepageUrl') is not None else 'N/A'
+    ) for plugin in object_reader(directory=extract_directory, key='getPlugins') if
+        "sonar" not in plugin.get('organizationName', '').lower()])
 
 
 def process_permission_templates(extract_directory):
