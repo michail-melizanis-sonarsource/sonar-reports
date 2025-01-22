@@ -1,21 +1,8 @@
 from collections import defaultdict
 from constants import BUILTIN_REPOS
+from report.utils import generate_section
 
 from utils import multi_extract_object_reader
-
-ACTIVE_TEMPLATE = """
-### Active Custom Quality Profiles
-| Server ID  | Language | Quality Profile Name | Parent Profile | Default Profile | Total Rules | Template Rules | Rules from 3rd party plugins | # of Projects using |
-|:-----------|:---------|:---------------------|:---------------|:----------------|:------------|:---------------|:-----------------------------|:---------------------|
-{quality_profiles}
-"""
-
-INACTIVE_TEMPLATE = """
-### Unused Custom Quality Profiles
-| Server ID | Language | Quality Profile Name | Parent Profile | Total Rules | Template Rules | Rules from 3rd party plugins |
-|:----------|:---------|:---------------------|:---------------|:------------|:---------------|:-----------------------------|
-{unused_quality_profiles}
-"""
 
 
 def process_rules(directory, extract_mapping, server_id_mapping, plugins):
@@ -75,47 +62,13 @@ def process_quality_profiles(directory, extract_mapping, server_id_mapping, prof
             is_default="Yes" if profile.get('isDefault', False) else "No",
             parent=profile.get('parentName', ""),
             rules=rules,
+            rule_count=len(rules),
             template_rules=len(template_rules[server_id].intersection(rules)),
             plugin_rules=len(plugin_rules[server_id].intersection(rules)),
-            projects=profile_projects[server_id].get(profile['key'], set())
+            projects=profile_projects[server_id].get(profile['key'], set()),
+            project_count=len(profile_projects[server_id].get(profile['key'], set()))
         ))
     return profiles
-
-
-def format_active_profiles(profiles):
-    return "\n".join(
-        [
-            "| {server_id} | {language} | {name} | {parent} | {is_default} | {total_rules} | {template_rules} | {plugin_rules} | {project_count} |".format(
-                server_id=profile['server_id'],
-                language=profile['language'],
-                name=profile['name'],
-                parent=profile['parent'],
-                is_default=profile['is_default'],
-                total_rules=len(profile['rules']),
-                template_rules=profile['template_rules'],
-                plugin_rules=profile['plugin_rules'],
-                project_count=len(profile['projects'])
-            ) for profile in sorted(
-            profiles,
-            key=lambda x: len(x['projects']),
-            reverse=True
-        ) if (len(profile['projects']) > 0 or profile['is_default'] == "Yes") and not profile['is_built_in']
-        ]
-    )
-
-
-def format_inactive_profiles(profiles):
-    return "\n".join(
-        ["| {server_id} | {language} | {name} | {parent} | {total_rules} | {template_rules} | {plugin_rules} |".format(
-            server_id=profile['server_id'],
-            language=profile['language'],
-            name=profile['name'],
-            parent=profile['parent'],
-            total_rules=len(profile['rules']),
-            template_rules=profile['template_rules'],
-            plugin_rules=profile['plugin_rules']
-        ) for profile in profiles if len(profile['projects']) == 0 and profile['is_default'] == "No" and not profile['is_built_in']]
-    )
 
 
 def generate_profile_markdown(directory, extract_mapping, server_id_mapping, projects, plugins):
@@ -129,7 +82,22 @@ def generate_profile_markdown(directory, extract_mapping, server_id_mapping, pro
                                         server_id_mapping=server_id_mapping, profile_projects=profile_projects,
                                         profile_rules=profile_rules, plugin_rules=plugin_rules,
                                         template_rules=template_rules)
-    active_profiles = format_active_profiles(profiles=profiles)
-    inactive_profiles = format_inactive_profiles(profiles=profiles)
-    return ACTIVE_TEMPLATE.format(quality_profiles=active_profiles), INACTIVE_TEMPLATE.format(
-        unused_quality_profiles=inactive_profiles)
+    active_profiles = generate_section(
+        headers_mapping={'Server ID': 'server_id', 'Language': 'language', 'Quality Profile Name': 'name',
+                         'Parent Profile': 'parent', 'Default Profile': 'is_default', 'Total Rules': 'rule_count',
+                         'Template Rules': 'template_rules', 'Rules from 3rd party plugins': 'plugin_rules',
+                         '# of Projects using': 'project_count'},
+        rows=profiles, title='Quality Profiles', level=2, sort_by_lambda=lambda x: x['project_count'],
+        sort_order='desc',
+        filter_lambda=lambda x: len(x['projects']) > 0 or x['is_default'] == "Yes" and not x['is_built_in']
+    )
+    inactive_profiles = generate_section(
+        headers_mapping={'Server ID': 'server_id', 'Language': 'language', 'Quality Profile Name': 'name',
+                         'Parent Profile': 'parent', 'Total Rules': 'rule_count', 'Template Rules': 'template_rules',
+                         'Rules from 3rd party plugins': 'plugin_rules'},
+        rows=profiles, title='Quality Profiles', level=2, sort_by_lambda=lambda x: x['project_count'],
+        sort_order='asc',
+        filter_lambda=lambda x: x['project_count'] == 0 and x['is_default'] == "No" and not x['is_built_in']
+    )
+
+    return active_profiles, inactive_profiles

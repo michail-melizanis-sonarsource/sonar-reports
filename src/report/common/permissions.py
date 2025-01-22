@@ -1,12 +1,7 @@
 from collections import defaultdict
 
+from report.utils import generate_section
 from utils import multi_extract_object_reader
-
-TEMPLATE = """
-### Permission Templates
-| Server ID  | Template Name | Description | Project key pattern | Default For |
-|:-----------|:--------------|:------------|:--------------------|:------------|
-{permission_templates}"""
 
 
 def process_permission_templates(directory, extract_mapping, server_id_mapping):
@@ -37,18 +32,19 @@ def process_permission_templates(directory, extract_mapping, server_id_mapping):
     return templates
 
 
-def format_permission_templates(permission_templates):
-    return "\n".join(
-        [
-            "| {server_id} | {name} | {description} | {pattern} | {defaults} |".format(**template)
-            for template in permission_templates
-        ]
-    )
-
 
 def generate_permission_template_markdown(directory, extract_mapping, server_id_mapping):
     permission_templates = process_permission_templates(directory=directory, extract_mapping=extract_mapping, server_id_mapping=server_id_mapping)
 
-    return TEMPLATE.format(
-        permission_templates=format_permission_templates(permission_templates=permission_templates)
+    return generate_section(
+        headers_mapping={
+            "Server ID": "server_id",
+            "Template Name": "name",
+            "Description": "description",
+            "Project key pattern": "pattern",
+            "Default For": "defaults"
+        },
+        level=3,
+        rows=permission_templates,
+        title="Permission Templates"
     )

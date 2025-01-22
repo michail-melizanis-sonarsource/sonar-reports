@@ -2,14 +2,7 @@ from collections import defaultdict
 
 from .projects import process_project_pull_requests, process_project_branches
 from utils import multi_extract_object_reader
-from parser import extract_path_value
-
-TEMPLATE = """
-## DevOps Integrations
-| Server ID | DevOps Platform Binding  | Type | URL | # Projects | Multi-branch Projects? | PR Projects? |
-|:----------|:-------------------------|:-----|:----|:------------|:-----------------------|:-------------|
-{devops_bindings}
-"""
+from report.utils import generate_section
 
 
 def process_project_bindings(directory, extract_mapping, server_id_mapping):
@@ -41,15 +34,6 @@ def process_devops_bindings(directory, extract_mapping, server_id_mapping):
     return bindings
 
 
-def format_bindings(bindings):
-    return "\n".join(
-        [
-            f"| {binding['server_id']} | {binding['binding']} | {binding['type']} | {binding['url']}| {binding['projects']} | {binding['multi_branch_projects']} | {binding['pr_projects']} |"
-            for binding in sorted(bindings, key=lambda x: x['projects'], reverse=True)
-        ]
-    )
-
-
 def generate_devops_markdown(directory, extract_mapping, server_id_mapping):
     bindings = list()
     project_bindings = process_project_bindings(directory=directory, extract_mapping=extract_mapping,
@@ -73,4 +57,11 @@ def generate_devops_markdown(directory, extract_mapping, server_id_mapping):
                 pr_projects='Yes' if project_data & pull_requests.get(server_id, set()) else 'No'
             )
             bindings.append(binding)
-    return TEMPLATE.format(devops_bindings=format_bindings(bindings=bindings))
+
+    return generate_section(
+        headers_mapping={'Server ID': 'server_id', 'DevOps Platform Binding': 'binding', 'Type': 'type', 'URL': 'url',
+                         '# Projects': 'projects', 'Multi-branch Projects?': 'multi_branch_projects',
+                         'PR Projects?': 'pr_projects'},
+        rows=bindings, title='DevOps Integrations', level=2, sort_by_lambda=lambda x: x['projects'],
+        sort_order='desc', filter_lambda=lambda x: x['projects'] > 0
+    )

@@ -1,7 +1,10 @@
 from collections import defaultdict
 
 from utils import multi_extract_object_reader
-
+NEW_CODE_MAPPINGS = dict(
+        NUMBER_OF_DAYS='days',
+        PREVIOUS_VERSION='previous_version',
+    )
 
 def is_cloud_binding(binding):
     is_cloud = False
@@ -33,18 +36,20 @@ def generate_unique_binding_key(server_url, key, alm, url, repository):
 
 
 def map_new_code_definitions(export_directory, extract_mapping):
+
     new_code_definitions = dict()
     for server_url, new_code_definition in multi_extract_object_reader(directory=export_directory,
                                                                        key='getNewCodePeriods',
                                                                        mapping=extract_mapping):
-        if new_code_definition['type'] not in ['PREVIOUS_VERSION', 'NUMBER_OF_DAYS']:
+        if new_code_definition['type'] not in NEW_CODE_MAPPINGS.keys():
             continue
+
         if server_url not in new_code_definitions.keys():
             new_code_definitions[server_url] = dict()
         if new_code_definition['projectKey'] not in new_code_definitions[server_url].keys():
             new_code_definitions[server_url][new_code_definition['projectKey']] = dict()
         new_code_definitions[server_url][new_code_definition['projectKey']][new_code_definition['branchKey']] = dict(
-            type=new_code_definition['type'].lower(),
+            type=NEW_CODE_MAPPINGS[new_code_definition['type']],
             value=new_code_definition.get('value', 30 if new_code_definition[
                                                              'type'] == 'NUMBER_OF_DAYS' else 'previous_version'),
         )
