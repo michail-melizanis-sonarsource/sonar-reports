@@ -1,14 +1,8 @@
 from collections import defaultdict
 
+from report.utils import generate_section
 from utils import multi_extract_object_reader
 from parser import extract_path_value
-
-TEMPLATE = """
-## Project Metrics
-| Server ID | Project Name | Total Rules | Template Rules | Plugin Rules |
-|:----------|:-------------|:------------|:---------------|:-------------|
-{projects}
-"""
 
 
 def process_project_details(directory, extract_mapping, server_id_mapping):
@@ -53,7 +47,7 @@ def process_project_pull_requests(directory, extract_mapping, server_id_mapping)
         server_id = server_id_mapping[url]
         if pull_request['projectKey'] not in projects[server_id].keys():
             projects[server_id][pull_request['projectKey']] = 0
-        projects[server_id][pull_request['projectKey']] +=1
+        projects[server_id][pull_request['projectKey']] += 1
     return {server_id: {k for k, v in projects.items() if v > 0} for server_id, projects in projects.items()}
 
 
@@ -68,4 +62,13 @@ def format_project_metrics(projects):
 
 
 def generate_project_metrics_markdown(projects):
-    return TEMPLATE.format(projects=format_project_metrics(projects=projects))
+    return generate_section(
+        headers_mapping={"Server ID": "server_id", "Project Name": "name", "Total Rules": "rules",
+                         "Template Rules": "template_rules", "Plugin Rules": "plugin_rules"},
+        title='Project Metrics', level=2, filter_lambda=lambda x: x['template_rules'] > 0 or x['plugin_rules'] > 0,
+        rows=[
+            project
+            for server_id, project_list in projects.items()
+            for project in project_list
+        ], sort_by_lambda=lambda x: x['template_rules'] + x['plugin_rules'],
+    )

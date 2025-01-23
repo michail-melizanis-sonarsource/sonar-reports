@@ -3,18 +3,7 @@ from collections import defaultdict
 from parser import extract_path_value
 from .projects import process_project_details
 from utils import multi_extract_object_reader
-
-TEMPLATE = """
-## Overview
-* Number of Instances: {instance_count}
-* Total Projects: {project_count}
-* Total Lines of Code: {lines_of_code}
-
-## Instances
-| Server ID | Url | Version | Projects | Lines of Code | Users | SAST Configured |
-|:----------|:----|:--------|:---------|:--------------|:------|:----------------|
-{instances}
-"""
+from ..utils import generate_section
 
 
 def process_server_details(directory, extract_mapping):
@@ -22,11 +11,14 @@ def process_server_details(directory, extract_mapping):
 
     for url, server_details in multi_extract_object_reader(directory=directory, mapping=extract_mapping,
                                                            key='getServerInfo'):
+        version = extract_path_value(obj=server_details, path='System.Version')
+        if version is None:
+            version = extract_path_value(obj=server_details, path='Application Nodes.0.System.Version')
         details.append(
             dict(
                 url=url,
                 server_id=extract_path_value(obj=server_details, path='System.Server ID'),
-                version=extract_path_value(obj=server_details, path='System.Version'),
+                version=version,
                 edition=extract_path_value(obj=server_details, path='System.Edition'),
                 lines_of_code=extract_path_value(obj=server_details, path='System.Lines of Code', default=0),
             )
@@ -63,12 +55,14 @@ def generate_server_markdown(directory, extract_mapping):
     projects = process_project_details(directory=directory, extract_mapping=extract_mapping, server_id_mapping=id_map)
     user_totals = process_user_totals(directory=directory, extract_mapping=extract_mapping, server_id_mapping=id_map)
     sast_configs = process_sast_config(directory=directory, extract_mapping=extract_mapping, server_id_mapping=id_map)
-    return TEMPLATE.format(
-        instance_count=len(server_details),
-        project_count=sum([len(projects[server['server_id']]) for server in server_details]),
-        lines_of_code=sum([int(0 if not server.get('lines_of_code') else server.get('lines_of_code')) for server in server_details]),
-        instances="\n".join(
-            [
-                f"| {server['server_id']} | {server['url']} | {server['version']} | {len(projects[server['server_id']])} | {server['lines_of_code']} | {user_totals[server['server_id']]} | {sast_configs[server['server_id']]} |"
-                for server in server_details])
-    ), id_map, projects
+    for server in server_details:
+        server['users'] = user_totals[server['server_id']]
+        server['sast_configured'] = "Yes" if sast_configs[server['server_id']] else "No"
+        server['project_count'] = len(projects[server['server_id']])
+    section = generate_section(
+        headers_mapping={"Server ID": "server_id", "Url": "url", "Version": "version", "Projects": "project_count",
+                            "Lines of Code": "lines_of_code", "Users": "users", "SAST Configured": "sast_configured"},
+        title='Server Details', level=2,
+        rows = server_details,
+    )
+    return section, id_map, projects

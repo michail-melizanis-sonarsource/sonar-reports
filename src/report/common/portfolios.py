@@ -1,20 +1,7 @@
 from collections import defaultdict
 
+from report.utils import generate_section
 from utils import multi_extract_object_reader
-
-ACTIVE_TEMPLATE = """
-### Active Portfolios
-| Server ID | Portfolio Name | Project selection type | Contains Nested Portfolios | # of Projects | 
-|:----------|:---------------|:-----------------------|:---------------------------|:---------------|
-{active_portfolios}
-"""
-
-INACTIVE_TEMPLATE = """
-### Inactive Portfolios
-| Server ID | Portfolio Name | Project selection type | 
-|:----------|:---------------|:-----------------------|
-{inactive_portfolios}
-"""
 
 
 def process_portfolios(directory, extract_mapping, server_id_mapping):
@@ -26,6 +13,7 @@ def process_portfolios(directory, extract_mapping, server_id_mapping):
             name=portfolio['name'],
             server_id=server_id,
             projects=set(),
+            project_count=0,
             selection=extract_selection_modes(portfolio=portfolio),
             children="Yes" if portfolio.get('subViews') else "No",
         )
@@ -35,6 +23,7 @@ def process_portfolios(directory, extract_mapping, server_id_mapping):
         if project['portfolioKey'] not in portfolios[server_id].keys():
             continue
         portfolios[server_id][project['portfolioKey']]['projects'].add(project['key'])
+        portfolios[server_id][project['portfolioKey']]['project_count'] = len(portfolios[server_id][project['portfolioKey']]['projects'])
     return [portfolio for server_id, p in portfolios.items() for portfolio in p.values()]
 
 
@@ -46,27 +35,20 @@ def extract_selection_modes(portfolio):
         selection_modes = selection_modes.union(extract_selection_modes(portfolio=child))
     return selection_modes
 
-def format_active_portfolios(portfolios):
-    return "\n".join(
-        ["| {server_id} | {name} | {selection} | {children} | {project_count} |".format(
-            server_id=portfolio['server_id'],
-            name=portfolio['name'],
-            selection=", ".join(portfolio['selection']),
-            children=portfolio['children'],
-            project_count=len(portfolio['projects'])
-        ) for portfolio in portfolios if len(portfolio['projects']) > 0])
-
-def format_inactive_portfolios(portfolios):
-    return "\n".join(
-        ["| {server_id} | {name} | {selection} |".format(
-            server_id=portfolio['server_id'],
-            name=portfolio['name'],
-            selection=", ".join(portfolio['selection'])
-        ) for portfolio in portfolios if len(portfolio['projects']) == 0]
-    )
 
 def generate_portfolio_markdown(directory, extract_mapping, server_id_mapping):
-    portfolios = process_portfolios(directory=directory, extract_mapping=extract_mapping, server_id_mapping=server_id_mapping)
-    active_portfolios = format_active_portfolios(portfolios=portfolios)
-    inactive_portfolios = format_inactive_portfolios(portfolios=portfolios)
-    return ACTIVE_TEMPLATE.format(active_portfolios=active_portfolios), INACTIVE_TEMPLATE.format(inactive_portfolios=inactive_portfolios)
+    portfolios = process_portfolios(directory=directory, extract_mapping=extract_mapping,
+                                    server_id_mapping=server_id_mapping)
+    active_portfolios = generate_section(
+        headers_mapping={'Server ID': 'server_id', 'Portfolio Name': 'name', 'Project selection type': 'selection',
+                         'Contains Nested Portfolios': 'children', '# of Projects': 'project_count'},
+        rows=portfolios, title='Active Portfolios', level=3, sort_by_lambda=lambda x: x['project_count'],
+        sort_order='desc', filter_lambda=lambda x: x['project_count'] > 0
+    )
+
+    inactive_portfolios = generate_section(
+        headers_mapping={'Server ID': 'server_id', 'Portfolio Name': 'name', 'Project selection type': 'selection'},
+        rows=portfolios, title='Inactive Portfolios', level=3, sort_by_lambda=lambda x: x['name'],
+        sort_order='asc', filter_lambda=lambda x: x['project_count'] == 0
+    )
+    return active_portfolios, inactive_portfolios

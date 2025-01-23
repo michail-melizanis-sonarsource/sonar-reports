@@ -1,20 +1,7 @@
 from collections import defaultdict
 
+from report.utils import generate_section
 from utils import multi_extract_object_reader
-
-ACTIVE_TEMPLATE = """
-### Active Custom Quality Gates
-| Server ID  | Quality Gate Name | # of Projects using | Is Default |
-|:-----------|:------------------|:--------------------|:-----------|
-{active_quality_gates}
-"""
-
-INACTIVE_TEMPLATE = """
-### Unused Custom Quality Gates
-| Server ID | Quality Gate Name |
-|:----------|:------------------|
-{inactive_quality_gates}
-"""
 
 
 def process_quality_gates(directory, extract_mapping, server_id_mapping, projects):
@@ -35,29 +22,24 @@ def process_quality_gates(directory, extract_mapping, server_id_mapping, project
     return [v for k, v in quality_gates.items() for k, v in v.items()]
 
 
-def format_active_quality_gates(quality_gates):
-    return "\n".join([
-        "| {server_id} | {name} | {project_count} | {is_default} |".format(**gate)
-        for gate in sorted(quality_gates, key=lambda x: x['project_count'], reverse=True) if
-        (gate['project_count'] > 0 or gate['is_default'] == "Yes") and gate['is_built_in'] != "Yes"
-    ])
-
-
-def format_inactive_quality_gates(quality_gates):
-    return "\n".join([
-        "| {server_id} | {name} |".format(**gate)
-        for gate in quality_gates if gate['project_count'] == 0 and gate['is_default'] != "Yes" and gate['is_built_in'] != "Yes"
-    ])
-
-
 def generate_gate_markdown(directory, extract_mapping, server_id_mapping, projects):
     quality_gates = process_quality_gates(directory=directory, extract_mapping=extract_mapping,
                                           server_id_mapping=server_id_mapping, projects=projects)
+
+
     return (
-        ACTIVE_TEMPLATE.format(
-            active_quality_gates=format_active_quality_gates(quality_gates=quality_gates)
+        generate_section(
+            headers_mapping={"Server ID": "server_id", "Quality Gate Name": "name",
+                             "# of Projects using": "project_count",
+                             "Is Default": "is_default"},
+            title='Active Custom Quality Gates', level=3, sort_by_lambda=lambda x: x['project_count'],
+            sort_order='desc', filter_lambda=lambda x: x['project_count'] > 0 or x['is_default'] == "Yes",
+            rows=quality_gates,
         ),
-        INACTIVE_TEMPLATE.format(
-            inactive_quality_gates=format_inactive_quality_gates(quality_gates=quality_gates)
+        generate_section(
+            headers_mapping={"Server ID": "server_id", "Quality Gate Name": "name"},
+            title='Unused Custom Quality Gates', level=3,
+            filter_lambda=lambda x: x['project_count'] == 0 and x['is_default'] != "Yes",
+            rows=quality_gates,
         )
     )
