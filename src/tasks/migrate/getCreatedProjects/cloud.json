@@ -1,16 +1,16 @@
 {
   "editions": [
-    "enterprise",
+    "community",
     "teams"
   ],
   "dependencies": [
     {
-      "key": "getCreatedProjects",
-      "strategy": "each"
+        "key": "createProjects",
+        "strategy": "none"
     },
     {
-      "key": "renameProjectBranch",
-      "strategy": "none"
+      "key": "getEnterpriseOrgKeys",
+      "strategy": "each"
     }
   ],
   "operations": [
@@ -25,7 +25,7 @@
         },
         "url": {
           "value": {
-            "raw": "/api/project_branches/list"
+            "raw": "/api/projects/search"
           },
           "operations": []
         },
@@ -37,13 +37,13 @@
         },
         "paginationKey": {
           "value": {
-            "raw": null
+            "raw": "p"
           },
           "operations": []
         },
         "pageSizeKey": {
           "value": {
-            "raw": null
+            "raw": "ps"
           },
           "operations": []
         },
@@ -55,7 +55,7 @@
         },
         "resultKey": {
           "value": {
-            "raw": "branches"
+            "raw": "components"
           },
           "operations": []
         },
@@ -67,19 +67,18 @@
         },
         "totalKey": {
           "value": {
-            "raw": null
+            "raw": "$.paging.total"
           },
           "operations": []
         },
         "params": {
           "value": {
             "map": {
-              "project": {
+              "organization": {
                 "value": {
-                  "source": "getCreatedProjects",
-                  "path": "$.key"
-                },
-                "operations": []
+                  "source": "getEnterpriseOrgKeys",
+                  "path": "key"
+                }
               }
             }
           },
@@ -92,16 +91,14 @@
       "kwargs": {
         "key": {
           "value": {
-            "raw": "projectKey"
-          },
-          "operations": []
+            "raw": "orgKey"
+          }
         },
         "val": {
           "value": {
-            "source": "getCreatedProjects",
-            "path": "$.key"
-          },
-          "operations": []
+            "source": "getEnterpriseOrgKeys",
+            "path": "key"
+          }
         }
       }
     },
@@ -110,16 +107,14 @@
       "kwargs": {
         "key": {
           "value": {
-            "raw": "sonarCloudOrgKey"
-          },
-          "operations": []
+            "raw": "enterpriseKey"
+          }
         },
         "val": {
           "value": {
-            "source": "getCreatedProjects",
-            "path": "$.organization"
-          },
-          "operations": []
+            "source": "getEnterpriseOrgKeys",
+            "path": "enterpriseKey"
+          }
         }
       }
     }
