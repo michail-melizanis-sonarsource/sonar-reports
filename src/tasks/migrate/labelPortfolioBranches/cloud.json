@@ -22,15 +22,44 @@
       "kwargs": {
         "left": {
           "value": {
-            "source": "getPortfolioProjects",
-            "path": "refKey"
+            "source": "pullBranchIds",
+            "path": "projectKey"
           }
         },
         "right": {
           "value": {
-            "source": "pullBranchIds",
-            "path": "sourceProjectKey"
-          }
+            "raw": null
+          },
+          "operations": [
+            {
+              "operation": "join_string",
+              "kwargs": {
+                "strings": {
+                  "value": {
+                    "array": [
+                      {
+                        "value": {
+                          "source": "pullBranchIds",
+                          "path": "sonarCloudOrgKey"
+                        }
+                      },
+                      {
+                        "value": {
+                          "source": "getPortfolioProjects",
+                          "path": "refKey"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "delimiter": {
+                  "value": {
+                    "raw": "_"
+                  }
+                }
+              }
+            }
+          ]
         },
         "operator": {
           "value": {
@@ -90,6 +119,24 @@
             "source": "createPortfolios",
             "path": "id"
           }
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "sonarCloudOrgKey"
+          },
+          "operations": []
+        },
+        "val": {
+          "value": {
+            "source": "pullBranchIds",
+            "path": "$.sonarCloudOrgKey"
+          },
+          "operations": []
         }
       }
     }

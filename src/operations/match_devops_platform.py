@@ -14,7 +14,6 @@ def process_chunk(chunk):
 
 def execute(alm, repository, slug, label, repo_slug, integration_key, output_key, **_):
     results = None
-    log_event(level='warning', status='success', process_type='match_platform', payload=dict(alm=alm, repository=repository, slug=slug, label=label, repo_slug=repo_slug, integration_key=integration_key), logger_name='default')
     if alm == 'bitbucketcloud' and repository == label:
         results = {output_key: integration_key}
     elif alm == 'github' and repository == repo_slug:
