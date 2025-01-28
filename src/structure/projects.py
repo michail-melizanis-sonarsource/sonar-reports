@@ -1,10 +1,12 @@
 from collections import defaultdict
 
 from utils import multi_extract_object_reader
+
 NEW_CODE_MAPPINGS = dict(
-        NUMBER_OF_DAYS='days',
-        PREVIOUS_VERSION='previous_version',
-    )
+    NUMBER_OF_DAYS='days',
+    PREVIOUS_VERSION='previous_version',
+)
+
 
 def is_cloud_binding(binding):
     is_cloud = False
@@ -36,7 +38,6 @@ def generate_unique_binding_key(server_url, key, alm, url, repository):
 
 
 def map_new_code_definitions(export_directory, extract_mapping):
-
     new_code_definitions = dict()
     for server_url, new_code_definition in multi_extract_object_reader(directory=export_directory,
                                                                        key='getNewCodePeriods',
@@ -97,9 +98,10 @@ def map_project_structure(export_directory, extract_mapping):
             monorepo=project_binding.get('project_binding', dict()).get('monorepo', False),
         )
         branch_name = project.get('branch', 'master')
-        new_code_definition = new_code_definitions.get(server_url, dict()).get(project['key'], dict()).get(branch_name,
-                                                                                                           dict(
-                                                                                                               type='number_of_days',
+        new_code_definition = new_code_definitions.get(
+            server_url, dict()
+        ).get(project['key'], dict()).get(branch_name, dict(
+                                                                                                               type='days',
                                                                                                                value=30
                                                                                                            ))
         projects[unique_project_key] = dict(
