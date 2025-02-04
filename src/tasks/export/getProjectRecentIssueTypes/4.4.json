@@ -13,6 +13,46 @@
   ],
   "operations": [
     {
+      "operation": "expand_list",
+        "kwargs":{
+        "inputs": {
+          "value": {
+            "raw": [
+              "CODE_SMELL",
+              "BUG",
+              "VULNERABILITY"
+            ]
+          }
+        },
+        "resultKey": {
+          "value": {
+            "raw": "issueType"
+          }
+        }
+      }
+    },
+    {
+      "operation": "expand_list",
+      "kwargs": {
+        "inputs": {
+          "value": {
+            "raw": [
+              "INFO",
+              "MINOR",
+              "MAJOR",
+              "CRITICAL",
+              "BLOCKER"
+            ]
+          }
+        },
+        "resultKey": {
+          "value": {
+            "raw": "severity"
+          }
+        }
+      }
+    },
+    {
       "operation": "http_request",
       "kwargs": {
         "client": {
@@ -23,7 +63,7 @@
         },
         "url": {
           "value": {
-            "raw": "/api/hotspots/search"
+            "raw": "/api/issues/search"
           },
           "operations": []
         },
@@ -72,30 +112,33 @@
         "params": {
           "value": {
             "map": {
-              "project": {
+              "createdInLast": {
+                "value": {
+                  "raw": "30d"
+                }
+              },
+              "components": {
                 "value": {
                   "source": "getProjects",
                   "path": "$.key"
                 },
                 "operations": []
               },
-              "status": {
-                "value": {
-                  "raw": "REVIEWED"
-                },
-                "operations": []
-              },
-              "resolution": {
-                "value": {
-                  "raw": "FIXED"
-                },
-                "operations": []
-              },
               "ps": {
                 "value": {
-                  "raw": 1
+                  "raw": "1"
                 },
                 "operations": []
+              },
+              "types": {
+                "value": {
+                  "path": "$.issueType"
+                }
+              },
+              "severities": {
+                "value": {
+                  "path": "$.severity"
+                }
               }
             }
           },

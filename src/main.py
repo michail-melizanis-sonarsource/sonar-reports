@@ -28,7 +28,8 @@ def cli():
 @click.option('--concurrency', default=25, help='Maximum number of concurrent requests')
 @click.option('--timeout', default=60, help='Number of seconds before a request will timeout')
 @click.option('--extract_id', help='ID of an extract to resume in case of failures. Extract will start by retrying last completed task')
-def extract(url, token, export_directory: str, extract_type, pem_file_path, key_file_path, cert_password,
+@click.option('--target_task', help='Target Task to complete. All dependent tasks will be included')
+def extract(url, token, export_directory: str, extract_type, pem_file_path, key_file_path, cert_password, target_task,
             concurrency, timeout, extract_id):
     """Extracts data from a SonarQube Server instance and stores it in the export directory as new line delimited json files
 
@@ -49,12 +50,15 @@ def extract(url, token, export_directory: str, extract_type, pem_file_path, key_
     configure_client(url=url, cert=cert, server_version=server_version, token=token, concurrency=concurrency,
                      timeout=timeout)
     configs = get_available_task_configs(client_version=server_version, edition=edition)
-    if extract_type == 'report':
+    if target_task is not None:
+        target_tasks = [target_task]
+    elif extract_type == 'report':
         target_tasks = REPORT_TASKS
     elif extract_type == 'migration':
         target_tasks = MIGRATION_TASKS
     else:
         target_tasks = list([k for k in configs.keys() if k.startswith('get')])
+
     plan = generate_task_plan(target_tasks=target_tasks, task_configs=configs)
     with open(os.path.join(extract_directory, 'extract.json'), 'wt') as f:
         json.dump(
@@ -75,7 +79,9 @@ def extract(url, token, export_directory: str, extract_type, pem_file_path, key_
 
 @cli.command()
 @click.option('--export_directory', default='/app/files/', help="Root Directory containing all of the SonarQube exports")
-def report(export_directory, report_type='migration'):
+@click.option('--report_type', default='migration', help='Type of report to generate')
+@click.option('--filename', default=None, help='Filename for the report')
+def report(export_directory, report_type, filename):
     """Generates a markdown report based on data extracted from one or more SonarQube Server instances"""
     from importlib import import_module
     try:
@@ -87,7 +93,10 @@ def report(export_directory, report_type='migration'):
     if not extract_mapping:
         click.echo("No Extracts Found")
         return
-    module.generate_markdown(extract_directory=export_directory, extract_mapping=extract_mapping)
+    md = module.generate_markdown(extract_directory=export_directory, extract_mapping=extract_mapping)
+    filename = filename if filename else report_type
+    with open(os.path.join(export_directory, f'{filename}.md'), 'wt') as f:
+        f.write(md)
 
 
 @cli.command()

@@ -64,4 +64,4 @@ def generate_devops_markdown(directory, extract_mapping, server_id_mapping):
                          'PR Projects?': 'pr_projects'},
         rows=bindings, title='DevOps Integrations', level=2, sort_by_lambda=lambda x: x['projects'],
         sort_order='desc', filter_lambda=lambda x: x['projects'] > 0
-    )
+    ), pull_requests

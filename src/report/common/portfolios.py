@@ -22,7 +22,7 @@ def process_portfolios(directory, extract_mapping, server_id_mapping):
         server_id = server_id_mapping[url]
         if project['portfolioKey'] not in portfolios[server_id].keys():
             continue
-        portfolios[server_id][project['portfolioKey']]['projects'].add(project['key'])
+        portfolios[server_id][project['portfolioKey']]['projects'].add(project['refKey'])
         portfolios[server_id][project['portfolioKey']]['project_count'] = len(portfolios[server_id][project['portfolioKey']]['projects'])
     return [portfolio for server_id, p in portfolios.items() for portfolio in p.values()]
 

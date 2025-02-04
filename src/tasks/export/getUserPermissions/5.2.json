@@ -18,7 +18,7 @@
         },
         "url": {
           "value": {
-            "raw": "/api/issues/search"
+            "raw": "/api/permissions/users"
           },
           "operations": []
         },
@@ -30,13 +30,13 @@
         },
         "paginationKey": {
           "value": {
-            "raw": null
+            "raw": "p"
           },
           "operations": []
         },
         "pageSizeKey": {
           "value": {
-            "raw": null
+            "raw": "ps"
           },
           "operations": []
         },
@@ -48,32 +48,25 @@
         },
         "resultKey": {
           "value": {
-            "raw": null
+            "raw": "users"
           },
           "operations": []
         },
         "maxPageSize": {
           "value": {
-            "raw": null
+            "raw": 100
           },
           "operations": []
         },
         "totalKey": {
           "value": {
-            "raw": null
+            "raw": "$.paging.total"
           },
           "operations": []
         },
         "params": {
           "value": {
-            "map": {
-              "issueStatuses": {
-                "value": {
-                  "raw": "CONFIRMED,FALSE_POSITIVE,ACCEPTED"
-                },
-                "operations": []
-              }
-            }
+            "map": {}
           },
           "operations": []
         }
