@@ -13,3 +13,4 @@ COPY /deployment/startup/extract.sh /app/extract.sh
 
 WORKDIR /app
 ENTRYPOINT ["python", "/app/main.py"]
+LABEL org.opencontainers.image.source=https://github.com/sonar-solutions/sonar-reports

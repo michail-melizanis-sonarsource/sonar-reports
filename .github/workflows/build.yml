@@ -25,10 +25,10 @@ jobs:
       # Build the Docker image using the Dockerfile in the repo
       - name: Build Docker image
         run: |
-          docker build -t ghcr.io/sonarsource-demos/sonar-reports:latest .
+          docker build -t ghcr.io/sonar-solutions/sonar-reports:latest .
 
       # Push the Docker image to GitHub Container Registry
       - name: Push Docker image to GitHub Container Registry
         run: |
-          docker push ghcr.io/sonarsource-demos/sonar-reports:latest
+          docker push ghcr.io/sonar-solutions/sonar-reports:latest
 
