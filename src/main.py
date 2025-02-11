@@ -10,7 +10,7 @@ from operations.http_request import configure_client, configure_client_cert, get
 from plan import generate_task_plan, get_available_task_configs
 from utils import get_unique_extracts, export_csv, load_csv, filter_completed
 from validate import validate_migration
-
+from importlib import import_module
 
 @click.group()
 def cli():
@@ -52,12 +52,17 @@ def extract(url, token, export_directory: str, extract_type, pem_file_path, key_
     configs = get_available_task_configs(client_version=server_version, edition=edition)
     if target_task is not None:
         target_tasks = [target_task]
-    elif extract_type == 'report':
-        target_tasks = REPORT_TASKS
-    elif extract_type == 'migration':
-        target_tasks = MIGRATION_TASKS
-    else:
+    elif extract_type == 'all':
         target_tasks = list([k for k in configs.keys() if k.startswith('get')])
+    else:
+        try:
+            module = import_module(f'report.{extract_type}')
+        except ImportError:
+            click.echo(f"Report Type {extract_type} Not Found")
+            return
+        else:
+            target_tasks = module.REQUIRED
+
 
     plan = generate_task_plan(target_tasks=target_tasks, task_configs=configs)
     with open(os.path.join(extract_directory, 'extract.json'), 'wt') as f:
