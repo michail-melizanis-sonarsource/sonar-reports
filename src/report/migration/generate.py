@@ -55,20 +55,19 @@ TEMPLATE = """
 
 def generate_markdown(extract_directory, extract_mapping):
     server_markdown, server_id_mapping,  projects = generate_server_markdown(directory=extract_directory, extract_mapping=extract_mapping)
-    pipeline_overview, project_scan_details = generate_pipeline_markdown(
+    pipeline_overview, project_scan_details, *_ = generate_pipeline_markdown(
         directory=extract_directory,
         extract_mapping=extract_mapping,
         server_id_mapping=server_id_mapping
     )
-    devops_markdown = generate_devops_markdown(directory=extract_directory, extract_mapping=extract_mapping,
+    devops_markdown, *_ = generate_devops_markdown(directory=extract_directory, extract_mapping=extract_mapping,
                                                server_id_mapping=server_id_mapping)
-    permission_templates = generate_permission_template_markdown(directory=extract_directory, extract_mapping=extract_mapping,
-                                       server_id_mapping=server_id_mapping)
-    projects = process_project_details(directory=extract_directory, extract_mapping=extract_mapping,
-                                       server_id_mapping=server_id_mapping)
+    permissions, permission_templates = generate_permission_template_markdown(directory=extract_directory, extract_mapping=extract_mapping,
+                                       server_id_mapping=server_id_mapping, projects=projects)
+
     plugins_md, plugins = generate_plugin_markdown(directory=extract_directory, extract_mapping=extract_mapping,
                                        server_id_mapping=server_id_mapping)
-    active_profiles, inactive_profiles = generate_profile_markdown(
+    active_profiles, inactive_profiles, *_ = generate_profile_markdown(
         directory=extract_directory,
         extract_mapping=extract_mapping,
         server_id_mapping=server_id_mapping,
@@ -93,7 +92,7 @@ def generate_markdown(extract_directory, extract_mapping):
         devops_integrations=devops_markdown,
         pipeline_overview=pipeline_overview,
         active_applications=active_app_md,
-        permission_templates=permission_templates,
+        permission_templates=permissions,
         active_quality_profiles=active_profiles,
         active_quality_gates=active_gates,
         active_portfolios=active_portfolios,
@@ -105,7 +104,4 @@ def generate_markdown(extract_directory, extract_mapping):
         empty_portfolios=inactive_portfolios,
         empty_applications=inactive_app_md,
     )
-
-    with open(os.path.join(extract_directory, 'report.md'), 'wt') as f:
-        f.write(md)
     return md

@@ -7,32 +7,11 @@
   ],
   "dependencies": [
     {
-      "key": "getRules",
+      "key": "getProjects",
       "strategy": "each"
     }
   ],
   "operations": [
-    {
-      "operation": "apply_filter",
-      "kwargs": {
-        "operator": {
-          "value": {
-            "raw": "eq"
-          }
-        },
-        "left": {
-          "value": {
-            "source": "getRules",
-            "path": "$.is_template"
-          }
-        },
-        "right": {
-          "value": {
-            "raw": true
-          }
-        }
-      }
-    },
     {
       "operation": "http_request",
       "kwargs": {
@@ -44,7 +23,7 @@
         },
         "url": {
           "value": {
-            "raw": "/api/issues/search"
+            "raw": "/api/measures/search"
           },
           "operations": []
         },
@@ -74,7 +53,7 @@
         },
         "resultKey": {
           "value": {
-            "raw": null
+            "raw": "measures"
           },
           "operations": []
         },
@@ -93,13 +72,38 @@
         "params": {
           "value": {
             "map": {
-              "issueStatuses": {
+              "projectKeys": {
                 "value": {
-                  "raw": "CONFIRMED,FALSE_POSITIVE,ACCEPTED"
+                  "source": "getProjects",
+                  "path": "$.key"
+                },
+                "operations": []
+              },
+              "metricKeys": {
+                "value": {
+                  "raw": "ncloc_language_distribution,new_violations,accepted_issues,alert_status,false_positive_issues,violations,new_lines_to_cover,lines_to_cover,new_coverage,coverage,uncovered_lines,new_uncovered_lines"
                 },
                 "operations": []
               }
             }
+          },
+          "operations": []
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "projectKey"
+          },
+          "operations": []
+        },
+        "val": {
+          "value": {
+            "source": "getProjects",
+            "path": "$.key"
           },
           "operations": []
         }

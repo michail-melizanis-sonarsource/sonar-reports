@@ -35,7 +35,7 @@ def process_profile_rules(directory, extract_mapping, server_id_mapping):
 def process_profile_projects(server_projects, profile_rules, template_rules, plugin_rules):
     profile_projects = defaultdict(dict)
     for server_id, projects in server_projects.items():
-        for project in projects:
+        for project in projects.values():
             for profile in project['profiles']:
                 if profile not in profile_projects[server_id].keys():
                     profile_projects[server_id][profile] = set()
@@ -50,10 +50,13 @@ def process_profile_projects(server_projects, profile_rules, template_rules, plu
 def process_quality_profiles(directory, extract_mapping, server_id_mapping, profile_projects, profile_rules,
                              template_rules, plugin_rules):
     profiles = list()
+    profile_map = defaultdict(dict)
     for url, profile in multi_extract_object_reader(directory=directory, mapping=extract_mapping, key='getProfiles'):
         server_id = server_id_mapping[url]
         rules = profile_rules[server_id].get(profile['key'], set())
-        profiles.append(dict(
+        if profile['language'] not in profile_map[server_id].keys():
+            profile_map[server_id][profile['language']] = dict()
+        profile_map[server_id][profile['language']][profile['name']] = dict(
             server_id=server_id,
             language=profile['language'],
             key=profile['key'],
@@ -67,9 +70,21 @@ def process_quality_profiles(directory, extract_mapping, server_id_mapping, prof
             plugin_rules=len(plugin_rules[server_id].intersection(rules)),
             projects=profile_projects[server_id].get(profile['key'], set()),
             project_count=len(profile_projects[server_id].get(profile['key'], set()))
-        ))
-    return profiles
+        )
+    for server_id, languages in profile_map.items():
+        for language, profiles_dict in languages.items():
+            for profile_name, profile in profiles_dict.items():
+                profile['root'] = extract_root_parent(profile, profiles_dict)
+                profiles.append(profile)
+    return profiles, profile_map
 
+def extract_root_parent(profile, profiles):
+    root = profile.get('parent', '')
+    if profile['parent']:
+        parent_root = extract_root_parent(profiles[profile['parent']], profiles)
+        if parent_root:
+            root = parent_root
+    return root
 
 def generate_profile_markdown(directory, extract_mapping, server_id_mapping, projects, plugins):
     template_rules, plugin_rules = process_rules(directory=directory, extract_mapping=extract_mapping,
@@ -78,7 +93,7 @@ def generate_profile_markdown(directory, extract_mapping, server_id_mapping, pro
                                           server_id_mapping=server_id_mapping)
     profile_projects = process_profile_projects(server_projects=projects, profile_rules=profile_rules,
                                                 template_rules=template_rules, plugin_rules=plugin_rules)
-    profiles = process_quality_profiles(directory=directory, extract_mapping=extract_mapping,
+    profiles, profile_map = process_quality_profiles(directory=directory, extract_mapping=extract_mapping,
                                         server_id_mapping=server_id_mapping, profile_projects=profile_projects,
                                         profile_rules=profile_rules, plugin_rules=plugin_rules,
                                         template_rules=template_rules)
@@ -100,4 +115,4 @@ def generate_profile_markdown(directory, extract_mapping, server_id_mapping, pro
         filter_lambda=lambda x: x['project_count'] == 0 and x['is_default'] == "No" and not x['is_built_in']
     )
 
-    return active_profiles, inactive_profiles
+    return active_profiles, inactive_profiles, profile_map

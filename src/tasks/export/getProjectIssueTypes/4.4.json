@@ -5,8 +5,53 @@
     "developer",
     "datacenter"
   ],
-  "dependencies": [],
+  "dependencies": [
+    {
+      "key": "getProjects",
+      "strategy": "each"
+    }
+  ],
   "operations": [
+    {
+      "operation": "expand_list",
+      "kwargs": {
+        "inputs": {
+          "value": {
+            "raw": [
+              "CODE_SMELL",
+              "BUG",
+              "VULNERABILITY"
+            ]
+          }
+        },
+        "resultKey": {
+          "value": {
+            "raw": "issueType"
+          }
+        }
+      }
+    },
+    {
+      "operation": "expand_list",
+      "kwargs": {
+        "inputs": {
+          "value": {
+            "raw": [
+              "INFO",
+              "MINOR",
+              "MAJOR",
+              "CRITICAL",
+              "BLOCKER"
+            ]
+          }
+        },
+        "resultKey": {
+          "value": {
+            "raw": "severity"
+          }
+        }
+      }
+    },
     {
       "operation": "http_request",
       "kwargs": {
@@ -18,7 +63,7 @@
         },
         "url": {
           "value": {
-            "raw": "/api/plugins/installed"
+            "raw": "/api/issues/search"
           },
           "operations": []
         },
@@ -48,7 +93,7 @@
         },
         "resultKey": {
           "value": {
-            "raw": "plugins"
+            "raw": null
           },
           "operations": []
         },
@@ -67,13 +112,48 @@
         "params": {
           "value": {
             "map": {
-              "type": {
+              "components": {
                 "value": {
-                  "raw": "EXTERNAL"
+                  "source": "getProjects",
+                  "path": "$.key"
                 },
                 "operations": []
+              },
+              "ps": {
+                "value": {
+                  "raw": "1"
+                },
+                "operations": []
+              },
+              "types": {
+                "value": {
+                  "path": "$.issueType"
+                }
+              },
+              "severities": {
+                "value": {
+                  "path": "$.severity"
+                }
               }
             }
+          },
+          "operations": []
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "projectKey"
+          },
+          "operations": []
+        },
+        "val": {
+          "value": {
+            "source": "getProjects",
+            "path": "$.key"
           },
           "operations": []
         }

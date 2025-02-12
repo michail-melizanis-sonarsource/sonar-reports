@@ -18,15 +18,56 @@
         "inputs": {
           "value": {
             "raw": [
-              "REPORT",
-              "ISSUE_SYNC",
-              "PROJECT_EXPORT"
+              "FALSE-POSITIVE",
+              "WONTFIX",
+              "FIXED",
+              "REMOVED"
             ]
           }
         },
         "resultKey": {
           "value": {
-            "raw": "taskType"
+            "raw": "resolution"
+          }
+        }
+      }
+    },
+    {
+      "operation": "expand_list",
+      "kwargs": {
+        "inputs": {
+          "value": {
+            "raw": [
+              "CODE_SMELL",
+              "BUG",
+              "VULNERABILITY"
+            ]
+          }
+        },
+        "resultKey": {
+          "value": {
+            "raw": "issueType"
+          }
+        }
+      }
+    },
+    {
+      "operation": "expand_list",
+      "kwargs": {
+        "inputs": {
+          "value": {
+            "raw": [
+              "INFO",
+              "MINOR",
+              "MAJOR",
+              "CRITICAL",
+              "BLOCKER"
+            ]
+          }
+        },
+        "resultKey": {
+          "value": {
+            "raw": "severity"
           }
         }
       }
@@ -42,7 +83,7 @@
         },
         "url": {
           "value": {
-            "raw": "/api/ce/activity"
+            "raw": "/api/issues/search"
           },
           "operations": []
         },
@@ -54,13 +95,13 @@
         },
         "paginationKey": {
           "value": {
-            "raw": "p"
+            "raw": null
           },
           "operations": []
         },
         "pageSizeKey": {
           "value": {
-            "raw": "ps"
+            "raw": null
           },
           "operations": []
         },
@@ -72,60 +113,72 @@
         },
         "resultKey": {
           "value": {
-            "raw": "tasks"
+            "raw": null
           },
           "operations": []
         },
         "maxPageSize": {
           "value": {
-            "raw": 1000
+            "raw": null
           },
           "operations": []
         },
         "totalKey": {
           "value": {
-            "raw": "$.paging.total"
+            "raw": null
           },
           "operations": []
         },
         "params": {
           "value": {
             "map": {
-              "type": {
-                "value": {
-                  "path": "$.taskType"
-                }
-              },
-              "component": {
+              "components": {
                 "value": {
                   "source": "getProjects",
                   "path": "$.key"
                 },
                 "operations": []
               },
-              "minSubmittedAt": {
+              "ps": {
                 "value": {
-                  "raw": null
+                  "raw": "1"
                 },
-                "operations": [
-                  {
-                    "operation": "get_date",
-                    "kwargs": {
-                      "days": {
-                        "value": {
-                          "raw": 30
-                        }
-                      },
-                      "format": {
-                        "value": {
-                          "raw": "%Y-%m-%dT%H:%M:%S%z"
-                        }
-                      }
-                    }
-                  }
-                ]
+                "operations": []
+              },
+              "resolutions": {
+                "value": {
+                  "path": "$.resolution"
+                }
+              },
+              "types": {
+                "value": {
+                  "path": "$.issueType"
+                }
+              },
+              "severities": {
+                "value": {
+                  "path": "$.severity"
+                }
               }
             }
+          },
+          "operations": []
+        }
+      }
+    },
+    {
+      "operation": "set_key",
+      "kwargs": {
+        "key": {
+          "value": {
+            "raw": "projectKey"
+          },
+          "operations": []
+        },
+        "val": {
+          "value": {
+            "source": "getProjects",
+            "path": "$.key"
           },
           "operations": []
         }

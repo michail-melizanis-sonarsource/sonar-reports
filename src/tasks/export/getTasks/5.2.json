@@ -6,12 +6,36 @@
     "datacenter"
   ],
   "dependencies": [
-    {
-      "key": "getProjects",
-      "strategy": "each"
-    }
   ],
   "operations": [
+    {
+      "operation": "expand_list",
+      "kwargs": {
+        "inputs": {
+          "value": {
+            "raw": [
+              "REPORT",
+              "ISSUE_SYNC",
+              "AUDIT_PURGE",
+              "PROJECT_EXPORT",
+              "APP_REFRESH",
+              "PROJECT_IMPORT",
+              "VIEW_REFRESH",
+              "REPORT_SUBMIT",
+              "GITHUB_AUTH_PROVISIONING",
+              "GITHUB_PROJECT_PERMISSIONS_PROVISIONING",
+              "GITLAB_AUTH_PROVISIONING",
+              "GITLAB_PROJECT_PERMISSIONS_PROVISIONING"
+            ]
+          }
+        },
+        "resultKey": {
+          "value": {
+            "raw": "taskType"
+          }
+        }
+      }
+    },
     {
       "operation": "http_request",
       "kwargs": {
@@ -23,7 +47,7 @@
         },
         "url": {
           "value": {
-            "raw": "/api/issues/search"
+            "raw": "/api/ce/activity"
           },
           "operations": []
         },
@@ -35,13 +59,13 @@
         },
         "paginationKey": {
           "value": {
-            "raw": null
+            "raw": "p"
           },
           "operations": []
         },
         "pageSizeKey": {
           "value": {
-            "raw": null
+            "raw": "ps"
           },
           "operations": []
         },
@@ -53,63 +77,53 @@
         },
         "resultKey": {
           "value": {
-            "raw": null
+            "raw": "tasks"
           },
           "operations": []
         },
         "maxPageSize": {
           "value": {
-            "raw": null
+            "raw": 1000
           },
           "operations": []
         },
         "totalKey": {
           "value": {
-            "raw": null
+            "raw": "$.paging.total"
           },
           "operations": []
         },
         "params": {
           "value": {
             "map": {
-              "components": {
+              "type": {
                 "value": {
-                  "source": "getProjects",
-                  "path": "$.key"
-                },
-                "operations": []
+                  "path": "$.taskType"
+                }
               },
-              "issueStatuses": {
+              "minSubmittedAt": {
                 "value": {
-                  "raw": "FALSE_POSITIVE"
+                  "raw": null
                 },
-                "operations": []
-              },
-              "ps": {
-                "value": {
-                  "raw": "1"
-                },
-                "operations": []
+                "operations": [
+                  {
+                    "operation": "get_date",
+                    "kwargs": {
+                      "days": {
+                        "value": {
+                          "raw":30
+                        }
+                      },
+                        "format": {
+                            "value": {
+                            "raw": "%Y-%m-%dT%H:%M:%S%z"
+                            }
+                    }
+                  }
+                    }
+                ]
               }
             }
-          },
-          "operations": []
-        }
-      }
-    },
-    {
-      "operation": "set_key",
-      "kwargs": {
-        "key": {
-          "value": {
-            "raw": "projectKey"
-          },
-          "operations": []
-        },
-        "val": {
-          "value": {
-            "source": "getProjects",
-            "path": "$.key"
           },
           "operations": []
         }

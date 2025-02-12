@@ -2,7 +2,7 @@ from collections import defaultdict
 
 from report.utils import generate_section
 from utils import multi_extract_object_reader
-from datetime import datetime
+from datetime import datetime, timedelta, UTC
 
 
 def process_scan_details(directory, extract_mapping, server_id_mapping):
@@ -19,11 +19,25 @@ def process_scan_details(directory, extract_mapping, server_id_mapping):
             project_scans[server_id][analysis['detectedCI']][analysis['projectKey']] = dict(
                 total_scans=0,
                 first_scan=None,
-                last_scan=None
+                last_scan=None,
+                scan_count_30_days=0,
+                failed_scans=0,
+                failed_scans_30_days=0
             )
+        failed = False
+        for event in analysis.get('events', []):
+            if event['category'] == 'QUALITY_GATE':
+                if event['name'].upper() == 'FAILED':
+                    failed=True
+                    project_scans[server_id][analysis['detectedCI']][analysis['projectKey']]['failed_scans'] += 1
+                break
         project_scans[server_id][analysis['detectedCI']][analysis['projectKey']]['total_scans'] += 1
         first_scan = project_scans[server_id][analysis['detectedCI']][analysis['projectKey']]['first_scan']
         last_scan = project_scans[server_id][analysis['detectedCI']][analysis['projectKey']]['last_scan']
+        if date> datetime.now(tz=UTC) - timedelta(days=30):
+            project_scans[server_id][analysis['detectedCI']][analysis['projectKey']]['scan_count_30_days'] += 1
+            if failed:
+                project_scans[server_id][analysis['detectedCI']][analysis['projectKey']]['failed_scans_30_days'] += 1
         if not first_scan or date < first_scan:
             first_scan = date
         if not last_scan or date > last_scan:
@@ -86,4 +100,4 @@ def generate_pipeline_markdown(directory, extract_mapping, server_id_mapping):
         sort_by_lambda=lambda x: x['total_scans'],
         sort_order='desc'
     )
-    return overview, details
+    return overview, details, project_scans
