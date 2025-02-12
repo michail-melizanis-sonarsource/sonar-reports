@@ -9,6 +9,8 @@ def generate_usage_markdown(projects, scans):
     for server, cis in scans.items():
         for ci, projects_scanned in cis.items():
             for key, project in projects_scanned.items():
+                if key not in projects[server].keys():
+                    continue
                 if project['scan_count_30_days'] > 0:
                     active_projects[projects[server][key]['tier']][key] = projects[server][key].get('loc', 0)
                 if '30_day_scans' not in projects[server][key]:

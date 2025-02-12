@@ -12,8 +12,9 @@ def process_issues(extract_directory, extract_mapping, server_id_mapping):
     for setting, key in FOLDER_MAPPING.items():
         for url, issues in multi_extract_object_reader(directory=extract_directory, mapping=extract_mapping, key=key):
             server_id = server_id_mapping[url]
-            if issues['severity'] not in project_issues[server_id][issues['projectKey']][issues['issueType']]:
-                project_issues[server_id][issues['projectKey']][issues['issueType']][issues['severity']] = dict(
+            project = project_issues[server_id][issues['projectKey']]
+            if issues['severity'] not in project:
+                project[issues['issueType']][issues['severity']] = dict(
                     project_key=issues['projectKey'],
                     issue_type=issues['issueType'],
                     server_id=server_id,
@@ -26,18 +27,15 @@ def process_issues(extract_directory, extract_mapping, server_id_mapping):
                     false_positive=0,
                     recent=0
                 )
+            issue_count = issues.get('total', 0)
             if setting == 'resolved':
                 resolution = issues['resolution'].lower().replace('-', "_")
-                project_issues[server_id][issues['projectKey']][issues['issueType']][issues['severity']][resolution] = \
-                    issues['total']
-                project_issues[server_id][issues['projectKey']][issues['issueType']][issues['severity']]['open'] -= \
-                    issues['total']
+                project[issues['issueType']][issues['severity']][resolution] = issue_count
+                project[issues['issueType']][issues['severity']]['open'] -= issue_count
             else:
-                project_issues[server_id][issues['projectKey']][issues['issueType']][issues['severity']][setting] = \
-                    issues['total']
+                project[issues['issueType']][issues['severity']][setting] = issue_count
                 if setting == 'all':
-                    project_issues[server_id][issues['projectKey']][issues['issueType']][issues['severity']]['open'] += \
-                        issues['total']
+                    project[issues['issueType']][issues['severity']]['open'] += issue_count
     return project_issues
 
 

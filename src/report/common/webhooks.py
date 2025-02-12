@@ -8,7 +8,6 @@ from datetime import datetime, UTC, timedelta
 def process_webhook(webhooks, webhook, server_id):
     webhooks[server_id][webhook['name']] = dict(
         server_id=server_id,
-        key=webhook['key'],
         name=webhook['name'],
         url=webhook['url'],
         project=webhook.get('projectKey', ''),
@@ -26,6 +25,8 @@ def process_webhook(webhooks, webhook, server_id):
 
 def process_delivery(webhooks, server_id, delivery):
     name = delivery['name']
+    if name not in webhooks[server_id].keys():
+        return webhooks
     webhook = webhooks[server_id][name]
     webhook['deliveries'] += 1
     delivery_date = datetime.strptime(delivery['at'], '%Y-%m-%dT%H:%M:%S%z')
@@ -51,10 +52,10 @@ def process_webhooks(directory, extract_mapping, server_id_mapping):
         webhooks = process_webhook(webhooks=webhooks, webhook=webhook, server_id=server_id)
     for url, delivery in multi_extract_object_reader(directory=directory, mapping=extract_mapping, key='getWebhookDeliveries'):
         server_id = server_id_mapping[url]
-        webhooks = process_webhook(webhooks=webhooks, webhook=delivery, server_id=server_id)
+        webhooks = process_delivery(webhooks=webhooks, delivery=delivery, server_id=server_id)
     for url, delivery in multi_extract_object_reader(directory=directory, mapping=extract_mapping, key='getProjectWebhookDeliveries'):
         server_id = server_id_mapping[url]
-        webhooks = process_webhook(webhooks=webhooks, webhook=delivery, server_id=server_id)
+        webhooks = process_delivery(webhooks=webhooks, delivery=delivery, server_id=server_id)
     return webhooks
 
 def generate_webhook_markdown(directory, extract_mapping, server_id_mapping):

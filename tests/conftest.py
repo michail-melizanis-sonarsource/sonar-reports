@@ -6,7 +6,7 @@ import json
 from functools import partial
 import httpx
 from urllib.parse import urlparse, parse_qs
-import re
+import respx
 from respx.patterns import M
 import os
 
@@ -18,9 +18,18 @@ def token():
     return "sq_"+str(uuid.uuid4())
 
 
+@pytest.fixture(scope='session', params=['migration', 'maturity'])
+def report_types(request):
+    return request.param
+
 @pytest.fixture(scope='session')
 def root_dir():
     return os.path.dirname(__file__)
+
+@pytest.fixture(scope='session')
+def custom_mock():
+    with respx.mock(assert_all_called=False) as mock:
+        yield mock
 
 
 
@@ -61,13 +70,13 @@ def output_dir(root_dir, edition, version):
     os.makedirs(path, exist_ok=True)
     return path
 
-@pytest.fixture()
-def request_mocks(respx_mock, server_url, edition, version, endpoints):
-    respx_mock.get(f"{server_url}/api/server/version").mock(return_value=httpx.Response(200, text=f"{version}.0"))
+@pytest.fixture(scope='session')
+def request_mocks(custom_mock, server_url, edition, version, endpoints):
+    custom_mock.get(f"{server_url}/api/server/version").mock(return_value=httpx.Response(200, text=f"{version}.0"))
     for k, v in endpoints.items():
         if k == 'api/server/version':
             continue
-        respx_mock.route(M(url=f"{server_url}/{k}")).mock(side_effect=partial(validate_api_input, endpoint=v))
+        custom_mock.route(M(url=f"{server_url}/{k}")).mock(side_effect=partial(validate_api_input, endpoint=v))
 
 
 def validate_api_input(request, endpoint):
@@ -84,7 +93,7 @@ def validate_api_input(request, endpoint):
         raise ValueError(f"Invalid parameters: {set(params.keys()) - allowed_params}")
     return httpx.Response(200, json=endpoint.get('response', dict()))
 
-@pytest.fixture()
+@pytest.fixture(scope='session')
 def extracts(request_mocks, server_url, token, output_dir):
     runner = CliRunner()
     result = runner.invoke(cli, ['extract', server_url, token, f'--export_directory={output_dir}'])

@@ -8,6 +8,6 @@ def process_groups(directory, extract_mapping, server_id_mapping):
             server_id=server_id,
             name=group['name'],
             permissions=group['permissions'],
-            is_managed=group['managed']
+            is_managed=group.get('managed')
         ))
     return groups

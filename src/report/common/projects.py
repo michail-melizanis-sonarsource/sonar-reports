@@ -26,6 +26,7 @@ def process_project_details(directory, extract_mapping, server_id_mapping):
             languages=set([i['language'] for i in project['qualityProfiles'] if not i.get('deleted', False)]),
             quality_gate=project['qualityGate']['name'],
             binding=project.get('binding', dict()).get('key', ''),
+            loc=0,
             tier='unknown',
             rules=0,
             template_rules=0,
@@ -72,6 +73,8 @@ def process_project_usage(directory, extract_mapping, server_id_mapping, project
     for url, project in multi_extract_object_reader(directory=directory, mapping=extract_mapping,
                                                     key='getUsage'):
         server_id = server_id_mapping[url]
+        if project['projectKey'] not in projects[server_id].keys():
+            continue
         projects[server_id][project['projectKey']]['loc'] = project['linesOfCode']
         for tier, value in sorted(TIERS.items(), key=lambda x: x[1], reverse=True):
             if project['linesOfCode'] >= value and tier!= 'unknown':

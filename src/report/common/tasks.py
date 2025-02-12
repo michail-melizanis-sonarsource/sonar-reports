@@ -67,12 +67,13 @@ def process_task(server_id, tasks, task):
 
 def process_tasks(directory, extract_mapping, server_id_mapping):
     tasks = defaultdict(dict)
-    for url, task in multi_extract_object_reader(directory=directory, mapping=extract_mapping, key='getTasks'):
-        server_id = server_id_mapping[url]
-        tasks = process_task(server_id=server_id, tasks=tasks, task=task)
-    for url, task in multi_extract_object_reader(directory=directory, mapping=extract_mapping, key='getProjectTasks'):
-        server_id = server_id_mapping[url]
-        tasks = process_task(server_id=server_id, tasks=tasks, task=task)
+    for key in ['getTasks', 'getProjectTasks']:
+        for url, task in multi_extract_object_reader(directory=directory, mapping=extract_mapping, key=key):
+            server_id = server_id_mapping[url]
+            if 'type' not in task.keys():
+                print(task)
+                continue
+            tasks = process_task(server_id=server_id, tasks=tasks, task=task)
     return tasks
 
 
