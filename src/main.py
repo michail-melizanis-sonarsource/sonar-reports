@@ -102,6 +102,7 @@ def report(export_directory, report_type, filename):
     filename = filename if filename else report_type
     with open(os.path.join(export_directory, f'{filename}.md'), 'wt') as f:
         f.write(md)
+    return md
 
 
 @cli.command()

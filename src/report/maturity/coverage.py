@@ -16,10 +16,10 @@ def generate_coverage_markdown(measures):
                 if metric in row.keys():
                     row[metric] += int(measure)
     if row['lines_to_cover'] > 0:
-        row['coverage'] = f"{(row['lines_to_cover'] - row['uncovered_lines']) / row['lines_to_cover'] * 100:.2f}%"
+        row['coverage'] = (row['lines_to_cover'] - row['uncovered_lines']) / row['lines_to_cover'] * 100
         row['covered_lines'] = row['lines_to_cover'] - row['uncovered_lines']
     if row['new_lines_to_cover'] > 0:
-        row['new_coverage'] = f"{(row['new_lines_to_cover'] - row['new_uncovered_lines']) / row['new_lines_to_cover'] * 100:.2f}%"
+        row['new_coverage'] = (row['new_lines_to_cover'] - row['new_uncovered_lines']) / row['new_lines_to_cover'] * 100
         row['new_covered_lines'] = row['new_lines_to_cover'] - row['new_uncovered_lines']
     return generate_section(
         title="Code Coverage",

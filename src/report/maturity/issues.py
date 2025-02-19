@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+from parser import extract_path_value
 from report.utils import generate_section
 from utils import multi_extract_object_reader
 
@@ -8,34 +9,46 @@ FOLDER_MAPPING = dict(resolved='getProjectResolvedIssueTypes', all='getProjectIs
 
 
 def process_issues(extract_directory, extract_mapping, server_id_mapping):
-    project_issues = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
+    project_issues = defaultdict(
+        lambda: defaultdict(
+            lambda: defaultdict(
+                lambda: defaultdict(
+                    lambda: dict(
+                        project_key=None,
+                        issue_type=None,
+                        server_id=None,
+                        severity=None,
+                        all=0,
+                        open=0,
+                        fixed=0,
+                        wontfix=0,
+                        removed=0,
+                        false_positive=0,
+                        recent=0
+                    )
+                )
+            )
+        )
+    )
     for setting, key in FOLDER_MAPPING.items():
         for url, issues in multi_extract_object_reader(directory=extract_directory, mapping=extract_mapping, key=key):
             server_id = server_id_mapping[url]
-            project = project_issues[server_id][issues['projectKey']]
-            if issues['severity'] not in project:
-                project[issues['issueType']][issues['severity']] = dict(
-                    project_key=issues['projectKey'],
-                    issue_type=issues['issueType'],
-                    server_id=server_id,
-                    severity=issues['severity'],
-                    all=0,
-                    open=0,
-                    fixed=0,
-                    wontfix=0,
-                    removed=0,
-                    false_positive=0,
-                    recent=0
-                )
-            issue_count = issues.get('total', 0)
+            project_key = extract_path_value(obj=issues, path='$.projectKey')
+            severity = extract_path_value(obj=issues, path='$.severity')
+            issue_type = extract_path_value(obj=issues, path='$.issueType')
+            project_severity = project_issues[server_id][project_key][issue_type][severity]
+            issue_count = extract_path_value(obj=issues, path='$.total', default=0)
+            resolution = extract_path_value(obj=issues, path='$.resolution', default='').replace('-', "_")
+            project_severity['project_key'] = project_key
+            project_severity['issue_type'] = issue_type
+            project_severity['server_id'] = server_id
             if setting == 'resolved':
-                resolution = issues['resolution'].lower().replace('-', "_")
-                project[issues['issueType']][issues['severity']][resolution] = issue_count
-                project[issues['issueType']][issues['severity']]['open'] -= issue_count
+                project_severity[resolution] = issue_count
+                project_severity['open'] -= issue_count
             else:
-                project[issues['issueType']][issues['severity']][setting] = issue_count
+                project_severity[setting] = issue_count
                 if setting == 'all':
-                    project[issues['issueType']][issues['severity']]['open'] += issue_count
+                    project_severity['open'] += issue_count
     return project_issues
 
 
@@ -82,7 +95,8 @@ def generate_issue_markdown(extract_directory, extract_mapping, server_id_mappin
                     detail_rows[issue_type][severity]['false_positive'] += issue['false_positive']
                     if issue['open'] > 0:
                         detail_rows[issue_type][severity]['affected_projects'].add(issue['project_key'])
-                        detail_rows[issue_type][severity]['project_count'] = len(detail_rows[issue_type][severity]['affected_projects'])
+                        detail_rows[issue_type][severity]['project_count'] = len(
+                            detail_rows[issue_type][severity]['affected_projects'])
                         issue_rows[severity]['affected_projects'].add(issue['project_key'])
                         issue_rows[severity]['project_count'] = len(issue_rows[severity]['affected_projects'])
 
@@ -95,7 +109,6 @@ def generate_issue_markdown(extract_directory, extract_mapping, server_id_mappin
                     elif issue_type == 'CODE_SMELL':
                         issue_rows[severity]['open_code_smells'] += issue['open']
                         issue_rows[severity]['recent_code_smells'] += issue['recent']
-
 
     overview_md = generate_section(
         title='Issues Overview',

@@ -38,13 +38,13 @@ def extract_path_value(obj, path: str | list, default=None):
     if path[0] == '$':
         val = obj
     elif isinstance(obj, dict):
-        val = obj.get(path[0])
+        val = obj.get(path[0], default)
     elif isinstance(obj, list) and not path[0].isnumeric():
-        val = [extract_path_value(path=path, obj=o) for o in obj]
+        val = [extract_path_value(path=path, obj=o, default=default) for o in obj]
     elif isinstance(obj, list) and path[0].isnumeric() and len(obj) > int(path[0]):
         val = obj[int(path[0])]
     if val is not None and len(path) > 1:
-        val = extract_path_value(path=path[1:], obj=val)
+        val = extract_path_value(path=path[1:], obj=val, default=default)
     return val
 
 
