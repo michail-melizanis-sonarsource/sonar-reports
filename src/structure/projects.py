@@ -1,7 +1,7 @@
 from collections import defaultdict
 
 from utils import multi_extract_object_reader
-
+from parser import extract_path_value
 NEW_CODE_MAPPINGS = dict(
     NUMBER_OF_DAYS='days',
     PREVIOUS_VERSION='previous_version',
@@ -42,17 +42,21 @@ def map_new_code_definitions(export_directory, extract_mapping):
     for server_url, new_code_definition in multi_extract_object_reader(directory=export_directory,
                                                                        key='getNewCodePeriods',
                                                                        mapping=extract_mapping):
-        if new_code_definition['type'] not in NEW_CODE_MAPPINGS.keys():
+        ncd_type = extract_path_value(obj=new_code_definition, path='$.type')
+        ncd_value = extract_path_value(obj=new_code_definition, path='$.value', default=30)
+        project_key = extract_path_value(obj=new_code_definition, path='$.projectKey')
+        branch_key = extract_path_value(obj=new_code_definition, path='$.branchKey')
+        if ncd_type not in NEW_CODE_MAPPINGS.keys():
             continue
 
         if server_url not in new_code_definitions.keys():
             new_code_definitions[server_url] = dict()
-        if new_code_definition['projectKey'] not in new_code_definitions[server_url].keys():
-            new_code_definitions[server_url][new_code_definition['projectKey']] = dict()
-        new_code_definitions[server_url][new_code_definition['projectKey']][new_code_definition['branchKey']] = dict(
-            type=NEW_CODE_MAPPINGS[new_code_definition['type']],
-            value=new_code_definition.get('value', 30 if new_code_definition[
-                                                             'type'] == 'NUMBER_OF_DAYS' else 'previous_version'),
+
+        if project_key not in new_code_definitions[server_url].keys():
+            new_code_definitions[server_url][project_key] = dict()
+        new_code_definitions[server_url][project_key][branch_key] = dict(
+            type=NEW_CODE_MAPPINGS[ncd_type],
+            value=ncd_value if ncd_type == 'NUMBER_OF_DAYS' else 'previous_version'
         )
     return new_code_definitions
 

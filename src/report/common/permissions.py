@@ -1,12 +1,13 @@
 from collections import defaultdict
 
+from parser import extract_path_value
 from report.utils import generate_section
 from utils import multi_extract_object_reader
 import re
 
 
 def process_permission_templates(directory, extract_mapping, server_id_mapping):
-    default_templates = defaultdict(dict)
+    default_templates = defaultdict(lambda: defaultdict(set))
     MAPPING = dict(
         APP="Applications",
         TRK="Projects",
@@ -15,9 +16,11 @@ def process_permission_templates(directory, extract_mapping, server_id_mapping):
     for url, template in multi_extract_object_reader(directory=directory, mapping=extract_mapping,
                                                      key='getDefaultTemplates'):
         server_id = server_id_mapping[url]
-        if template['templateId'] not in default_templates[server_id].keys():
-            default_templates[server_id][template['templateId']] = set()
-        default_templates[server_id][template['templateId']].add(MAPPING[template['qualifier']])
+        template_id = extract_path_value(obj=template, path='$.templateId')
+        qualifier = extract_path_value(obj=template, path='$.qualifier')
+        if template_id is None or qualifier is None:
+            continue
+        default_templates[server_id][template_id].add(MAPPING[qualifier])
     templates = list()
     for url, template in multi_extract_object_reader(directory=directory, mapping=extract_mapping,
                                                      key='getTemplates'):
@@ -25,9 +28,9 @@ def process_permission_templates(directory, extract_mapping, server_id_mapping):
         templates.append(
             dict(
                 server_id=server_id,
-                name=template['name'],
-                description=template.get('description', ""),
-                pattern=template.get('projectKeyPattern', ""),
+                name=extract_path_value(obj=template, path='$.name'),
+                description=extract_path_value(obj=template, path='$.description'),
+                pattern=extract_path_value(obj=template, path='$.projectKeyPattern'),
                 defaults=", ".join(default_templates[server_id].get(template['id'], [])),
                 projects=[],
                 project_count=0

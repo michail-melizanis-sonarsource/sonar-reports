@@ -1,6 +1,9 @@
 import uuid
+from opcode import opname
 from unittest.mock import ANY
 import pytest
+import shutil
+from plan import get_available_task_configs
 import os
 import json
 from functools import partial
@@ -19,7 +22,7 @@ def token():
 
 
 @pytest.fixture(scope='session', params=['migration', 'maturity'])
-def report_types(request):
+def report_type(request):
     return request.param
 
 @pytest.fixture(scope='session')
@@ -71,6 +74,13 @@ def output_dir(root_dir, edition, version):
     return path
 
 @pytest.fixture(scope='session')
+def report_output_dir(output_dir, report_type):
+    path = f"{output_dir}{report_type}/"
+    os.makedirs(path, exist_ok=True)
+    return path
+
+
+@pytest.fixture(scope='session')
 def request_mocks(custom_mock, server_url, edition, version, endpoints):
     custom_mock.get(f"{server_url}/api/server/version").mock(return_value=httpx.Response(200, text=f"{version}.0"))
     for k, v in endpoints.items():
@@ -94,7 +104,20 @@ def validate_api_input(request, endpoint):
     return httpx.Response(200, json=endpoint.get('response', dict()))
 
 @pytest.fixture(scope='session')
-def extracts(request_mocks, server_url, token, output_dir):
+def extracts(request_mocks, server_url, token, report_output_dir, report_type):
     runner = CliRunner()
-    result = runner.invoke(cli, ['extract', server_url, token, f'--export_directory={output_dir}'])
+    result = runner.invoke(cli, ['extract', server_url, token, f'--export_directory={report_output_dir}', f'--extract_type={report_type}'], catch_exceptions=False)
     return result.output
+
+@pytest.fixture(scope='session')
+def empty_results():
+    path = f"/app/files/empty/"
+    configs = get_available_task_configs(client_version=1000000, edition='enterprise')
+    shutil.rmtree(path, ignore_errors=True)
+    os.makedirs(path, exist_ok=True)
+    for task, config in configs.items():
+        task_dir = f"{path}{task}"
+        os.makedirs(task_dir, exist_ok=True)
+        with open(f'{task_dir}/results.1.json', 'wt') as f:
+            f.write('{}')
+    return path

@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+from parser import extract_path_value
 from report.utils import generate_section
 from utils import multi_extract_object_reader
 
@@ -12,7 +13,7 @@ def process_global_permissions(extract_directory, extract_mapping):
     for key in permissions.keys():
         for url, entity in multi_extract_object_reader(directory=extract_directory, mapping=extract_mapping,
                                                        key=f"get{key.capitalize()}{'Permissions' if key == 'user' else ''}"):
-            for permission in entity['permissions']:
+            for permission in extract_path_value(obj=entity, path='$.permissions', default=list()):
                 permissions[key][permission] += 1
     return permissions
 
@@ -32,7 +33,8 @@ def process_entity_permissions(extract_directory, extract_mapping):
         for key in perms.keys():
             for url, entity in multi_extract_object_reader(directory=extract_directory, mapping=extract_mapping,
                                                            key=f"get{entity_type.capitalize()}{key.capitalize()}"):
-                permissions[entity_type][key].add(entity['login' if key == 'users' else 'name'])
+                path_key = 'login' if key == 'user' else 'name'
+                permissions[entity_type][key].add(extract_path_value(obj=entity, path=f'$.{path_key}'))
     return permissions
 
 def generate_permissions_markdown(extract_directory, extract_mapping):

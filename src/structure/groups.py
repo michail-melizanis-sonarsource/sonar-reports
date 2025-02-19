@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+from parser import extract_path_value
 from utils import multi_extract_object_reader
 
 
@@ -18,11 +19,15 @@ def add_default_groups(results, project_org_mapping, export_directory, extract_m
     org_keys = set(project_org_mapping.values())
     for server_url, group in multi_extract_object_reader(directory=export_directory, mapping=extract_mapping,
                                                          key='getGroups'):
-        if group['id'] == 'Anyone' or not group['permissions']:
+        group_id = extract_path_value(group, '$.id')
+        name = extract_path_value(group, '$.name')
+        permissions = extract_path_value(group, '$.permissions')
+        description = extract_path_value(group, '$.description')
+        if any([group_id == 'Anyone', name== 'Anyone']) or not permissions:
             continue
         for org_key in org_keys:
-            results = add_group_result(results=results, name=group['name'], org_key=org_key,
-                                       server_url=server_url, description=group.get('description'))
+            results = add_group_result(results=results, name=name, org_key=org_key,
+                                       server_url=server_url, description=description)
     return results
 
 

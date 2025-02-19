@@ -1,3 +1,4 @@
+from parser import extract_path_value
 from utils import multi_extract_object_reader
 from report.utils import generate_section
 
@@ -12,8 +13,8 @@ def process_applications(directory, extract_mapping, server_id_mapping):
         applications.append(
             dict(
                 server_id=server_id,
-                name=application['name'],
-                project_count=len(application['projects'])
+                name=extract_path_value(obj=application, path='$.name'),
+                project_count=len(extract_path_value(obj=application, path='$.projects', default=list()))
             )
         )
     return applications

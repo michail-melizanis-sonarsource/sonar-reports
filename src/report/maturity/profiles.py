@@ -17,7 +17,7 @@ def generate_profile_summary(profile_map, languages):
                 row['profiles'] += 1
                 if len(profile['projects']) > 0:
                     row['active'] += 1
-                    if profile['root'].lower() == 'sonar way' or profile['name'].lower() == 'sonar way':
+                    if profile['root'] is not None and (profile['root'].lower() == 'sonar way' or profile['name'].lower() == 'sonar way'):
                         row['sonar_way'] += 1
                 if not profile['is_built_in'] and profile['is_default'] == "Yes":
                     row['custom_defaults'] += 1
