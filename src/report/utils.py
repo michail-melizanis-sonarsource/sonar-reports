@@ -37,12 +37,12 @@ def generate_section(headers_mapping: dict[str, str], rows, level=3, title=None,
 
 def format_value(value):
     val = value
-    if isinstance(value, int):
+    if isinstance(value, bool):
+        val = 'Yes' if value else 'No'
+    elif isinstance(value, int):
         val =  f"{value:,}"
     elif isinstance(value, float):
         val= f"{value:,.2f}"
-    elif isinstance(value, bool):
-        val= 'Yes' if value else 'No'
     elif isinstance(value, datetime):
         val = value.strftime('%Y-%m-%d')
     elif isinstance(value, list) or isinstance(value, set):

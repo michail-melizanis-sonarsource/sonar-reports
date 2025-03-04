@@ -9,3 +9,7 @@ click
 markdown
 pytest-cov
 tenacity
+PyNaCl
+ruamel.yaml
+bashlex
+lxml

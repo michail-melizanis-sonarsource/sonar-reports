@@ -246,7 +246,15 @@ def reset(token, edition, url, enterprise_key, concurrency, export_directory):
                  output_directory=export_directory, current_run_id=run_id,
                  run_ids={run_id})
 
-
+@cli.command()
+@click.argument('token')
+@click.argument('enterprise_key')
+@click.option('--edition', default='enterprise', help="SonarQube Cloud License Edition")
+@click.option('--url', default='https://sonarcloud.io/', help="Url of the SonarQube Cloud")
+@click.option('--concurrency', default=25, help="Maximum number of concurrent requests")
+@click.option('--export_directory', default='/app/files/', help="Directory to place all interim files")
+def pipeline(token, edition, url, enterprise_key, concurrency, export_directory):
+    pass
 
 if __name__ == '__main__':
     cli()
