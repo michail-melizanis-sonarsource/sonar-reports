@@ -29,4 +29,4 @@ def update_content(content, projects:set, project_mappings):
     return dict(updated_content="\n".join(updated_content), is_updated=True)
 
 def format_value(key, path, project):
-    return f"{key}={extract_path_value(project, path=path, default='')}"
+    return f"{key}={extract_path_value(obj=project, path=path, default='')}"

@@ -31,6 +31,8 @@ def update_script(script, root_dir, dir_project_mapping):
             include = False
             if parse_error is not None:
                 dir_project_mapping[root_dir]['projects'].add(line.split('=')[-1])
+        if 'sonar.projectName' in line:
+            include = False
         if include:
             updated.append(line)
     updated_script = " ".join(updated).replace('\n ', '\n')

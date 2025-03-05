@@ -70,8 +70,8 @@ jobs:
       run: |
         mvn -B test -Pcoverage verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
         -Dmaven.test.skip=true \
-        -Dsonar.projectKey="demo:java-security" \
-        -Dsonar.projectName="Java Web App" \
+        -Dsonar.projectKey="test_proj_1" \
+        -Dsonar.projectName="Test Project" \
         -Dsonar.pullrequest.key="${{ github.event.pull_request.number }}" \
         -Dsonar.pullrequest.base="${{ github.event.pull_request.base.ref }}" \
         -Dsonar.pullrequest.branch="${{ github.head_ref }}" \

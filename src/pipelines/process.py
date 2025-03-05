@@ -22,7 +22,7 @@ async def update_pipelines(migration_directory, org_secret_mapping, sonar_token,
         org_secret_mapping=org_secret_mapping,
         sonar_token=sonar_token, sonar_url=sonar_url
     )
-    await update_repos(organization_mapping=orgs, migration_directory=migration_directory)
+    return await update_repos(organization_mapping=orgs, migration_directory=migration_directory)
 
 
 async def create_org_secrets(migration_directory, org_secret_mapping, sonar_token, sonar_url):
@@ -42,7 +42,7 @@ async def create_org_secrets(migration_directory, org_secret_mapping, sonar_toke
     for organization in object_reader(migration_directory, 'generateOrganizationMappings'):
         if not organization.get('is_cloud', False):
             continue
-        organization['token'] = org_secret_mapping[organization['sonarqube_org_key']]
+        organization['token'] = org_secret_mapping[organization['sonarcloud_org_key']]
         organizations[organization['sonarcloud_org_key']] = organization
         if organization.get('alm') == 'azure':
             continue
@@ -51,7 +51,7 @@ async def create_org_secrets(migration_directory, org_secret_mapping, sonar_toke
             secrets_updates.append(
                 platform.create_org_secret(
                     organization=organization,
-                    token=org_secret_mapping[organization['sonarqube_org_key']],
+                    token=organization['token'],
                     **secret
                 )
             )
@@ -64,7 +64,7 @@ async def update_repos(organization_mapping, migration_directory):
     for project in object_reader(migration_directory, 'createProjects'):
         if project['sonarCloudOrgKey'] in organization_mapping and project['repository']:
             repos[project['repository']]['repository'] = project['repository']
-            repos[project['repository']]['projects'][project['sourceProjectKey']] = project,
+            repos[project['repository']]['projects'][project['sourceProjectKey']] = project
             repos[project['repository']]['organization'] = organization_mapping[project['sonarCloudOrgKey']]
     for repo in repos.values():
         pull_request = await update_repository(token=repo['organization']['token'], projects=repo['projects'],
@@ -78,7 +78,7 @@ async def update_repository(token, repo_string, projects, organization):
     platform = get_platform_module(name=organization['alm'])
     repository = platform.generate_repository_string(repo_string=repo_string, organization=organization)
     default_branch = await platform.get_default_branch(token=token, repository=repository)
-    pipeline_files = await platform.get_pipeline_files(token=token, repository=repository, branch=default_branch)
+    pipeline_files = await platform.get_pipeline_files(token=token, repository=repository, branch_name=default_branch)
     branch = await platform.create_branch(token=token, repository=repository,
                                           branch_name='sonar/auto-migrate-pipelines',
                                           base_branch_name=default_branch)
@@ -86,7 +86,7 @@ async def update_repository(token, repo_string, projects, organization):
         repository=repository,
         files=pipeline_files,
         token=token,
-        branch_name=branch['name'],
+        branch=branch,
         platform=platform,
         projects=projects,
     )
@@ -103,11 +103,11 @@ async def update_repository(token, repo_string, projects, organization):
     return pr
 
 
-async def update_pipeline_files(platform, projects, repository, branch_name, files, token):
+async def update_pipeline_files(platform, projects, repository, branch, files, token):
     loop = asyncio.get_event_loop()
     updates = list()
     updated_files = list()
-    for file, _ in files:
+    for (file, _) in files:
         file['yaml'] = YAML().load(file['content'])
         updates.append(
             loop.run_in_executor(
@@ -116,7 +116,7 @@ async def update_pipeline_files(platform, projects, repository, branch_name, fil
                     update_pipeline_file,
                     platform=platform,
                     file=file,
-                ), ()
+                )
             )
         )
     updated = await gather(*updates)
@@ -132,7 +132,7 @@ async def update_pipeline_files(platform, projects, repository, branch_name, fil
         platform=platform,
         project_mappings=projects,
         repository=repository,
-        branch_name=branch_name,
+        branch=branch,
         root_dir=root_dir,
         projects=mapped['projects'],
         scanners=mapped['scanners'],
@@ -143,9 +143,10 @@ async def update_pipeline_files(platform, projects, repository, branch_name, fil
         platform.create_or_update_file(
             token=token,
             repository=repository,
-            branch_name=branch_name,
+            branch_name=branch['name'],
             file_path=i['file_path'],
             content=i['updated_content'],
+            message=f'Updating {i["file_path"]} for SonarQube Cloud',
             sha=i['sha']
         ) for i in updated_files
     ])
@@ -173,7 +174,7 @@ def update_pipeline_file(platform, file):
     return file, dir_project_mapping
 
 
-async def update_config_file(platform, project_mappings, projects, root_dir, scanners, repository, branch_name, token):
+async def update_config_file(platform, project_mappings, projects, root_dir, scanners, repository, branch, token):
     if not scanners:
         scanners = {'cli'}
     content = list()
@@ -183,26 +184,26 @@ async def update_config_file(platform, project_mappings, projects, root_dir, sca
         mod = load_module(mod_type='scanners', name=scanner)
         file_names = mod.get_config_file_name()
         for file_name in file_names:
-            file_path = os.path.join(root_dir, file_name)
+            file_path = os.path.join(root_dir, file_name).replace('./', '')
             content.append(
                 platform.get_content(
                     token=token,
                     repository=repository,
                     file_path=file_path,
-                    branch=branch_name,
+                    branch_name=branch['name'],
                     extra_args=dict(file_name=file_path, scanner_mod=mod, scanner=scanner)
                 )
             )
-    content = await gather(*content)
+    files = await gather(*content)
     updated_configs = [
         dict(
             **extra['scanner_mod'].update_content(
                 content=file['content'],
                 projects=projects,
                 project_mappings=project_mappings,
-            ), **file
+            ), sha=file['sha'] if content else branch['sha'], file_path=file['file_path']
         )
-        for file, extra in content if file['content'] or extra['scanner'] == 'cli'
+        for file, extra in files if file['content'] or extra['scanner'] == 'cli'
     ]
     return updated_configs
 

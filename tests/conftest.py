@@ -12,22 +12,41 @@ from urllib.parse import urlparse, parse_qs
 import respx
 from respx.patterns import M
 import os
-
 from click.testing import CliRunner
 from main import cli, extract, report
+from .mocks.mock_platform import MockPlatform
+
+TEST_DIR = os.path.dirname(__file__)
+PIPELINE_MOCK_DIR = os.path.join(TEST_DIR, 'mocks/pipelines/')
+PIPELINE_MOCKS = [os.path.join(PIPELINE_MOCK_DIR, i) for i in os.listdir(PIPELINE_MOCK_DIR)]
+PIPELINE_CASES = [os.path.join(PIPELINE_MOCK_DIR, i) for i in os.listdir(PIPELINE_MOCK_DIR) if
+                  os.path.exists(os.path.join(PIPELINE_MOCK_DIR, i) and 'pycache' not in i)]
+
+
+@pytest.fixture(scope='session', autouse=True, params=['github'])
+def platform(request):
+    return request.param
+
+
+@pytest.fixture(scope='session', params=PIPELINE_CASES)
+def pipeline_case(request):
+    return request.param
+
 
 @pytest.fixture(scope='session')
 def token():
-    return "sq_"+str(uuid.uuid4())
+    return "sq_" + str(uuid.uuid4())
 
 
 @pytest.fixture(scope='session', params=['migration', 'maturity'])
 def report_type(request):
     return request.param
 
+
 @pytest.fixture(scope='session')
 def root_dir():
     return os.path.dirname(__file__)
+
 
 @pytest.fixture(scope='session')
 def custom_mock():
@@ -35,10 +54,10 @@ def custom_mock():
         yield mock
 
 
-
 @pytest.fixture(scope='session', params=['community', 'enterprise', 'developer'])
 def edition(request):
     return request.param
+
 
 @pytest.fixture(scope='session', params=['9.9', '10.7'])
 def version(request):
@@ -64,6 +83,7 @@ def endpoints(root_dir, edition, version):
             paths[path]['response'] = response
     return paths
 
+
 @pytest.fixture(scope='session')
 def output_dir(root_dir, edition, version):
     import shutil
@@ -72,6 +92,7 @@ def output_dir(root_dir, edition, version):
     os.makedirs(f"/app/files/{edition}", exist_ok=True)
     os.makedirs(path, exist_ok=True)
     return path
+
 
 @pytest.fixture(scope='session')
 def report_output_dir(output_dir, report_type):
@@ -92,7 +113,7 @@ def request_mocks(custom_mock, server_url, edition, version, endpoints):
 def validate_api_input(request, endpoint):
     params = parse_qs(urlparse(str(request.url)).query)
     allowed_params = set()
-    required_params= set()
+    required_params = set()
     for i in endpoint.get('params', []):
         allowed_params.add(i['key'])
         if i.get('required', False):
@@ -103,11 +124,14 @@ def validate_api_input(request, endpoint):
         raise ValueError(f"Invalid parameters: {set(params.keys()) - allowed_params}")
     return httpx.Response(200, json=endpoint.get('response', dict()))
 
+
 @pytest.fixture(scope='session')
 def extracts(request_mocks, server_url, token, report_output_dir, report_type):
     runner = CliRunner()
-    result = runner.invoke(cli, ['extract', server_url, token, f'--export_directory={report_output_dir}', f'--extract_type={report_type}'], catch_exceptions=False)
+    result = runner.invoke(cli, ['extract', server_url, token, f'--export_directory={report_output_dir}',
+                                 f'--extract_type={report_type}'], catch_exceptions=False)
     return result.output
+
 
 @pytest.fixture(scope='session')
 def empty_results():
@@ -121,3 +145,10 @@ def empty_results():
         with open(f'{task_dir}/results.1.json', 'wt') as f:
             f.write('{}')
     return path
+
+
+@pytest.fixture()
+def custom_platform(mocker, platform, pipeline_case):
+    mocker.patch('pipelines.process.get_platform_module',
+                 return_value=MockPlatform(platform=platform, case=pipeline_case))
+    return mocker

@@ -25,7 +25,8 @@ async def get_org_public_key(token, org_name, host=DEFAULT_HOST):
     return js['key_id'], js['key']
 
 
-async def create_org_secret(token, org_name, secret_name, secret_value, host=DEFAULT_HOST, **unused_kwargs):
+async def create_org_secret(token, organization, secret_name, secret_value, host=DEFAULT_HOST, **unused_kwargs):
+    org_name = organization['sonarqube_org_key'].split('/')[-1]
     key_id, key = await get_org_public_key(token=token, org_name=org_name, host=host)
     url = f'/orgs/{org_name}/actions/secrets/{secret_name}'
     payload = {
@@ -50,19 +51,19 @@ def encrypt_secret(secret, key):
     return b64encode(encrypted).decode("utf-8")
 
 
-async def list_files(token, repository, file_path, branch, host=DEFAULT_HOST, **unused_kwargs):
+async def list_files(token, repository, file_path, branch_name, host=DEFAULT_HOST, **unused_kwargs):
     url = f'/repos/{repository}/contents/{quote(file_path)}'
     _, js = await safe_json_request(url=url, host=host, headers=generate_headers(token=token), method='GET',
-                                    params={'ref': branch})
+                                    params={'ref': branch_name})
     files = js.get('entries', [])
     sha = js.get('sha')
     return sha, files
 
 
-async def get_content(token, repository, file_path, branch, host=DEFAULT_HOST, extra_args=None, **unused_kwargs):
+async def get_content(token, repository, file_path, branch_name, host=DEFAULT_HOST, extra_args=None, **unused_kwargs):
     url = f'/repos/{repository}/contents/{quote(file_path)}'
     _, js = await safe_json_request(url=url, host=host, headers=generate_headers(token=token), method='GET',
-                                    params={'ref': branch})
+                                    params={'ref': branch_name})
 
     file = dict(
         file_path=file_path,
@@ -162,9 +163,15 @@ def generate_repository_string(repo_string, **_):
     return repo_string
 
 
-async def get_pipeline_files(token, repository, branch, host=DEFAULT_HOST, **unused_kwargs):
-    sha, files = await list_files(token=token, repository=repository, file_path='.github/workflows', branch=branch,
+async def get_pipeline_files(token, repository, branch_name, host=DEFAULT_HOST, **unused_kwargs):
+    sha, files = await list_files(token=token, repository=repository, file_path=get_pipeline_file_paths()['folders'], branch_name=branch_name,
                                   host=host)
     return await gather(
-        *[get_content(token=token, repository=repository, file_path=file['path'], branch=branch, host=host) for file in
+        *[get_content(token=token, repository=repository, file_path=file['path'], branch_name=branch_name, host=host) for file in
           files])
+
+def get_pipeline_file_paths():
+    return dict(
+        files=[],
+        folders=['.github/workflows']
+    )

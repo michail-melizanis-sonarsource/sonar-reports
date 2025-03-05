@@ -19,8 +19,8 @@ jobs:
       - uses: sonarsource/sonarqube-scan-action@master
         with:
           args: >
-            -Dsonar.projectKey="demo:java-security" \
-            -Dsonar.projectName="Java Web App" \
+            -Dsonar.projectKey="test_proj_1" \
+            -Dsonar.projectName="Test Project" \
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}

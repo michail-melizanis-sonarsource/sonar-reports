@@ -1,9 +1,7 @@
 from lxml import etree
 
-from main import extract
 from parser import extract_path_value
 from pipelines.scanners.base import get_mappings
-from io import StringIO, BytesIO
 
 
 def get_config_file_name():
@@ -18,7 +16,6 @@ def update_content(content, projects:set, project_mappings):
         first_line = content.split('\n')[0] + '\n'
     for element in elements:
         if element.tag.endswith('properties'):
-            print(element)
             for prop in element:
                 if prop.tag in mappings.keys():
                     updated_keys.add(prop.tag)
