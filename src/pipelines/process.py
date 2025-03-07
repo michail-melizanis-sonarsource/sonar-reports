@@ -16,13 +16,13 @@ CLOUD_TOKEN_NAME = 'SONARQUBE_CLOUD_TOKEN'
 CLOUD_URL_NAME = 'SONARQUBE_CLOUD_URL'
 
 
-async def update_pipelines(migration_directory, org_secret_mapping, sonar_token, sonar_url):
+async def update_pipelines(input_directory, output_directory, org_secret_mapping, sonar_token, sonar_url):
     orgs, secrets = await create_org_secrets(
-        migration_directory=migration_directory,
+        migration_directory=input_directory,
         org_secret_mapping=org_secret_mapping,
         sonar_token=sonar_token, sonar_url=sonar_url
     )
-    return await update_repos(organization_mapping=orgs, migration_directory=migration_directory)
+    return await update_repos(organization_mapping=orgs, output_directory=output_directory, input_directory=input_directory)
 
 
 async def create_org_secrets(migration_directory, org_secret_mapping, sonar_token, sonar_url):
@@ -58,26 +58,42 @@ async def create_org_secrets(migration_directory, org_secret_mapping, sonar_toke
     return organizations, await gather(*secrets_updates)
 
 
-async def update_repos(organization_mapping, migration_directory):
+def create_nested_folders(current_dir, folder_string):
+    folders = folder_string.split('/')
+    folder = os.path.join(current_dir, folders[0])
+    os.makedirs(folder, exist_ok=True)
+    if len(folders) == 1:
+        return folder
+    else:
+        return create_nested_folders(folder, '/'.join(folders[1:]))
+
+
+async def update_repos(organization_mapping, input_directory, output_directory):
     repos = defaultdict(lambda: dict(projects=dict(), organization=dict(), repository=None))
     pull_requests = dict()
 
-    for project in object_reader(migration_directory, 'createProjects'):
+    for project in object_reader(input_directory, 'createProjects'):
         if project['sonarCloudOrgKey'] in organization_mapping and project['repository']:
             repos[project['repository']]['repository'] = project['repository']
             repos[project['repository']]['projects'][project['sourceProjectKey']] = project
             repos[project['repository']]['organization'] = organization_mapping[project['sonarCloudOrgKey']]
     for repo in repos.values():
-        pull_request = await update_repository(token=repo['organization']['token'], projects=repo['projects'],
-                                               organization=repo['organization'], repo_string=repo['repository'])
+        pull_request = await update_repository(
+            output_directory=output_directory,
+            token=repo['organization']['token'],
+            projects=repo['projects'],
+            organization=repo['organization'],
+            repo_string=repo['repository']
+        )
         if pull_request:
             pull_requests[repo['repository']] = pull_request
     return pull_requests
 
 
-async def update_repository(token, repo_string, projects, organization):
+async def update_repository(token, output_directory, repo_string, projects, organization):
     platform = get_platform_module(name=organization['alm'])
     repository = platform.generate_repository_string(repo_string=repo_string, organization=organization)
+    repo_folder = create_nested_folders(current_dir= output_directory, folder_string=f'{organization["alm"]}/{repo_string}')
     default_branch = await platform.get_default_branch(token=token, repository=repository)
     pipeline_files = await platform.get_pipeline_files(token=token, repository=repository, branch_name=default_branch)
     branch = await platform.create_branch(token=token, repository=repository,
@@ -85,6 +101,7 @@ async def update_repository(token, repo_string, projects, organization):
                                           base_branch_name=default_branch['name'])
     updated_files = await update_pipeline_files(
         repository=repository,
+        repo_folder = repo_folder,
         files=pipeline_files,
         token=token,
         branch=branch,
@@ -104,7 +121,7 @@ async def update_repository(token, repo_string, projects, organization):
     return pr
 
 
-async def update_pipeline_files(platform, projects, repository, branch, files, token):
+async def update_pipeline_files(platform, repo_folder, projects, repository, branch, files, token):
     loop = asyncio.get_event_loop()
     updates = list()
     updated_files = list()
@@ -123,14 +140,18 @@ async def update_pipeline_files(platform, projects, repository, branch, files, t
     updated = await gather(*updates)
     mappings = defaultdict(lambda: dict(projects=set(), scanners=set()))
     for file, dir_project_mapping in updated:
+        file_folder = create_nested_folders(current_dir=repo_folder, folder_string=os.path.dirname(file['file_path']))
+        with open(os.path.join(file_folder, f"input.{os.path.basename(file['file_path'])}"), 'wt') as f:
+            f.write(file['content'])
         if file['is_updated']:
             updated_files.append(file)
-
+            with open(os.path.join(file_folder, f"output.{os.path.basename(file['file_path'])}"), 'wt') as f:
+                f.write(file['updated_content'])
         for key, value in dir_project_mapping.items():
             mappings[key]['projects'] = mappings[key]['projects'].union(value['projects'])
             mappings[key]['scanners'] = mappings[key]['scanners'].union(value['scanners'])
-    assert mappings
-    updated_configs = await gather(*[update_config_file(
+    updated_configs = await gather(*[update_config_files(
+        repo_folder=repo_folder,
         platform=platform,
         project_mappings=projects,
         repository=repository,
@@ -154,13 +175,14 @@ async def update_pipeline_files(platform, projects, repository, branch, files, t
     ])
     return updated_files
 
+
 def update_pipeline_file(platform, file):
     pipeline_type = identify_pipeline_type(platform=platform, file=file)
     targets = pipeline_type.process_yaml(file=file)
     dir_project_mapping = dict()
     file['is_updated'] = False
     for target in targets:
-        file['yaml'], dir_project_mapping = update_pipeline_target(
+        file['updated_yaml'], dir_project_mapping = update_pipeline_target(
             pipeline_type=pipeline_type,
             yaml=file['yaml'],
             target=target,
@@ -169,14 +191,14 @@ def update_pipeline_file(platform, file):
         file['is_updated'] = True
     if file['is_updated']:
         with StringIO() as output:
-            YAML().dump(file['yaml'], output)
+            YAML().dump(file['updated_yaml'], output)
             output.seek(0)
             file['updated_content'] = output.read()
             file['is_updated'] = True
     return file, dir_project_mapping
 
 
-async def update_config_file(platform, project_mappings, projects, root_dir, scanners, repository, branch, token):
+async def update_config_files(platform, project_mappings, projects, root_dir, scanners, repository, branch, token, repo_folder):
     if not scanners:
         scanners = {'cli'}
     content = list()
@@ -197,17 +219,31 @@ async def update_config_file(platform, project_mappings, projects, root_dir, sca
                 )
             )
     files = await gather(*content)
-    updated_configs = [
-        dict(
-            **extra['scanner_mod'].update_content(
-                content=file['content'],
-                projects=projects,
-                project_mappings=project_mappings,
-            ), sha=file['sha'] if content else branch['sha'], file_path=file['file_path']
-        )
-        for file, extra in files if file['content'] or extra['scanner'] == 'cli'
-    ]
-    return updated_configs
+
+
+    updated_configs = await gather(*[
+        update_config_file(
+            scanner_mod=extra['scanner_mod'],
+            file=file,
+            projects=projects,
+            project_mappings=project_mappings,
+            repo_folder=repo_folder
+        ) for file, extra in files if file['content'] or extra['scanner'] == 'cli'
+    ])
+    return [config for config in updated_configs if config['is_updated']]
+
+async def update_config_file(scanner_mod, file, projects, project_mappings, repo_folder):
+    file_folder = create_nested_folders(current_dir=repo_folder, folder_string=os.path.dirname(file['file_path']))
+    with open(os.path.join(file_folder, f"input.{os.path.basename(file['file_path'])}"), 'wt') as f:
+        f.write(file['content'])
+    file.update(scanner_mod.update_content(content=file['content'], projects=projects,
+                                                 project_mappings=project_mappings))
+    if file['is_updated']:
+        with open(os.path.join(file_folder, f"output.{os.path.basename(file['file_path'])}"), 'wt') as f:
+            f.write(file['updated_content'])
+    return file
+
+
 
 
 def update_pipeline_variables(pipeline_type, yaml, variables):
@@ -232,7 +268,7 @@ def update_pipeline_target(pipeline_type, yaml, target, dir_project_mapping):
                 root_dir=task['working_dir'],
                 dir_project_mapping=dir_project_mapping
             )
-            set_path_value(obj=yaml, path=task['script'], val=updated)
+            yaml = set_path_value(obj=yaml, path=task['script'], val=updated)
     return yaml, dir_project_mapping
 
 

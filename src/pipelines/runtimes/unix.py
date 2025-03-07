@@ -10,7 +10,6 @@ SONAR_COMMANDS = {
 
 def update_script(script, root_dir, dir_project_mapping):
     updated = list()
-    parse_error = None
     try:
         _, dir_project_mapping = process_command_list(
             root_directory=root_dir,
@@ -19,16 +18,7 @@ def update_script(script, root_dir, dir_project_mapping):
         )
     except bashlex.parser.errors.ParsingError as e:
         pass
-    for line in bashlex.split(script):
-        include = True
-        if 'sonar.projectKey' in line:
-            include = False
-            if parse_error is not None:
-                dir_project_mapping[root_dir]['projects'].add(line.split('=')[-1])
-        if 'sonar.projectName' in line:
-            include = False
-        if include:
-            updated.append(line)
+
     if not dir_project_mapping:
         dir_project_mapping = {
             root_dir: dict(
@@ -36,6 +26,17 @@ def update_script(script, root_dir, dir_project_mapping):
                 scanners=set()
             )
         }
+
+    for line in bashlex.split(script):
+        include = True
+        if 'sonar.projectKey' in line:
+            include = False
+            dir_project_mapping[root_dir]['projects'].add(line.split('=')[-1])
+        if 'sonar.projectName' in line:
+            include = False
+        if include:
+            updated.append(line)
+
     updated_script = " ".join(updated).replace('\n ', '\n').replace(' \n', '\n')
     return updated_script, dir_project_mapping
 

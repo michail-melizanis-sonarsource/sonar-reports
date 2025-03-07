@@ -264,23 +264,30 @@ def reset(token, edition, url, enterprise_key, concurrency, export_directory):
 @click.argument('secrets_file')
 @click.argument('sonar_token')
 @click.argument('sonar_url')
-@click.option('--export_directory', default='/app/files/', help="Directory to place all interim files")
-def pipelines(secrets_file, sonar_token, sonar_url, export_directory):
-    with open(os.path.join(export_directory, secrets_file), 'rt') as f:
+@click.option('--input_directory', default='/app/files/', help="Directory to find all migration files")
+@click.option('--output_directory', default=None, help="Directory to place all interim files")
+def pipelines(secrets_file, sonar_token, sonar_url, input_directory, output_directory):
+    with open(os.path.join(input_directory, secrets_file), 'rt') as f:
         secrets = json.load(f)
-    migration_id = get_latest_extract_id(directory=export_directory)
-    if migration_id:
-        pipeline_dir = os.path.join(export_directory, str(migration_id))
-    elif os.path.exists(os.path.join(export_directory, 'generateOrganizationMappings')):
-        pipeline_dir = export_directory
+    extract_mapping = get_unique_extracts(directory=input_directory, key='plan.json')
+
+    if output_directory is None:
+        output_directory = input_directory
+    if extract_mapping:
+        pipeline_dir = os.path.join(input_directory, str(max(extract_mapping.values())))
+    elif os.path.exists(os.path.join(input_directory, 'generateOrganizationMappings')):
+        pipeline_dir = input_directory
     else:
         click.echo("No Migrations Found")
         return
+    run_id = str(int(datetime.now(UTC).timestamp()))
+    run_dir = os.path.join(output_directory, run_id)
+    os.makedirs(run_dir, exist_ok=True)
     loop = asyncio.get_event_loop()
     configure_logger(name='http_request', level='INFO', output_file=os.path.join(pipeline_dir, 'requests.log'))
     results = loop.run_until_complete(
         update_pipelines(
-            migration_directory=pipeline_dir, org_secret_mapping=secrets, sonar_token=sonar_token,
+            input_directory=pipeline_dir, output_directory=run_dir, org_secret_mapping=secrets, sonar_token=sonar_token,
             sonar_url=sonar_url
         )
     )
