@@ -4,13 +4,16 @@ from datetime import datetime, UTC
 from constants import REPORT_TASKS, MIGRATION_TASKS
 import click
 import os
+import asyncio
 from execute import execute_plan
 from logs import configure_logger
 from operations.http_request import configure_client, configure_client_cert, get_server_details
 from plan import generate_task_plan, get_available_task_configs
-from utils import get_unique_extracts, export_csv, load_csv, filter_completed
+from utils import get_unique_extracts, export_csv, load_csv, filter_completed, get_latest_extract_id
 from validate import validate_migration
 from importlib import import_module
+from pipelines.process import update_pipelines
+
 
 @click.group()
 def cli():
@@ -27,7 +30,8 @@ def cli():
 @click.option('--extract_type', default='all', help='Type of Extract to run')
 @click.option('--concurrency', default=25, help='Maximum number of concurrent requests')
 @click.option('--timeout', default=60, help='Number of seconds before a request will timeout')
-@click.option('--extract_id', help='ID of an extract to resume in case of failures. Extract will start by retrying last completed task')
+@click.option('--extract_id',
+              help='ID of an extract to resume in case of failures. Extract will start by retrying last completed task')
 @click.option('--target_task', help='Target Task to complete. All dependent tasks will be included')
 def extract(url, token, export_directory: str, extract_type, pem_file_path, key_file_path, cert_password, target_task,
             concurrency, timeout, extract_id):
@@ -63,7 +67,6 @@ def extract(url, token, export_directory: str, extract_type, pem_file_path, key_
         else:
             target_tasks = module.REQUIRED
 
-
     plan = generate_task_plan(target_tasks=target_tasks, task_configs=configs)
     with open(os.path.join(extract_directory, 'extract.json'), 'wt') as f:
         json.dump(
@@ -83,7 +86,8 @@ def extract(url, token, export_directory: str, extract_type, pem_file_path, key_
 
 
 @cli.command()
-@click.option('--export_directory', default='/app/files/', help="Root Directory containing all of the SonarQube exports")
+@click.option('--export_directory', default='/app/files/',
+              help="Root Directory containing all of the SonarQube exports")
 @click.option('--report_type', default='migration', help='Type of report to generate')
 @click.option('--filename', default=None, help='Filename for the report')
 def report(export_directory, report_type, filename):
@@ -106,7 +110,8 @@ def report(export_directory, report_type, filename):
 
 
 @cli.command()
-@click.option('--export_directory', default='/app/files/', help="Root Directory containing all of the SonarQube exports")
+@click.option('--export_directory', default='/app/files/',
+              help="Root Directory containing all of the SonarQube exports")
 def structure(export_directory):
     """Groups projects into organizations based on DevOps Bindings and Server Urls. Outputs organizations and projects as CSVs"""
     from structure import map_organization_structure, map_project_structure
@@ -118,7 +123,8 @@ def structure(export_directory):
 
 
 @cli.command()
-@click.option('--export_directory', default='/app/files/', help="Root Directory containing all of the SonarQube exports")
+@click.option('--export_directory', default='/app/files/',
+              help="Root Directory containing all of the SonarQube exports")
 def mappings(export_directory):
     """Maps groups, permission templates, quality profiles, quality gates, and portfolios to relevant organizations. Outputs CSVs for each entity type"""
     from structure import map_templates, map_groups, map_profiles, map_gates, map_portfolios
@@ -146,10 +152,13 @@ def mappings(export_directory):
 @click.argument('enterprise_key')
 @click.option('--edition', default='enterprise')
 @click.option('--url', default='https://sonarcloud.io/')
-@click.option('--run_id', default=None, help='ID of a run to resume in case of failures. Migration will resume by retrying the last completed task')
+@click.option('--run_id', default=None,
+              help='ID of a run to resume in case of failures. Migration will resume by retrying the last completed task')
 @click.option('--concurrency', default=25, help='Maximum number of concurrent requests')
-@click.option('--export_directory', default='/app/files/', help="Root Directory containing all of the SonarQube exports")
-@click.option('--target_task', help='Name of a specific migration task to complete. All dependent tasks will be be included')
+@click.option('--export_directory', default='/app/files/',
+              help="Root Directory containing all of the SonarQube exports")
+@click.option('--target_task',
+              help='Name of a specific migration task to complete. All dependent tasks will be be included')
 def migrate(token, edition, url, enterprise_key, concurrency, run_id, export_directory, target_task):
     """Migrate SonarQube Server configurations to SonarQube Cloud. User must run the structure and mappings command and add the SonarQube Cloud organization keys to the organizations.csv in order to start the migration
 
@@ -170,7 +179,8 @@ def migrate(token, edition, url, enterprise_key, concurrency, run_id, export_dir
     if target_task is not None:
         target_tasks = [target_task]
     else:
-        target_tasks = list([k for k in configs.keys() if not any([k.startswith(i) for i in ['get', 'delete', 'reset']])])
+        target_tasks = list(
+            [k for k in configs.keys() if not any([k.startswith(i) for i in ['get', 'delete', 'reset']])])
     completed = completed.union(MIGRATION_TASKS)
     if create_plan:
         plan = generate_task_plan(
@@ -193,10 +203,12 @@ def migrate(token, edition, url, enterprise_key, concurrency, run_id, export_dir
         with open(os.path.join(run_dir, 'plan.json'), 'rt') as f:
             plan = json.load(f)['plan']
     plan = filter_completed(plan=plan, directory=run_dir)
-    execute_plan(execution_plan=plan, inputs=dict(url=url, api_url=api_url, enterprise_key=enterprise_key), concurrency=concurrency,
+    execute_plan(execution_plan=plan, inputs=dict(url=url, api_url=api_url, enterprise_key=enterprise_key),
+                 concurrency=concurrency,
                  task_configs=configs,
                  output_directory=export_directory, current_run_id=run_id,
                  run_ids=set(extract_mapping.values()).union({run_id}))
+
 
 @cli.command()
 @click.argument('token')
@@ -241,11 +253,45 @@ def reset(token, edition, url, enterprise_key, concurrency, export_directory):
                 run_id=run_id,
             ), f
         )
-    execute_plan(execution_plan=plan, inputs=dict(url=url, api_url=api_url, enterprise_key=enterprise_key), concurrency=concurrency,
+    execute_plan(execution_plan=plan, inputs=dict(url=url, api_url=api_url, enterprise_key=enterprise_key),
+                 concurrency=concurrency,
                  task_configs=configs,
                  output_directory=export_directory, current_run_id=run_id,
                  run_ids={run_id})
 
+
+@cli.command()
+@click.argument('secrets_file')
+@click.argument('sonar_token')
+@click.argument('sonar_url')
+@click.option('--input_directory', default='/app/files/', help="Directory to find all migration files")
+@click.option('--output_directory', default=None, help="Directory to place all interim files")
+def pipelines(secrets_file, sonar_token, sonar_url, input_directory, output_directory):
+    with open(os.path.join(input_directory, secrets_file), 'rt') as f:
+        secrets = json.load(f)
+    extract_mapping = get_unique_extracts(directory=input_directory, key='plan.json')
+
+    if output_directory is None:
+        output_directory = input_directory
+    if extract_mapping:
+        pipeline_dir = os.path.join(input_directory, str(max(extract_mapping.values())))
+    elif os.path.exists(os.path.join(input_directory, 'generateOrganizationMappings')):
+        pipeline_dir = input_directory
+    else:
+        click.echo("No Migrations Found")
+        return
+    run_id = str(int(datetime.now(UTC).timestamp()))
+    run_dir = os.path.join(output_directory, run_id)
+    os.makedirs(run_dir, exist_ok=True)
+    loop = asyncio.get_event_loop()
+    configure_logger(name='http_request', level='INFO', output_file=os.path.join(pipeline_dir, 'requests.log'))
+    results = loop.run_until_complete(
+        update_pipelines(
+            input_directory=pipeline_dir, output_directory=run_dir, org_secret_mapping=secrets, sonar_token=sonar_token,
+            sonar_url=sonar_url
+        )
+    )
+    click.echo(f"Repositories Updated: {list(results.keys())}")
 
 
 if __name__ == '__main__':

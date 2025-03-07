@@ -1,4 +1,5 @@
 import httpx
+from httpx import AsyncClient
 from tenacity import retry, stop_after_attempt, wait_random_exponential
 from asyncio import gather
 from parser import extract_path_value
@@ -53,6 +54,8 @@ def format_response_body(response):
 def safe_json_request(host, method, url, stop=stop_after_attempt(3), reraise=True, raise_over=500,
                       wait=wait_random_exponential(multiplier=.01, max=1), log_attributes=None, **kwargs):
     client = get_client(url=host)
+    if client is None:
+        client = AsyncClient(base_url=host)
     if log_attributes is None:
         log_attributes = {
             k: v for k, v in kwargs.items() if k not in ['headers', 'files']

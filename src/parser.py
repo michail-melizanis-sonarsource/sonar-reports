@@ -47,6 +47,24 @@ def extract_path_value(obj, path: str | list, default=None):
         val = extract_path_value(path=path[1:], obj=val, default=default)
     return val
 
+def set_path_value(obj:dict|list, path, val):
+    if isinstance(path, str):
+        path = path.split('.')
+    if path[0] == '$':
+        path = path[1:]
+    if len(path) == 1:
+        if isinstance(obj, dict):
+            obj[path[0]] = val
+        elif isinstance(obj, list):
+            obj[int(path[0])] = val
+    else:
+        if isinstance(obj, dict):
+            if path[0] not in obj.keys():
+                obj[path[0]] = dict()
+            obj[path[0]] = set_path_value(obj=obj[path[0]], path=path[1:], val=val)
+        elif isinstance(obj, list):
+            obj[int(path[0])] = set_path_value(obj=obj[int(path[0])], path=path[1:], val=val)
+    return obj
 
 def extract_inputs(obj, operation_config):
     args = list()
