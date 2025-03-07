@@ -22,13 +22,13 @@ def get_latest_extract_id(directory):
     return max(dirs, key=int) if dirs else None
 
 
-def get_unique_extracts(directory):
+def get_unique_extracts(directory, key='extract.json'):
     url_mappings = defaultdict(set)
     for extract_id in os.listdir(directory):
         if not os.path.isdir(os.path.join(directory, extract_id)) or not os.path.exists(
-                os.path.join(directory, extract_id, 'extract.json')):
+                os.path.join(directory, extract_id, key)):
             continue
-        with open(os.path.join(directory, extract_id, 'extract.json'), 'rt') as f:
+        with open(os.path.join(directory, extract_id, key), 'rt') as f:
             plan = json.load(f)
             url_mappings[plan['url']].add(extract_id)
     return {k: max(v) for k, v in url_mappings.items()}

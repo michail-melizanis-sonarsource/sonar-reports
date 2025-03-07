@@ -9,7 +9,7 @@ from execute import execute_plan
 from logs import configure_logger
 from operations.http_request import configure_client, configure_client_cert, get_server_details
 from plan import generate_task_plan, get_available_task_configs
-from utils import get_unique_extracts, export_csv, load_csv, filter_completed
+from utils import get_unique_extracts, export_csv, load_csv, filter_completed, get_latest_extract_id
 from validate import validate_migration
 from importlib import import_module
 from pipelines.process import update_pipelines
@@ -268,14 +268,23 @@ def reset(token, edition, url, enterprise_key, concurrency, export_directory):
 def pipelines(secrets_file, sonar_token, sonar_url, export_directory):
     with open(os.path.join(export_directory, secrets_file), 'rt') as f:
         secrets = json.load(f)
+    migration_id = get_latest_extract_id(directory=export_directory)
+    if migration_id:
+        pipeline_dir = os.path.join(export_directory, str(migration_id))
+    elif os.path.exists(os.path.join(export_directory, 'generateOrganizationMappings')):
+        pipeline_dir = export_directory
+    else:
+        click.echo("No Migrations Found")
+        return
     loop = asyncio.get_event_loop()
+    configure_logger(name='http_request', level='INFO', output_file=os.path.join(pipeline_dir, 'requests.log'))
     results = loop.run_until_complete(
         update_pipelines(
-            migration_directory=export_directory, org_secret_mapping=secrets, sonar_token=sonar_token,
-            sonar_url=sonar_url)
+            migration_directory=pipeline_dir, org_secret_mapping=secrets, sonar_token=sonar_token,
+            sonar_url=sonar_url
+        )
     )
-    click.echo(f"Pipeline Update Complete: {results}")
-    return results
+    click.echo(f"Repositories Updated: {list(results.keys())}")
 
 
 if __name__ == '__main__':

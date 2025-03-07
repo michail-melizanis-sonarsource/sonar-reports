@@ -3,7 +3,7 @@ from hashlib import sha256
 from uuid import uuid4
 from importlib import import_module
 import logging
-
+import difflib
 class MockPlatform:
     def __init__(self, platform: str, case: str):
         self.platform = platform
@@ -91,8 +91,16 @@ class MockPlatform:
 
     async def create_pull_request(self, token, repository, source_branch, target_branch, title, body):
         for k,v in self.expected.items():
-            assert self.updated_files.get(k) == v
-
+            changes = "\n"
+            if self.updated_files.get(k, '').strip() != v.strip():
+                for pos, op in enumerate(difflib.ndiff(self.updated_files.get(k,'').splitlines(), v.splitlines())):
+                    if op[0] == ' ':
+                        continue
+                    if op[0] == '+':
+                        changes += f"line {pos}: + |{op[2:]}\n"
+                    elif op[0] == '-':
+                        changes += f"line {pos}: - |{op[2:]}\n"
+                raise AssertionError(changes)
         return {
             "title": title,
             "body": body,

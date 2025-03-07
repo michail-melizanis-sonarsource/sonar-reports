@@ -18,13 +18,7 @@ def update_script(script, root_dir, dir_project_mapping):
             dir_project_mapping=dir_project_mapping
         )
     except bashlex.parser.errors.ParsingError as e:
-        dir_project_mapping = {
-            root_dir: dict(
-                projects=set(),
-                scanners=set()
-            )
-        }
-        parse_error = e
+        pass
     for line in bashlex.split(script):
         include = True
         if 'sonar.projectKey' in line:
@@ -35,7 +29,14 @@ def update_script(script, root_dir, dir_project_mapping):
             include = False
         if include:
             updated.append(line)
-    updated_script = " ".join(updated).replace('\n ', '\n')
+    if not dir_project_mapping:
+        dir_project_mapping = {
+            root_dir: dict(
+                projects=set(),
+                scanners=set()
+            )
+        }
+    updated_script = " ".join(updated).replace('\n ', '\n').replace(' \n', '\n')
     return updated_script, dir_project_mapping
 
 

@@ -3,8 +3,9 @@ from nacl import encoding, public
 from operations.http_request.base import safe_json_request
 from urllib.parse import quote
 from asyncio import gather
-
-DEFAULT_HOST = 'https://api.github.com'
+import os
+from itertools import chain
+DEFAULT_HOST = os.getenv('GITHUB_URL', 'https://api.github.com')
 
 
 def get_available_pipelines():
@@ -53,18 +54,16 @@ def encrypt_secret(secret, key):
 
 async def list_files(token, repository, file_path, branch_name, host=DEFAULT_HOST, **unused_kwargs):
     url = f'/repos/{repository}/contents/{quote(file_path)}'
-    _, js = await safe_json_request(url=url, host=host, headers=generate_headers(token=token), method='GET',
-                                    params={'ref': branch_name})
-    files = js.get('entries', [])
-    sha = js.get('sha')
-    return sha, files
+    _, js = await safe_json_request(url=url, host=host, headers=generate_headers(token=token), method='GET')
+    files = []
+    if isinstance(js, list):
+        files= js
+    return files
 
 
 async def get_content(token, repository, file_path, branch_name, host=DEFAULT_HOST, extra_args=None, **unused_kwargs):
     url = f'/repos/{repository}/contents/{quote(file_path)}'
-    _, js = await safe_json_request(url=url, host=host, headers=generate_headers(token=token), method='GET',
-                                    params={'ref': branch_name})
-
+    _, js = await safe_json_request(url=url, host=host, headers=generate_headers(token=token), method='GET')
     file = dict(
         file_path=file_path,
         content='',
@@ -74,6 +73,7 @@ async def get_content(token, repository, file_path, branch_name, host=DEFAULT_HO
         file['content'] = b64decode(js['content']).decode('utf-8')
     elif js.get('download_url') is not None:
         _, sub_js = await safe_json_request(host=host, url=js['download_url'], headers=generate_headers(token=token),
+
                                             method='GET')
         file['content'] = sub_js['content']
     return file, extra_args
@@ -82,6 +82,8 @@ async def get_content(token, repository, file_path, branch_name, host=DEFAULT_HO
 async def get_branch(token, repository, branch_name, host=DEFAULT_HOST, **unused_kwargs):
     url = f'/repos/{repository}/branches/{branch_name}'
     unused, js = await safe_json_request(url=url, host=host, headers=generate_headers(token=token), method='GET')
+    js['sha'] = js['commit']['sha']
+    js['name'] = branch_name
     return js
 
 
@@ -100,8 +102,9 @@ async def create_branch(token, repository, branch_name, base_branch_name, host=D
     }
     unused, js = await safe_json_request(url=url, host=host, headers=generate_headers(token=token), method='POST',
                                          json=payload)
-    js['name'] = branch_name
-    return js
+    branch = await get_branch(token=token, repository=repository, branch_name=branch_name, host=host)
+
+    return branch
 
 
 async def create_or_update_file(token, repository, message, branch_name, file_path, content: str, sha,
@@ -111,12 +114,15 @@ async def create_or_update_file(token, repository, message, branch_name, file_pa
     payload = {
         "message": message,
         "content": b64encode(content.encode('utf-8')).decode('utf-8'),
-        "sha": sha,
         "branch": branch_name
     }
+    if '.github/' in file_path:
+        branch = await get_branch(token=token, repository=repository, branch_name=branch_name, host=host)
+        payload['sha'] = branch['commit']['sha']
+    if sha is not None:
+        payload['sha'] = sha
     unused, js = await safe_json_request(url=url, host=host, headers=generate_headers(token=token), method='PUT',
-                                         json=payload,
-                                         log_attributes=dict(file_path=file_path))
+                                         json=payload,)
     return js
 
 
@@ -164,14 +170,18 @@ def generate_repository_string(repo_string, **_):
 
 
 async def get_pipeline_files(token, repository, branch_name, host=DEFAULT_HOST, **unused_kwargs):
-    sha, files = await list_files(token=token, repository=repository, file_path=get_pipeline_file_paths()['folders'], branch_name=branch_name,
-                                  host=host)
+    collections = await gather(*[
+        list_files(token=token, repository=repository, file_path=path, branch_name=branch_name, host=host)
+        for path in get_pipeline_file_paths()['folders']])
     return await gather(
-        *[get_content(token=token, repository=repository, file_path=file['path'], branch_name=branch_name, host=host) for file in
-          files])
+        *[get_content(token=token, repository=repository, file_path=file['path'], branch_name=branch_name, host=host)
+          for file in chain.from_iterable(collections)])
+
 
 def get_pipeline_file_paths():
     return dict(
         files=[],
         folders=['.github/workflows']
     )
+
+

@@ -61,6 +61,7 @@ async def create_org_secrets(migration_directory, org_secret_mapping, sonar_toke
 async def update_repos(organization_mapping, migration_directory):
     repos = defaultdict(lambda: dict(projects=dict(), organization=dict(), repository=None))
     pull_requests = dict()
+
     for project in object_reader(migration_directory, 'createProjects'):
         if project['sonarCloudOrgKey'] in organization_mapping and project['repository']:
             repos[project['repository']]['repository'] = project['repository']
@@ -81,7 +82,7 @@ async def update_repository(token, repo_string, projects, organization):
     pipeline_files = await platform.get_pipeline_files(token=token, repository=repository, branch_name=default_branch)
     branch = await platform.create_branch(token=token, repository=repository,
                                           branch_name='sonar/auto-migrate-pipelines',
-                                          base_branch_name=default_branch)
+                                          base_branch_name=default_branch['name'])
     updated_files = await update_pipeline_files(
         repository=repository,
         files=pipeline_files,
@@ -96,7 +97,7 @@ async def update_repository(token, repo_string, projects, organization):
             token=token,
             repository=repository,
             source_branch=branch['name'],
-            target_branch=default_branch,
+            target_branch=default_branch['name'],
             title='Auto migrate pipelines',
             body='Auto migrate pipelines',
         )
@@ -124,10 +125,11 @@ async def update_pipeline_files(platform, projects, repository, branch, files, t
     for file, dir_project_mapping in updated:
         if file['is_updated']:
             updated_files.append(file)
+
         for key, value in dir_project_mapping.items():
             mappings[key]['projects'] = mappings[key]['projects'].union(value['projects'])
             mappings[key]['scanners'] = mappings[key]['scanners'].union(value['scanners'])
-
+    assert mappings
     updated_configs = await gather(*[update_config_file(
         platform=platform,
         project_mappings=projects,
@@ -156,7 +158,7 @@ def update_pipeline_file(platform, file):
     pipeline_type = identify_pipeline_type(platform=platform, file=file)
     targets = pipeline_type.process_yaml(file=file)
     dir_project_mapping = dict()
-    is_updated = False
+    file['is_updated'] = False
     for target in targets:
         file['yaml'], dir_project_mapping = update_pipeline_target(
             pipeline_type=pipeline_type,
@@ -164,8 +166,8 @@ def update_pipeline_file(platform, file):
             target=target,
             dir_project_mapping=dir_project_mapping
         )
-        is_updated = True
-    if is_updated:
+        file['is_updated'] = True
+    if file['is_updated']:
         with StringIO() as output:
             YAML().dump(file['yaml'], output)
             output.seek(0)
@@ -179,7 +181,7 @@ async def update_config_file(platform, project_mappings, projects, root_dir, sca
         scanners = {'cli'}
     content = list()
     if not projects:
-        projects = set(list(project_mappings.keys())[0])
+        projects = {list(project_mappings.keys())[0]}
     for scanner in scanners:
         mod = load_module(mod_type='scanners', name=scanner)
         file_names = mod.get_config_file_name()

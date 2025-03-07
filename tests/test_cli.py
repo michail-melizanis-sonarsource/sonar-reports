@@ -50,4 +50,6 @@ def test_pipelines(mocker, respx_mock, runner, platform, pipeline_case):
     mocker.patch('pipelines.process.get_platform_module',
                  return_value=MockPlatform(platform=platform, case=pipeline_case))
     result = runner.invoke(cli, ['pipelines', f'{pipeline_case}/secrets.json', 'test_url', 'test_token', f'--export_directory={pipeline_case}'], catch_exceptions=False)
+    print(result.stdout)
     assert result.exit_code == 0
+    assert '[]' not in result.output
