@@ -5,7 +5,7 @@ Sonarqube Reports
 ETL tool to extract data from SonarQube Server instances and migrate them to SonarQube Cloud. Commands should be run
 with a mounted volume in order to store data locally.
 
-`docker run -v ./{LOCAL_DIRECTORY}:/app/files ghcr.io/sonarsource-demos/sonar-reports:latest {COMMAND}`
+`docker run -v ./{LOCAL_DIRECTORY}:/app/files ghcr.io/sonar-solutions/sonar-reports:latest {COMMAND}`
 
 Process
 -------
