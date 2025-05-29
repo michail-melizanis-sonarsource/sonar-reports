@@ -247,6 +247,7 @@ def reset(token, edition, url, enterprise_key, concurrency, export_directory):
                 plan=plan,
                 version='cloud',
                 edition=edition,
+                enterprise_key=enterprise_key,
                 url=url,
                 target_tasks=target_tasks,
                 available_configs=list(configs.keys()),

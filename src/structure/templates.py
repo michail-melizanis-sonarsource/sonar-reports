@@ -1,3 +1,4 @@
+from logs import log_event
 from utils import multi_extract_object_reader
 import re
 
@@ -32,9 +33,14 @@ def map_templates(project_org_mapping, extract_mapping, export_directory):
                 results = add_template(results=results, org_key=org_key, template=template, server_url=server_url,
                                        is_default=template_key in default_templates)
         else:
-            regex = re.compile(template['projectKeyPattern'])
-            for matched in filter(regex.match, project_org_mapping.keys()):
-                org_key = project_org_mapping[matched]
-                results = add_template(results=results, org_key=org_key, template=template, server_url=server_url,
-                                       is_default=False)
+            try:
+                regex = re.compile(template['projectKeyPattern'])
+
+                for project_key in project_org_mapping.keys():
+                    if regex.match(project_key.replace(server_url, '')):
+                        org_key = project_org_mapping[project_key]
+                        results = add_template(results=results, org_key=org_key, template=template, server_url=server_url,
+                                               is_default=False)
+            except Exception:
+                continue
     return list(results.values())
