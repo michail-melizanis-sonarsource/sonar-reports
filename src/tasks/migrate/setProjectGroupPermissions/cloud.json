@@ -5,7 +5,7 @@
       "strategy": "each"
     },
     {
-      "key": "getProjectGroupsViewers",
+      "key": "getProjectGroupsPermissions",
       "strategy": "each"
     }
   ],
@@ -19,7 +19,7 @@
       "kwargs": {
         "left": {
           "value": {
-            "source": "getProjectGroupsViewers",
+            "source": "getProjectGroupsPermissions",
             "path": "project"
           }
         },
@@ -36,14 +36,31 @@
         }
       }
     },
-   {
+    {
       "operation": "expand_list",
       "kwargs": {
         "inputs": {
           "value": {
-            "source": "getProjectGroupsViewers",
-            "path": "permissions"
-          }
+            "raw": null
+          },
+          "operations": [
+              {
+                "operation": "extend_list",
+                "kwargs": {
+                  "result_list": {
+                    "value": {
+                      "source": "getProjectGroupsPermissions",
+                      "path": "permissions"
+                    }
+                  },
+                  "input_list": {
+                    "value": {
+                      "raw": ["user"]
+                    }
+                  }
+                }
+              }
+            ]
         },
         "resultKey": {
           "value": {
@@ -98,7 +115,7 @@
               },
               "groupName": {
                 "value": {
-                  "source": "getProjectGroupsViewers",
+                  "source": "getProjectGroupsPermissions",
                   "path": "name"
                 }
               },

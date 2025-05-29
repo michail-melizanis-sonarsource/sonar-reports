@@ -13,6 +13,21 @@
   ],
   "operations": [
     {
+      "operation": "expand_list",
+      "kwargs": {
+        "inputs": {
+          "value": {
+            "raw": ["admin", "codeviewer", "issueadmin", "securityhotspotadmin", "scan", "user"]
+          }
+        },
+        "resultKey": {
+          "value": {
+            "raw": "permission"
+          }
+        }
+      }
+    },
+    {
       "operation": "http_request",
       "kwargs": {
         "client": {
@@ -81,7 +96,7 @@
               },
               "permission": {
                 "value": {
-                  "raw": "user"
+                  "path": "$.permission"
                 },
                 "operations": []
               }

@@ -121,6 +121,7 @@ MIGRATION_TASKS = [
     'getGateUsers',
     'getProjectWebhookDeliveries',
     'getNewCodePeriods',
+    "getProjectGroupsPermissions",
     'getProjectUsersScanners', "getProjectTags",
     'getProjectTasks', 'getRuleDetails', "getProfileBackups",
     'getUserGroups', 'getProjectSettings', 'getTemplateUsersScanners', 'getServerWebhooks',
