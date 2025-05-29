@@ -32,15 +32,14 @@ def add_default_groups(results, project_org_mapping, export_directory, extract_m
 
 
 def add_project_groups(results, export_directory, extract_mapping, project_org_mapping):
-    for key in ['getProjectGroupsScanners', 'getProjectGroupsViewers']:
-        for server_url, group in multi_extract_object_reader(directory=export_directory, mapping=extract_mapping,
-                                                             key=key):
-            org_key = project_org_mapping.get(server_url + group['project'])
-            if not org_key:
-                continue
-            add_group_result(results=results, name=group['name'],
-                             org_key=org_key,
-                             server_url=server_url, description=group.get('description'))
+    for server_url, group in multi_extract_object_reader(directory=export_directory, mapping=extract_mapping,
+                                                         key='getProjectGroupsPermissions'):
+        org_key = project_org_mapping.get(server_url + group['project'])
+        if not org_key:
+            continue
+        add_group_result(results=results, name=group['name'],
+                         org_key=org_key,
+                         server_url=server_url, description=group.get('description'))
     return results
 
 
