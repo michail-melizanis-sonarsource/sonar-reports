@@ -81,7 +81,7 @@ def extract(url, token, export_directory: str, extract_type, pem_file_path, key_
             ), f
         )
     execute_plan(execution_plan=plan, inputs=dict(url=url), concurrency=concurrency, task_configs=configs,
-                 output_directory=export_directory, current_run_id=extract_id, run_ids={extract_id})
+                 output_directory=extract_directory, current_run_id=extract_id, run_ids={extract_id})
     click.echo(f"Extract Complete: {extract_id}")
 
 

@@ -57,7 +57,8 @@ def load_dependency(dependency, directory, run_ids):
 def load_chunk(dependency, directory, run_ids: set[str]):
     objs = list()
     for run_id in run_ids:
-        for obj in object_reader(directory=os.path.join(directory, run_id), key=dependency['key']):
+        # directory is already run-specific, don't add run_id again
+        for obj in object_reader(directory=directory, key=dependency['key']):
             # results = clean_entity(entity=obj, required_keys=required_keys)
             objs.append(obj)
             if len(objs) >= dependency['chunkSize']:
@@ -70,21 +71,24 @@ def load_chunk(dependency, directory, run_ids: set[str]):
 def load_all(dependency, directory, run_ids: set[str]):
     objs = list()
     for run_id in run_ids:
-        for obj in object_reader(directory=os.path.join(directory, run_id), key=dependency['key']):
+        # directory is already run-specific, don't add run_id again
+        for obj in object_reader(directory=directory, key=dependency['key']):
             objs.append(obj)
     yield objs
 
 
 def load_each(dependency, directory, run_ids: set[str]):
     for run_id in run_ids:
-        for obj in object_reader(directory=os.path.join(directory, run_id), key=dependency['key']):
+        # directory is already run-specific, don't add run_id again
+        for obj in object_reader(directory=directory, key=dependency['key']):
             yield obj
 
 
 def load_map(dependency, directory, run_ids: set[str]):
     objs = defaultdict(list)
     for run_id in run_ids:
-        for obj in object_reader(directory=os.path.join(directory, run_id),  key=dependency['key']):
+        # directory is already run-specific, don't add run_id again
+        for obj in object_reader(directory=directory, key=dependency['key']):
             objs[obj[dependency['groupKey']]].append(obj)
     yield objs
 

@@ -49,6 +49,8 @@ def export_csv(directory, name, data):
 
 
 def export_jsonl(directory: str, name: str, data: list, idx=0, key='obj'):
+    # Ensure the target directory exists before writing
+    os.makedirs(f"{directory}/{name}", exist_ok=True)
     filename = f"{directory}/{name}/results.{idx + 1}.jsonl"
     with open(filename, 'wt') as f:
         for i in data:

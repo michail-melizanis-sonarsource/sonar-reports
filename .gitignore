@@ -5,6 +5,11 @@ __pycache__/
 *.DS_Store
 local.env
 
+# SonarQube export data and sensitive files
+sonarqube-export/
+files/
+*.log
+
 # C extensions
 *.so
 
@@ -110,3 +115,8 @@ ENV/
 .vscode/
 .idea/
 
+# Exported files
+files/
+files/*
+sonarqube-export/
+sonarqube-export/*
