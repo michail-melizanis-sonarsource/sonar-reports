@@ -61,7 +61,7 @@ def generate_gate_markdown(directory, extract_mapping, server_id_mapping, projec
         generate_section(
             headers_mapping={"Server ID": "server_id", "Quality Gate Name": "name"},
             title='Unused Custom Quality Gates', level=3,
-            filter_lambda=lambda x: x['project_count'] == 0 and x['is_default'],
+            filter_lambda=lambda x: x['project_count'] == 0 and not x['is_default'],
             rows=quality_gates,
         )
     )
