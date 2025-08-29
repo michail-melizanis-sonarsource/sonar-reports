@@ -47,24 +47,98 @@ RUN_ID=""                                       # ID of a run to resume in case 
 TARGET_TASK=""                                  # Name of a specific migration task (leave empty for all tasks)
 
 # Docker image
-DOCKER_IMAGE="sonar-reports-fixed"
+DOCKER_IMAGE="sonar-reports"
 
 # ------------------------------------------------------------------------------------------
 # Script execution starts here
 # ------------------------------------------------------------------------------------------
 
-# Function to show progress bar
+# Function to show progress bar with time estimation
 show_progress() {
     local current=$1
     local total=$2
+    local start_time=$3
+    local step_name=${4:-"Processing"}
+    
     local width=50
     local percentage=$((current * 100 / total))
     local completed=$((current * width / total))
+    local current_time=$(date +%s)
+    local elapsed=$((current_time - start_time))
     
-    printf "\rProgress: ["
-    printf "%*s" $completed | tr ' ' '='
-    printf "%*s" $((width - completed)) | tr ' ' '-'
-    printf "] %d%% (%d/%d)" $percentage $current $total
+    # Calculate time estimates
+    local elapsed_formatted=""
+    local eta_formatted=""
+    
+    if [ $current -gt 0 ]; then
+        local estimated_total=$((elapsed * total / current))
+        local eta=$((estimated_total - elapsed))
+        
+        # Format elapsed time
+        if [ $elapsed -ge 3600 ]; then
+            elapsed_formatted="${elapsed}s ($(($elapsed / 3600))h $(((elapsed % 3600) / 60))m)"
+        elif [ $elapsed -ge 60 ]; then
+            elapsed_formatted="${elapsed}s ($(($elapsed / 60))m $(($elapsed % 60))s)"
+        else
+            elapsed_formatted="${elapsed}s"
+        fi
+        
+        # Format ETA
+        if [ $eta -ge 3600 ]; then
+            eta_formatted="~$(($eta / 3600))h $(((eta % 3600) / 60))m"
+        elif [ $eta -ge 60 ]; then
+            eta_formatted="~$(($eta / 60))m $(($eta % 60))s"
+        else
+            eta_formatted="~${eta}s"
+        fi
+    else
+        elapsed_formatted="${elapsed}s"
+        eta_formatted="calculating..."
+    fi
+    
+    printf "\r${step_name}: ["
+    printf "%*s" $completed | tr ' ' '█'
+    printf "%*s" $((width - completed)) | tr ' ' '░'
+    printf "] %d%% | Elapsed: %s | ETA: %s" $percentage "$elapsed_formatted" "$eta_formatted"
+}
+
+# Function to monitor process with improved progress bar
+monitor_process_with_progress() {
+    local pid=$1
+    local step_name=$2
+    local estimated_duration=${3:-300}  # Default 5 minutes
+    
+    local start_time=$(date +%s)
+    local update_interval=2
+    local current=0
+    
+    echo "${step_name} in progress..."
+    
+    while kill -0 $pid 2>/dev/null; do
+        local elapsed=$(($(date +%s) - start_time))
+        
+        # Calculate progress based on elapsed time vs estimated duration
+        # Progress will reach 90% at estimated duration, then slow down
+        if [ $elapsed -lt $estimated_duration ]; then
+            current=$((elapsed * 90 / estimated_duration))
+        else
+            # Slow progression after estimated time
+            local overtime=$((elapsed - estimated_duration))
+            current=$((90 + overtime * 8 / (overtime + 60)))  # Approaches 98% asymptotically
+        fi
+        
+        # Cap at 95% until process actually completes
+        if [ $current -gt 95 ]; then
+            current=95
+        fi
+        
+        show_progress $current 100 $start_time "$step_name"
+        sleep $update_interval
+    done
+    
+    # Show completion
+    show_progress 100 100 $start_time "$step_name"
+    echo ""
 }
 
 # Set up export directory
@@ -88,6 +162,22 @@ echo "==================================================================="
 echo "Source SonarQube Server: ${SOURCE_URL}"
 echo "Export Directory: ${EXPORT_DIRECTORY}"
 echo "==================================================================="
+
+# Record start time for total duration tracking
+PROCESS_START_TIME=$(date +%s)
+
+# STEP 0: Build Docker image
+echo "STEP 0: Building Docker image..."
+DOCKER_BUILD_CMD="docker build -t ${DOCKER_IMAGE} ."
+echo "Executing: ${DOCKER_BUILD_CMD}"
+${DOCKER_BUILD_CMD}
+
+if [ $? -eq 0 ]; then
+    echo "✅ Docker image built successfully!"
+else
+    echo "❌ Docker image build failed"
+    exit 1
+fi
 
 # STEP 1: Extract data from source SonarQube server
 echo "STEP 1: Extracting data from source SonarQube server..."
@@ -121,25 +211,26 @@ fi
 
 echo "Executing: ${EXTRACT_CMD}"
 echo "Note: This may take several minutes depending on the size of your SonarQube instance..."
+echo "📝 Detailed logs will be saved to: /tmp/sonar_extract.log"
 
-# Start extraction with progress monitoring
-${EXTRACT_CMD} &
+# Start extraction with progress monitoring (redirect output to prevent interference with progress bar)
+${EXTRACT_CMD} > /tmp/sonar_extract.log 2>&1 &
 EXTRACT_PID=$!
 
-# Simple progress indicator
-echo "Extraction in progress..."
-while kill -0 $EXTRACT_PID 2>/dev/null; do
-    printf "."
-    sleep 2
-done
+# Monitor with improved progress bar (estimated 2-3 minutes for typical instances)
+monitor_process_with_progress $EXTRACT_PID "Data Extraction" 150
+
 wait $EXTRACT_PID
 EXTRACT_EXIT_CODE=$?
-
-echo ""
 if [ $EXTRACT_EXIT_CODE -eq 0 ]; then
     echo "✅ Extraction completed successfully!"
 else
     echo "❌ Extraction failed with exit code: $EXTRACT_EXIT_CODE"
+    echo "📋 Last 20 lines of extraction log:"
+    echo "----------------------------------------"
+    tail -20 /tmp/sonar_extract.log 2>/dev/null || echo "Could not read log file"
+    echo "----------------------------------------"
+    echo "💡 Full log available at: /tmp/sonar_extract.log"
     exit $EXTRACT_EXIT_CODE
 fi
 
@@ -163,12 +254,27 @@ echo "Executing: ${REPORT_CMD}"
 ${REPORT_CMD}
 
 if [ $? -eq 0 ]; then
+    # Calculate total time for report generation
+    REPORT_END_TIME=$(date +%s)
+    TOTAL_REPORT_TIME=$((REPORT_END_TIME - PROCESS_START_TIME))
+    
+    # Format total time
+    if [ $TOTAL_REPORT_TIME -ge 3600 ]; then
+        TOTAL_TIME_FORMATTED="$(($TOTAL_REPORT_TIME / 3600))h $(((TOTAL_REPORT_TIME % 3600) / 60))m $(($TOTAL_REPORT_TIME % 60))s"
+    elif [ $TOTAL_REPORT_TIME -ge 60 ]; then
+        TOTAL_TIME_FORMATTED="$(($TOTAL_REPORT_TIME / 60))m $(($TOTAL_REPORT_TIME % 60))s"
+    else
+        TOTAL_TIME_FORMATTED="${TOTAL_REPORT_TIME}s"
+    fi
+    
     echo "✅ Migration report generated successfully!"
     echo "📄 Report available at: ${EXPORT_DIRECTORY}/migration.md"
     echo ""
     echo "==================================================================="
     echo "REPORT GENERATION COMPLETE"
     echo "==================================================================="
+    echo "⏱️  Total time: ${TOTAL_TIME_FORMATTED}"
+    echo ""
     echo "You can now:"
     echo "1. Review the migration report at: ${EXPORT_DIRECTORY}/migration.md"
     echo "2. Continue with the migration process (answer 'y' below)"
@@ -226,21 +332,17 @@ fi
 
 echo "Executing: ${MIGRATE_CMD}"
 echo "Note: This may take several minutes depending on the amount of data to migrate..."
+echo "📝 Detailed logs will be saved to: /tmp/sonar_migrate.log"
 
-# Start migration with progress monitoring
-${MIGRATE_CMD} &
+# Start migration with progress monitoring (redirect output to prevent interference with progress bar)
+${MIGRATE_CMD} > /tmp/sonar_migrate.log 2>&1 &
 MIGRATE_PID=$!
 
-# Simple progress indicator
-echo "Migration in progress..."
-while kill -0 $MIGRATE_PID 2>/dev/null; do
-    printf "."
-    sleep 2
-done
+# Monitor with improved progress bar (estimated 1-2 minutes for typical migrations)
+monitor_process_with_progress $MIGRATE_PID "Data Migration" 90
+
 wait $MIGRATE_PID
 MIGRATE_EXIT_CODE=$?
-
-echo ""
 if [ $MIGRATE_EXIT_CODE -eq 0 ]; then
     echo "✅ Migration completed successfully!"
     echo "==================================================================="
@@ -250,5 +352,10 @@ if [ $MIGRATE_EXIT_CODE -eq 0 ]; then
     echo "Please verify the migration in your SonarQube Cloud instance."
 else
     echo "❌ Migration failed with exit code: $MIGRATE_EXIT_CODE"
+    echo "📋 Last 20 lines of migration log:"
+    echo "----------------------------------------"
+    tail -20 /tmp/sonar_migrate.log 2>/dev/null || echo "Could not read log file"
+    echo "----------------------------------------"
+    echo "💡 Full log available at: /tmp/sonar_migrate.log"
     exit $MIGRATE_EXIT_CODE
 fi

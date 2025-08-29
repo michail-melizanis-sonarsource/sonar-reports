@@ -55,7 +55,7 @@ TEMPLATE = """
 
 def generate_markdown(extract_directory, extract_mapping):
     server_markdown, server_id_mapping,  projects = generate_server_markdown(directory=extract_directory, extract_mapping=extract_mapping)
-    pipeline_overview, project_scan_details, *_ = generate_pipeline_markdown(
+    pipeline_overview, project_scan_details, project_scans = generate_pipeline_markdown(
         directory=extract_directory,
         extract_mapping=extract_mapping,
         server_id_mapping=server_id_mapping
@@ -97,7 +97,7 @@ def generate_markdown(extract_directory, extract_mapping):
         active_quality_gates=active_gates,
         active_portfolios=active_portfolios,
         plugins=plugins_md,
-        project_metrics=generate_project_metrics_markdown(projects=projects),
+        project_metrics=generate_project_metrics_markdown(projects=projects, project_scans=project_scans),
         project_scan_details=project_scan_details,
         unused_quality_gates=inactive_gates,
         unused_quality_profiles=inactive_profiles,

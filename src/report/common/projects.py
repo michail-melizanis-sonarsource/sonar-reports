@@ -3,7 +3,7 @@ from collections import defaultdict
 from report.utils import generate_section
 from utils import multi_extract_object_reader
 from parser import extract_path_value
-from datetime import datetime, UTC, timedelta
+from datetime import datetime, timezone, timedelta
 
 TIERS = dict(
     xl=500000,
@@ -78,7 +78,7 @@ def process_project_pull_requests(directory, extract_mapping, server_id_mapping)
         recent_pr_scans=0,
         recent_failed_prs=0
     )))
-    now = datetime.now(tz=UTC)
+    now = datetime.now(tz=timezone.utc)
     recent_window_start = now - timedelta(days=30)
     for url, pull_request in multi_extract_object_reader(directory=directory, mapping=extract_mapping,
                                                          key='getProjectPullRequests'):
@@ -118,14 +118,40 @@ def process_project_usage(directory, extract_mapping, server_id_mapping, project
     return projects
 
 
-def generate_project_metrics_markdown(projects):
+def generate_project_metrics_markdown(projects, project_scans=None):
+    # Merge project data with scan data
+    project_rows = []
+    for server_id, project_list in projects.items():
+        for project in project_list.values():
+            # Find the most recent scan for this project across all CI tools
+            most_recent_scan = None
+            project_key = project.get('key')
+            
+            if project_scans and server_id in project_scans:
+                for ci_tool, ci_projects in project_scans[server_id].items():
+                    if project_key in ci_projects:
+                        scan_data = ci_projects[project_key]
+                        last_scan = scan_data.get('last_scan')
+                        if last_scan and (most_recent_scan is None or last_scan > most_recent_scan):
+                            most_recent_scan = last_scan
+            
+            # Format the most recent scan date
+            formatted_scan_date = ""
+            if most_recent_scan:
+                formatted_scan_date = most_recent_scan.strftime('%Y-%m-%d')
+            
+            # Create enhanced project row with scan data
+            enhanced_project = dict(project)
+            enhanced_project['most_recent_scan'] = formatted_scan_date
+            enhanced_project['_scan_date_for_sorting'] = most_recent_scan  # Keep datetime object for sorting
+            project_rows.append(enhanced_project)
+    
     return generate_section(
         headers_mapping={"Server ID": "server_id", "Project Name": "name", "Total Rules": "rules",
-                         "Template Rules": "template_rules", "Plugin Rules": "plugin_rules"},
+                         "Template Rules": "template_rules", "Plugin Rules": "plugin_rules", 
+                         "Most Recent Scan": "most_recent_scan"},
         title='Project Metrics', level=2, filter_lambda=lambda x: True,  # Show all projects for migration report
-        rows=[
-            project
-            for server_id, project_list in projects.items()
-            for project in project_list.values()
-        ], sort_by_lambda=lambda x: x['rules'],  # Sort by total rules
+        rows=project_rows,
+        sort_by_lambda=lambda x: x.get('_scan_date_for_sorting') or datetime.min.replace(tzinfo=timezone.utc),
+        sort_order='desc'  # Most recent scans first
     )
