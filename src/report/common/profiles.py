@@ -149,4 +149,4 @@ def generate_profile_markdown(directory, extract_mapping, server_id_mapping, pro
         filter_lambda=lambda x: x['project_count'] == 0 and not x['is_default'] and not x['is_built_in']
     )
 
-    return active_profiles, inactive_profiles, profile_map
+    return active_profiles, inactive_profiles, profile_map, projects

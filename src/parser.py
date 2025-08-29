@@ -28,7 +28,7 @@ def parse_value_field(obj, value_config):
     return val
 
 
-def extract_path_value(obj, path: str | list, default=None):
+def extract_path_value(obj, path, default=None):
     val = default
     if isinstance(path, str):
         if isinstance(obj, dict) and path in obj.keys():
@@ -47,7 +47,7 @@ def extract_path_value(obj, path: str | list, default=None):
         val = extract_path_value(path=path[1:], obj=val, default=default)
     return val
 
-def set_path_value(obj:dict|list, path, val):
+def set_path_value(obj, path, val):
     if isinstance(path, str):
         path = path.split('.')
     if path[0] == '$':

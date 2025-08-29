@@ -122,10 +122,10 @@ def generate_project_metrics_markdown(projects):
     return generate_section(
         headers_mapping={"Server ID": "server_id", "Project Name": "name", "Total Rules": "rules",
                          "Template Rules": "template_rules", "Plugin Rules": "plugin_rules"},
-        title='Project Metrics', level=2, filter_lambda=lambda x: x['template_rules'] > 0 or x['plugin_rules'] > 0,
+        title='Project Metrics', level=2, filter_lambda=lambda x: True,  # Show all projects for migration report
         rows=[
             project
             for server_id, project_list in projects.items()
             for project in project_list.values()
-        ], sort_by_lambda=lambda x: x['template_rules'] + x['plugin_rules'],
+        ], sort_by_lambda=lambda x: x['rules'],  # Sort by total rules
     )

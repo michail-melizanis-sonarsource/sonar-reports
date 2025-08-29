@@ -67,7 +67,7 @@ def generate_markdown(extract_directory, extract_mapping):
 
     plugins_md, plugins = generate_plugin_markdown(directory=extract_directory, extract_mapping=extract_mapping,
                                        server_id_mapping=server_id_mapping)
-    active_profiles, inactive_profiles, *_ = generate_profile_markdown(
+    active_profiles, inactive_profiles, _, projects = generate_profile_markdown(
         directory=extract_directory,
         extract_mapping=extract_mapping,
         server_id_mapping=server_id_mapping,

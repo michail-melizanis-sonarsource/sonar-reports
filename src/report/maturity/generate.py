@@ -122,9 +122,9 @@ def generate_markdown(extract_directory, extract_mapping):
                                                                               extract_mapping=extract_mapping,
                                                                               server_id_mapping=server_id_mapping,
                                                                               projects=projects, only_active=True)
-    _, _, profile_map = generate_profile_markdown(directory=extract_directory, extract_mapping=extract_mapping,
-                                                  server_id_mapping=server_id_mapping, projects=projects,
-                                                  plugins=plugins)
+    _, _, profile_map, _ = generate_profile_markdown(directory=extract_directory, extract_mapping=extract_mapping,
+                                                    server_id_mapping=server_id_mapping, projects=projects,
+                                                    plugins=plugins)
     gate_summary, gate_details = generate_gate_maturity_markdown(directory=extract_directory,
                                                                  extract_mapping=extract_mapping,
                                                                  server_id_mapping=server_id_mapping, projects=projects)
