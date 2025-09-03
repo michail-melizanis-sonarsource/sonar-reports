@@ -247,11 +247,27 @@ else
     exit 1
 fi
 
-# STEP 3: Generate migration report  
-echo "STEP 3: Generating migration report..."
-REPORT_CMD="docker run -v ${EXPORT_DIRECTORY}:/app/files ${DOCKER_IMAGE} report --export_directory /app/files"
-echo "Executing: ${REPORT_CMD}"
-${REPORT_CMD}
+# STEP 3: Generate reports (migration and maturity assessments)
+echo "STEP 3: Generating assessment reports..."
+
+# Generate migration report
+echo "Generating migration assessment report..."
+MIGRATION_REPORT_CMD="docker run -v ${EXPORT_DIRECTORY}:/app/files ${DOCKER_IMAGE} report --export_directory /app/files --report_type migration"
+echo "Executing: ${MIGRATION_REPORT_CMD}"
+${MIGRATION_REPORT_CMD}
+
+if [ $? -eq 0 ]; then
+    echo "✅ Migration report generated successfully!"
+else
+    echo "❌ Migration report generation failed"
+    exit 1
+fi
+
+# Generate maturity report
+echo "Generating maturity assessment report..."
+MATURITY_REPORT_CMD="docker run -v ${EXPORT_DIRECTORY}:/app/files ${DOCKER_IMAGE} report --export_directory /app/files --report_type maturity"
+echo "Executing: ${MATURITY_REPORT_CMD}"
+${MATURITY_REPORT_CMD}
 
 if [ $? -eq 0 ]; then
     # Calculate total time for report generation
@@ -267,21 +283,24 @@ if [ $? -eq 0 ]; then
         TOTAL_TIME_FORMATTED="${TOTAL_REPORT_TIME}s"
     fi
     
-    echo "✅ Migration report generated successfully!"
-    echo "📄 Report available at: ${EXPORT_DIRECTORY}/migration.md"
+    echo "✅ Maturity report generated successfully!"
     echo ""
     echo "==================================================================="
     echo "REPORT GENERATION COMPLETE"
     echo "==================================================================="
     echo "⏱️  Total time: ${TOTAL_TIME_FORMATTED}"
     echo ""
+    echo "📄 Reports available at:"
+    echo "   • Migration Assessment: ${EXPORT_DIRECTORY}/migration.md"
+    echo "   • Maturity Assessment: ${EXPORT_DIRECTORY}/maturity.md"
+    echo ""
     echo "You can now:"
-    echo "1. Review the migration report at: ${EXPORT_DIRECTORY}/migration.md"
+    echo "1. Review both assessment reports"
     echo "2. Continue with the migration process (answer 'y' below)"
-    echo "3. Or stop here if you only wanted the report (answer 'n' below)"
+    echo "3. Or stop here if you only wanted the reports (answer 'n' below)"
     echo "==================================================================="
 else
-    echo "❌ Report generation failed"
+    echo "❌ Maturity report generation failed"
     exit 1
 fi
 
@@ -314,11 +333,11 @@ if [ -z "${CLOUD_TOKEN}" ] || [ -z "${ENTERPRISE_KEY}" ]; then
   exit 1
 fi
 
-MIGRATE_CMD="docker run -v ${EXPORT_DIRECTORY}:/app/files ${DOCKER_IMAGE} migrate ${CLOUD_URL} ${CLOUD_TOKEN}"
+MIGRATE_CMD="docker run -v ${EXPORT_DIRECTORY}:/app/files ${DOCKER_IMAGE} migrate ${CLOUD_TOKEN} ${ENTERPRISE_KEY}"
 
 # Add optional parameters
-if [ -n "${ENTERPRISE_KEY}" ]; then
-    MIGRATE_CMD="${MIGRATE_CMD} --enterprise_key ${ENTERPRISE_KEY}"
+if [ -n "${CLOUD_URL}" ]; then
+    MIGRATE_CMD="${MIGRATE_CMD} --url ${CLOUD_URL}"
 fi
 if [ -n "${EDITION}" ]; then
     MIGRATE_CMD="${MIGRATE_CMD} --edition ${EDITION}"
